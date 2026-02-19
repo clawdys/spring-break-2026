@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spring Break 2026 — Amsterdam & Copenhagen</title>
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --card: #141414;
+    --border: #222;
+    --text: #e0e0e0;
+    --muted: #888;
+    --accent: #4ecdc4;
+    --accent2: #ff6b6b;
+    --amsterdam: #ff8c42;
+    --copenhagen: #4a90d9;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  .container { max-width: 720px; margin: 0 auto; padding: 24px 16px; }
+
+  /* Hero */
+  .hero {
+    text-align: center;
+    padding: 48px 0 32px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 32px;
+  }
+  .hero h1 {
+    font-size: 2em;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+  }
+  .hero .dates {
+    color: var(--muted);
+    font-size: 1.1em;
+    margin-bottom: 4px;
+  }
+  .hero .route {
+    color: var(--accent);
+    font-size: 0.95em;
+    font-weight: 500;
+  }
+
+  /* Section */
+  .section {
+    margin-bottom: 40px;
+  }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-header .emoji { font-size: 1.4em; }
+  .section-header h2 {
+    font-size: 1.3em;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  /* Day cards */
+  .day {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 12px;
+    transition: border-color 0.2s;
+  }
+  .day:hover { border-color: #333; }
+  .day-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  .day-label {
+    font-weight: 600;
+    font-size: 1.05em;
+  }
+  .day-date {
+    color: var(--muted);
+    font-size: 0.85em;
+  }
+  .city-tag {
+    font-size: 0.75em;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 3px 10px;
+    border-radius: 20px;
+    color: #fff;
+  }
+  .city-tag.amsterdam { background: var(--amsterdam); }
+  .city-tag.copenhagen { background: var(--copenhagen); }
+  .city-tag.travel { background: #666; }
+
+  .activity {
+    display: flex;
+    gap: 12px;
+    padding: 8px 0;
+    border-bottom: 1px solid #1a1a1a;
+  }
+  .activity:last-child { border-bottom: none; }
+  .activity-time {
+    color: var(--muted);
+    font-size: 0.85em;
+    min-width: 60px;
+    padding-top: 2px;
+  }
+  .activity-content { flex: 1; }
+  .activity-title { font-weight: 500; }
+  .activity-note {
+    color: var(--muted);
+    font-size: 0.85em;
+    margin-top: 2px;
+  }
+  .highlight {
+    color: var(--accent);
+    font-weight: 500;
+  }
+  .warn { color: var(--accent2); }
+
+  /* Flight cards */
+  .flight {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 12px;
+  }
+  .flight-route {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .flight-city {
+    text-align: center;
+  }
+  .flight-code {
+    font-size: 1.6em;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+  .flight-name {
+    font-size: 0.8em;
+    color: var(--muted);
+  }
+  .flight-arrow {
+    color: var(--muted);
+    font-size: 1.4em;
+  }
+  .flight-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    font-size: 0.9em;
+  }
+  .flight-detail-label {
+    color: var(--muted);
+    font-size: 0.8em;
+  }
+
+  /* Stay cards */
+  .stay {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 12px;
+  }
+  .stay-name {
+    font-weight: 600;
+    font-size: 1.1em;
+    margin-bottom: 4px;
+  }
+  .stay-meta {
+    color: var(--muted);
+    font-size: 0.85em;
+    margin-bottom: 12px;
+  }
+  .stay-detail {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    border-bottom: 1px solid #1a1a1a;
+    font-size: 0.9em;
+  }
+  .stay-detail:last-child { border-bottom: none; }
+
+  /* Info boxes */
+  .info-box {
+    background: #1a1a0a;
+    border: 1px solid #333300;
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 12px;
+    font-size: 0.9em;
+  }
+  .info-box.alert {
+    background: #1a0a0a;
+    border-color: #330000;
+  }
+  .info-box h4 {
+    margin-bottom: 6px;
+    font-size: 0.95em;
+  }
+
+  /* Budget table */
+  .budget-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9em;
+    margin-top: 8px;
+  }
+  .budget-table th, .budget-table td {
+    padding: 8px 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  .budget-table th {
+    color: var(--muted);
+    font-weight: 500;
+    font-size: 0.85em;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  .budget-table .total td {
+    font-weight: 600;
+    border-top: 2px solid var(--border);
+    color: var(--accent);
+  }
+
+  /* Links */
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* Booking links */
+  .book-btn {
+    display: inline-block;
+    background: var(--accent);
+    color: #000;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.85em;
+    margin-top: 8px;
+    transition: opacity 0.2s;
+  }
+  .book-btn:hover { opacity: 0.85; text-decoration: none; }
+
+  /* Checklist */
+  .checklist {
+    list-style: none;
+    padding: 0;
+  }
+  .checklist li {
+    padding: 10px 0;
+    border-bottom: 1px solid #1a1a1a;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .checklist li:last-child { border-bottom: none; }
+  .priority {
+    font-size: 0.7em;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+  }
+  .priority.urgent { background: var(--accent2); color: #fff; }
+  .priority.soon { background: var(--amsterdam); color: #fff; }
+  .priority.later { background: #555; color: #fff; }
+
+  /* Film spots */
+  .film-spot {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 8px;
+  }
+  .film-spot-name {
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+  .film-spot-desc {
+    color: var(--muted);
+    font-size: 0.85em;
+  }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.8em;
+    padding: 32px 0;
+    border-top: 1px solid var(--border);
+    margin-top: 40px;
+  }
+
+  /* Collapsible */
+  details {
+    margin-bottom: 8px;
+  }
+  details summary {
+    cursor: pointer;
+    font-weight: 500;
+    padding: 8px 0;
+    color: var(--accent);
+    font-size: 0.9em;
+  }
+  details[open] summary { margin-bottom: 8px; }
+
+  /* Responsive */
+  @media (max-width: 500px) {
+    .hero h1 { font-size: 1.5em; }
+    .flight-code { font-size: 1.3em; }
+    .container { padding: 16px 12px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Hero -->
+  <div class="hero">
+    <h1>🇳🇱 Amsterdam → Copenhagen 🇩🇰</h1>
+    <div class="dates">March 20 – 29, 2026 · Spring Break</div>
+    <div class="route">LAX ✈ AMS ✈ CPH ✈ LAX · 4 Travelers</div>
+  </div>
+
+  <!-- FLIGHTS -->
+  <div class="section">
+    <div class="section-header">
+      <span class="emoji">✈️</span>
+      <h2>Flights</h2>
+    </div>
+
+    <div class="flight">
+      <div class="flight-route">
+        <div class="flight-city">
+          <div class="flight-code">LAX</div>
+          <div class="flight-name">Los Angeles</div>
+        </div>
+        <div class="flight-arrow">→</div>
+        <div class="flight-city">
+          <div class="flight-code">AMS</div>
+          <div class="flight-name">Amsterdam</div>
+        </div>
+      </div>
+      <div class="flight-details">
+        <div><div class="flight-detail-label">Date</div>Fri, March 20</div>
+        <div><div class="flight-detail-label">Airline</div>KLM KL602 (SkyTeam ✅)</div>
+        <div><div class="flight-detail-label">Departs</div>~4:30 PM LAX</div>
+        <div><div class="flight-detail-label">Arrives</div>~11:30 AM+1 AMS</div>
+        <div><div class="flight-detail-label">Aircraft</div>Boeing 787 Dreamliner</div>
+        <div><div class="flight-detail-label">Duration</div>~10h 30m nonstop</div>
+      </div>
+      <div style="margin-top: 12px; font-size: 0.85em; color: var(--muted);">
+        💰 Est. $350–500/person one-way · Earns Delta SkyMiles · Gold status perks on KLM
+      </div>
+    </div>
+
+    <div class="flight">
+      <div class="flight-route">
+        <div class="flight-city">
+          <div class="flight-code">AMS</div>
+          <div class="flight-name">Amsterdam</div>
+        </div>
+        <div class="flight-arrow">→</div>
+        <div class="flight-city">
+          <div class="flight-code">CPH</div>
+          <div class="flight-name">Copenhagen</div>
+        </div>
+      </div>
+      <div class="flight-details">
+        <div><div class="flight-detail-label">Date</div>Wed, March 25</div>
+        <div><div class="flight-detail-label">Airline</div>easyJet / KLM / SAS</div>
+        <div><div class="flight-detail-label">Duration</div>~1h 30m nonstop</div>
+        <div><div class="flight-detail-label">Est. Price</div>$72–150/person</div>
+      </div>
+      <div style="margin-top: 12px; font-size: 0.85em; color: var(--muted);">
+        💡 easyJet is cheapest (~$72). KLM/SAS earn Delta miles but cost more.
+      </div>
+    </div>
+
+    <div class="flight">
+      <div class="flight-route">
+        <div class="flight-city">
+          <div class="flight-code">CPH</div>
+          <div class="flight-name">Copenhagen</div>
+        </div>
+        <div class="flight-arrow">→</div>
+        <div class="flight-city">
+          <div class="flight-code">LAX</div>
+          <div class="flight-name">Los Angeles</div>
+        </div>
+      </div>
+      <div class="flight-details">
+        <div><div class="flight-detail-label">Date</div>Sat, March 28</div>
+        <div><div class="flight-detail-label">Airline</div>SAS SK931 (SkyTeam ✅)</div>
+        <div><div class="flight-detail-label">Departs</div>~1:00 PM CPH T3</div>
+        <div><div class="flight-detail-label">Arrives</div>~4:00 PM LAX TB</div>
+        <div><div class="flight-detail-label">Aircraft</div>Airbus A350-900</div>
+        <div><div class="flight-detail-label">Duration</div>~11h 40m nonstop</div>
+      </div>
+      <div style="margin-top: 12px; font-size: 0.85em; color: var(--muted);">
+        💰 Est. $400–500/person one-way · Earns Delta SkyMiles · SAS joined SkyTeam Sept 2024
+      </div>
+    </div>
+  </div>
+
+  <!-- STAYS -->
+  <div class="section">
+    <div class="section-header">
+      <span class="emoji">🏨</span>
+      <h2>Accommodation</h2>
+    </div>
+
+    <div class="stay">
+      <div class="stay-name">🇳🇱 MEININGER Amsterdam Amstel</div>
+      <div class="stay-meta">March 21–25 · 4 nights · Rating: 8.9/10</div>
+      <div class="stay-detail"><span>Room</span><span>4-Bed Private Ensuite</span></div>
+      <div class="stay-detail"><span>Bathroom</span><span>✅ Private ensuite</span></div>
+      <div class="stay-detail"><span>Total (4 people)</span><span class="highlight">$348 (incl. tax)</span></div>
+      <div class="stay-detail"><span>Per person</span><span class="highlight">~$87 for 4 nights</span></div>
+      <div class="stay-detail"><span>Kitchen</span><span>✅ Guest kitchen (save on food!)</span></div>
+      <div class="stay-detail"><span>Location</span><span>At Amstel Station · 10 min metro to Centraal</span></div>
+      <div class="stay-detail"><span>Cancel policy</span><span>Free cancellation >2 days before</span></div>
+      <a href="https://www.hostelworld.com/hostels/p/285071/meininger-amsterdam-amstel/" target="_blank" class="book-btn">Book on Hostelworld →</a>
+    </div>
+
+    <div class="stay">
+      <div class="stay-name">🇩🇰 Next House Copenhagen</div>
+      <div class="stay-meta">March 25–28 · 3 nights · Rating: 9.1/10 (#1 in Copenhagen)</div>
+      <div class="stay-detail"><span>Room</span><span>4-Bed Private w/ Bathroom</span></div>
+      <div class="stay-detail"><span>Bathroom</span><span>✅ Private</span></div>
+      <div class="stay-detail"><span>Total (4 people, VAT incl.)</span><span class="highlight">€429 (~$450)</span></div>
+      <div class="stay-detail"><span>Per person</span><span class="highlight">~€107 (~$113) for 3 nights</span></div>
+      <div class="stay-detail"><span>Location</span><span>Near Central Station · 5 min to Tivoli</span></div>
+      <div class="stay-detail"><span>Perks</span><span>Rooftop terrace, bar, gym, cinema</span></div>
+      <div class="stay-detail"><span>Cancel policy</span><span>Free cancellation</span></div>
+      <a href="https://www.hostelworld.com/hostels/p/310761/next-house-copenhagen/" target="_blank" class="book-btn">Book on Hostelworld →</a>
+    </div>
+
+    <details>
+      <summary>💡 Also check: Generator Copenhagen (may be cheapest booked direct)</summary>
+      <div style="font-size: 0.85em; color: var(--muted); padding: 0 4px;">
+        Generator offers <strong>25% off 2+ night stays</strong> when booked at <a href="https://staygenerator.com" target="_blank">staygenerator.com</a>. 
+        Best location (nearest to Nyhavn). 4-bed private could be as low as €225–300 total. Check exact dates for availability.
+      </div>
+    </details>
+  </div>
+
+  <!-- DAILY ITINERARY -->
+  <div class="section">
+    <div class="section-header">
+      <span class="emoji">📋</span>
+      <h2>Day-by-Day Itinerary</h2>
+    </div>
+
+    <!-- Day 1 -->
+    <div class="day">
+      <div class="day-header">
+        <div><span class="day-label">Day 1</span><span class="day-date"> · Fri, March 20</span></div>
+        <span class="city-tag travel">✈️ Travel</span>
+      </div>
+      <div class="activity">
+        <div class="activity-time">4:30pm</div>
+        <div class="activity-content">
+          <div class="activity-title">Depart LAX → Amsterdam (KLM KL602)</div>
+          <div class="activity-note">Overnight flight, ~10.5 hours. Try to sleep!</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Day 2 -->
+    <div class="day">
+      <div class="day-header">
+        <div><span class="day-label">Day 2</span><span class="day-date"> · Sat, March 21</span></div>
+        <span class="city-tag amsterdam">Amsterdam</span>
+      </div>
+      <div class="activity">
+        <div class="activity-time">11:30am</div>
+        <div class="activity-content">
+          <div class="activity-title">Arrive Amsterdam Schiphol</div>
+          <div class="activity-note">Train to Amstel Station (~20 min, €5.80). Check into MEININGER.</div>
+        </div>
+      </div>
+      <div class="activity">
+        <div class="activity-time">2pm</div>
+        <div class="activity-content">
+          <div class="activity-title">Explore Jordaan Neighborhood</div>
+          <div class="activity-note">Canals, cafés, vintage shops. Get your bearings.</div>
+        </div>
+      </div>
+      <div class="activity">
+        <div class="activity-time">Evening</div>
+        <div class="activity-content">
+          <div class="activity-title">Dinner at Foodhallen + Leidseplein</div>
+          <div class="activity-note">Indoor food market, then explore the nightlife area.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Day 3 -->
+    <div class="day">
+      <div class="day-header">
+        <div><span class="day-label">Day 3</span><span class="day-date"> · Sun, March 22</span></div>
+        <span class="city-tag amsterdam">Amsterdam</span>
+      </div>
+      <div class="activity">
+        <div class="activity-time">AM</div>
+        <div class="activity-content">
+          <div class="activity-title">🔴 Anne Frank House</div>
+          <div class="activity-note warn">MUST PRE-BOOK at annefrank.org. Tickets release Tuesdays 10am CET.</div>
+        </div>
+      </div>
+      <div class="activity">
+        <div class="activity-time">PM</div>
+        <div class="activity-content">
+          <div class="activity-title">Canal Cruise + Free Walking Tour</div>
+          <div class="activity-note">Multiple operators near Centraal. Walking tours depart from Dam Square.</div>
+        </div>
+      </div>
+      <div class="activity">
+        <div class="activity-time">Evening</div>
+        <div class="activity-content">
+          <div class="activity-title">Red Light District (De Wallen)</div>
+          <div class="activity-note">Worth seeing for the architecture and atmosphere. Be respectful.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Day 4 -->
+    <div class="day">
+      <div class="day-header">
+        <div><span class="day-label">Day 4</span><span class="day-date"> · Mon, March 23</span></div>
+        <span class="city-tag amsterdam">Amsterdam</span>
+      </div>
+      <div class="activity">
+        <div class="activity-time">9am</div>
+        <div class="activity-content">
+          <div class="activity-title">🎨 Rijksmuseum</div>
+          <div class="activity-note">€27/person. Pre-book at rijksmuseum.nl. Allow 2–3 hours.</div>
+        </div>
+      </div>
+      <div class="activity">
+        <div class="activity-time">1pm</div>
+        <div class="activity-content">
+          <div class="activity-title">🎨 Van Gogh Museum</div>
+          <div class="activity-note">€15 with student ID! Pre-book at tickets.vangoghmuseum.com.</div>
+        </div>
+      </div>
+      <div class="activity">
+        <div class="activity-time">4pm</div>
+        <div class="activity-content">
+          <div class="activity-title">🎬 EYE Filmmuseum</div>
+          <div class="activity-note">Free ferry from Centraal. €16 student price. Incredible architecture + film exhibits.</div>
+        </div>
+      </div>
+      <div class="activity">
+        <div class="activity-time">Evening</div>
+        <div class="activity-content">
+          <div class="activity-title">NDSM Wharf + Amsterdam Noord nightlife</div>
+          <div class="activity-note">Post-industrial art area, street art, bars. Already near EYE.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Day 5 -->
+    <div class="day">
+      <div class="day-header">
+        <div><span class="day-label">Day 5</span><span class="day-date"> · Tue, March 24</span></div>
+        <span class="city-tag amsterdam">Amsterdam</span>
+      </div>
+      <div class="activity">
+        <div class="activity-time">AM</div>
+        <div class="activity-content">
+          <div class="activity-title">📸 FOAM Photography Museum</div>
+          <div class="activity-note">~€13 student. Canal house on Keizersgracht. Great for visual storytelling.</div>
+        </div>
+      </div>
+      <div class="activity">
+        <div class="activity-time">PM</div>
+        <div class="activity-content">
+          <div class="activity-title">Bike ride + Albert Cuyp Market</div>
+          <div class="activity-note">Rent bikes, ride through Vondelpark, grab street food at the market (~€3–10).</div>
+        </div>
+      </div>
+      <div class="activity">
+        <div class="activity-time">Evening</div>
+        <div class="activity-content">
+          <div class="activity-title">🎥 Tuschinski Theater (movie in Zaal 1)</div>
+          <div class="activity-note">Art Deco cinema from 1921. ~€15 for a movie. MUST pick Zaal 1 for the main auditorium.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Day 6 -->
+    <div class="day">
+      <div class="day-header">
+        <div><span class="day-label">Day 6</span><span class="day-date"> · Wed, March 25</span></div>
+        <span class="city-tag travel">✈️ AMS → CPH</span>
+      </div>
+      <div class="activity">
+        <div class="activity-time">AM</div>
+        <div class="activity-content">
+          <div class="activity-title">Check out of MEININGER · Last Amsterdam stops</div>
+          <div class="activity-note">🎬 CineDans Film Festival starts today at EYE — catch a morning screening if possible!</div>
+        </div>
+      </div>
+      <div class="activity">
+        <div class="activity-time">PM</div>
+        <div class="activity-content">
+          <div class="activity-title">Fly Amsterdam → Copenhagen (~1.5h)</div>
+          <div class="activity-note">easyJet/KLM/SAS from Schiphol. Arrive CPH, metro/train to hostel.</div>
+        </div>
+      </div>
+      <div class="activity">
+        <div class="activity-time">Evening</div>
+        <div class="activity-content">
+          <div class="activity-title">🏠 Check into Next House · Nyhavn dinner</div>
+          <div class="activity-note">Walk to Nyhavn — the iconic colorful harbor. Drinks + dinner waterside.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Day 7 -->
+    <div class="day">
+      <div class="day-header">
+        <div><span class="day-label">Day 7</span><span class="day-date"> · Thu, March 26</span></div>
+        <span class="city-tag copenhagen">Copenhagen</span>
+      </div>
+      <div class="activity">
+        <div class="activity-time">AM</div>
+        <div class="activity-content">
+          <div class="activity-title">Free Walking Tour</div>
+          <div class="activity-note">Great way to orient. Departs from City Hall Square twice daily.</div>
+        </div>
+      </div>
+      <div class="activity">
+        <div class="activity-time">PM</div>
+        <div class="activity-content">
+          <div class="activity-title">✊ Freetown Christiania</div>
+          <div class="activity-note">Free entry. ⚠️ NO photos on Pusher Street. Amazing street art + DIY architecture.</div>
+        </div>
+      </div>
+      <div class="activity">
+        <div class="activity-time">4pm</div>
+        <div class="activity-content">
+          <div class="activity-title">🎬 Danish Film Institute / Cinemateket</div>
+          <div class="activity-note">Denmark's national film house. Screenings ~DKK 95 (~$13). Check dfi.dk for schedule.</div>
+        </div>
+      </div>
+      <div class="activity">
+        <div class="activity-time">Evening</div>
+        <div class="activity-content">
+          <div class="activity-title">Meatpacking District (Kødbyen)</div>
+          <div class="activity-note">Copenhagen's nightlife hub in Vesterbro. Bars, clubs, food. Walking distance from Next House.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Day 8 -->
+    <div class="day">
+      <div class="day-header">
+        <div><span class="day-label">Day 8</span><span class="day-date"> · Fri, March 27</span></div>
+        <span class="city-tag copenhagen">Copenhagen</span>
+      </div>
+      <div class="activity">
+        <div class="activity-time">10am</div>
+        <div class="activity-content">
+          <div class="activity-title">🏛️ Louisiana Museum of Modern Art</div>
+          <div class="activity-note">Train to Humlebæk (~40 min, DKK 51). ~DKK 130 student. World-class art + sculpture garden on the coast. Allow 3–4 hours.</div>
+        </div>
+      </div>
+      <div class="activity">
+        <div class="activity-time">4pm</div>
+        <div class="activity-content">
+          <div class="activity-title">🎢 Tivoli Gardens (Easter opening!)</div>
+          <div class="activity-note">Opens March 27 for Easter season! ~DKK 155 entry. Magical gardens, rides, performances.</div>
+        </div>
+      </div>
+      <div class="activity">
+        <div class="activity-time">Evening</div>
+        <div class="activity-content">
+          <div class="activity-title">Last night out — Smørrebrød dinner + Nørrebro bars</div>
+          <div class="activity-note">Try traditional open-faced sandwiches. Nørrebro is the hip neighborhood for drinks.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Day 9 -->
+    <div class="day">
+      <div class="day-header">
+        <div><span class="day-label">Day 9</span><span class="day-date"> · Sat, March 28</span></div>
+        <span class="city-tag travel">✈️ Home</span>
+      </div>
+      <div class="activity">
+        <div class="activity-time">AM</div>
+        <div class="activity-content">
+          <div class="activity-title">Check out · Last Copenhagen spots</div>
+          <div class="activity-note">Reffen Street Food Market if time allows. Pack up.</div>
+        </div>
+      </div>
+      <div class="activity">
+        <div class="activity-time">~1pm</div>
+        <div class="activity-content">
+          <div class="activity-title">Depart CPH → LAX (SAS SK931)</div>
+          <div class="activity-note">Direct, 11h 40m. Arrive LAX ~4pm same day. Back in OC by evening.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FILM STUDENT SPOTS -->
+  <div class="section">
+    <div class="section-header">
+      <span class="emoji">🎬</span>
+      <h2>Film Student Must-Hits</h2>
+    </div>
+
+    <div style="margin-bottom: 12px; color: var(--muted); font-size: 0.9em;">Amsterdam</div>
+    <div class="film-spot">
+      <div class="film-spot-name">EYE Filmmuseum</div>
+      <div class="film-spot-desc">Free ferry from Centraal. €16 student. Iconic building, rotating film exhibitions. CineDans Festival Mar 25–29.</div>
+    </div>
+    <div class="film-spot">
+      <div class="film-spot-name">FOAM Photography Museum</div>
+      <div class="film-spot-desc">~€13 student. Canal house. Emerging + established photographers. Visual storytelling gold.</div>
+    </div>
+    <div class="film-spot">
+      <div class="film-spot-name">Tuschinski Theater</div>
+      <div class="film-spot-desc">1921 Art Deco cinema. Buy any ticket for Zaal 1 to experience the main auditorium.</div>
+    </div>
+    <div class="film-spot">
+      <div class="film-spot-name">NDSM Wharf</div>
+      <div class="film-spot-desc">Post-industrial shipyard turned art space. Graffiti, installations, film-worthy textures.</div>
+    </div>
+
+    <div style="margin: 16px 0 12px; color: var(--muted); font-size: 0.9em;">Copenhagen</div>
+    <div class="film-spot">
+      <div class="film-spot-name">Louisiana Museum of Modern Art</div>
+      <div class="film-spot-desc">One of the most photographed museums in Europe. Sculpture garden overlooking the Øresund strait.</div>
+    </div>
+    <div class="film-spot">
+      <div class="film-spot-name">Freetown Christiania</div>
+      <div class="film-spot-desc">Counterculture commune since 1971. Documentary-worthy. No photos on Pusher Street.</div>
+    </div>
+    <div class="film-spot">
+      <div class="film-spot-name">Danish Film Institute / Cinemateket</div>
+      <div class="film-spot-desc">Denmark's national film house. Arthouse screenings, film archive, bookshop.</div>
+    </div>
+    <div class="film-spot">
+      <div class="film-spot-name">Superkilen Park</div>
+      <div class="film-spot-desc">Wild urban design in Nørrebro. Objects from 60 countries. Visually insane for photography.</div>
+    </div>
+  </div>
+
+  <!-- BUDGET -->
+  <div class="section">
+    <div class="section-header">
+      <span class="emoji">💰</span>
+      <h2>Budget Estimate (Per Person)</h2>
+    </div>
+
+    <table class="budget-table">
+      <thead>
+        <tr><th>Item</th><th>Budget</th><th>Mid-Range</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Flights (3 legs)</td><td>~$795</td><td>~$1,020</td></tr>
+        <tr><td>Amsterdam stay (4 nights)</td><td>$87</td><td>~$140</td></tr>
+        <tr><td>Copenhagen stay (3 nights)</td><td>~$107</td><td>~$120</td></tr>
+        <tr><td>Food (~$40–60/day × 8 days)</td><td>$320</td><td>$480</td></tr>
+        <tr><td>Activities & museums</td><td>~$165</td><td>~$200</td></tr>
+        <tr><td>Transit passes</td><td>~$100</td><td>~$168</td></tr>
+        <tr class="total"><td>TOTAL</td><td>~$1,575</td><td>~$2,130</td></tr>
+      </tbody>
+    </table>
+
+    <details>
+      <summary>🍕 Budget food tips</summary>
+      <div style="font-size: 0.85em; color: var(--muted);">
+        <p style="margin-bottom:8px"><strong>Amsterdam:</strong> FEBO (vending machine snacks, €2–4), Manneken Pis (best fries, €4–7), Skek (student-run restaurant, €10), Albert Cuyp Market (street food), Tokoman (Surinamese, €8–12).</p>
+        <p><strong>Copenhagen:</strong> Reffen Street Food (50+ stalls, DKK 60–120), Dürüm Bar Nørrebro (legendary wraps, DKK 50–70), Grød (grain bowls, DKK 55–85), pølsevogn hot dog carts (DKK 40–50). Buy groceries at Albert Heijn (AMS) / Netto (CPH) for hostel breakfasts.</p>
+      </div>
+    </details>
+  </div>
+
+  <!-- PRACTICAL INFO -->
+  <div class="section">
+    <div class="section-header">
+      <span class="emoji">📌</span>
+      <h2>Practical Info</h2>
+    </div>
+
+    <div class="info-box">
+      <h4>🇳🇱 Amsterdam Transit</h4>
+      <p>Get the <strong>GVB 4-day pass</strong> (€27.50) — covers all trams, buses, metro. Buy at gvb.nl. Ferry to Noord is always free. Train to/from Schiphol ~€5.80 (separate).</p>
+    </div>
+
+    <div class="info-box">
+      <h4>🇩🇰 Copenhagen Transit</h4>
+      <p>Consider the <strong>Copenhagen Card Discover 48h</strong> (~DKK 859 / €115). Covers unlimited transit + Louisiana + Tivoli + 80 attractions. Pays for itself if you hit 3+ attractions.</p>
+    </div>
+
+    <div class="info-box">
+      <h4>🌧️ Weather (Late March)</h4>
+      <p><strong>Amsterdam:</strong> 8–12°C (46–54°F), rain likely. <strong>Copenhagen:</strong> 5–8°C (41–46°F), colder + windy. Pack layers, waterproof jacket, waterproof shoes. No shorts. Bring a beanie for Copenhagen.</p>
+    </div>
+
+    <div class="info-box">
+      <h4>💵 Tipping</h4>
+      <p>Neither country expects tips. Service charge is included. Round up if you want, but don't tip American-style. No one will judge you.</p>
+    </div>
+
+    <div class="info-box">
+      <h4>🎓 Student IDs</h4>
+      <p>Bring your Chapman student ID! Saves €10 at Van Gogh Museum, €5 at EYE, discounts at FOAM and Louisiana.</p>
+    </div>
+  </div>
+
+  <!-- ACTION ITEMS -->
+  <div class="section">
+    <div class="section-header">
+      <span class="emoji">⚡</span>
+      <h2>Booking Checklist</h2>
+    </div>
+
+    <ul class="checklist">
+      <li>
+        <span class="priority urgent">Urgent</span>
+        <div>
+          <strong>Anne Frank House tickets</strong> — Check <a href="https://www.annefrank.org/en/museum/tickets/" target="_blank">annefrank.org</a> NOW. New tickets drop Tuesdays 10am CET.
+        </div>
+      </li>
+      <li>
+        <span class="priority urgent">Urgent</span>
+        <div>
+          <strong>Book Amsterdam hostel</strong> — <a href="https://www.hostelworld.com/hostels/p/285071/meininger-amsterdam-amstel/" target="_blank">MEININGER 4-bed private</a>. Free cancel. Spring break dates filling up.
+        </div>
+      </li>
+      <li>
+        <span class="priority urgent">Urgent</span>
+        <div>
+          <strong>Book Copenhagen hostel</strong> — Check <a href="https://staygenerator.com" target="_blank">Generator direct</a> first (25% off), then <a href="https://www.hostelworld.com/hostels/p/310761/next-house-copenhagen/" target="_blank">Next House</a>.
+        </div>
+      </li>
+      <li>
+        <span class="priority soon">Soon</span>
+        <div>
+          <strong>Search flights</strong> — <a href="https://www.google.com/travel/flights" target="_blank">Google Flights</a> multi-city: LAX→AMS Mar 20, AMS→CPH Mar 25, CPH→LAX Mar 28. 4 pax.
+        </div>
+      </li>
+      <li>
+        <span class="priority soon">Soon</span>
+        <div>
+          <strong>Check Delta SkyMiles</strong> — <a href="https://www.delta.com" target="_blank">delta.com</a> "Shop with Miles" for KLM LAX→AMS.
+        </div>
+      </li>
+      <li>
+        <span class="priority soon">Soon</span>
+        <div>
+          <strong>Van Gogh Museum</strong> — Book €15 student tickets at <a href="https://tickets.vangoghmuseum.com" target="_blank">tickets.vangoghmuseum.com</a>. Bring Chapman ID.
+        </div>
+      </li>
+      <li>
+        <span class="priority later">Later</span>
+        <div>
+          <strong>Rijksmuseum</strong> — Book timeslot at <a href="https://www.rijksmuseum.nl" target="_blank">rijksmuseum.nl</a>. €27/person.
+        </div>
+      </li>
+      <li>
+        <span class="priority later">Later</span>
+        <div>
+          <strong>GVB 4-day pass</strong> — Buy at <a href="https://www.gvb.nl/en" target="_blank">gvb.nl</a> before the trip.
+        </div>
+      </li>
+      <li>
+        <span class="priority later">Later</span>
+        <div>
+          <strong>Copenhagen Card</strong> — Buy at <a href="https://copenhagencard.com" target="_blank">copenhagencard.com</a> or at airport.
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <!-- DELTA STATUS -->
+  <div class="section">
+    <div class="section-header">
+      <span class="emoji">🏅</span>
+      <h2>Delta Status Strategy</h2>
+    </div>
+    <div class="info-box">
+      <h4>Maximize Your Gold Medallion + Reserve Card</h4>
+      <p style="font-size:0.85em; margin-top:4px;">
+        <strong>KLM</strong> (LAX→AMS) and <strong>SAS</strong> (CPH→LAX) are both <strong>SkyTeam</strong> — you earn Delta SkyMiles on every leg and get Gold perks: priority check-in, priority boarding, extra baggage.
+      </p>
+      <p style="font-size:0.85em; margin-top:8px;">
+        <strong>Miles option:</strong> Book KLM LAX→AMS via delta.com "Shop with Miles" (~30–50K miles). Reserve card gives 15% off Delta-operated awards only (not partner flights). Check if cash or miles is the better deal.
+      </p>
+      <p style="font-size:0.85em; margin-top:8px;">
+        <strong>Pro tip:</strong> Add your SkyMiles number when booking on klm.com or flysas.com — status is automatically recognized.
+      </p>
+    </div>
+  </div>
+
+  <div class="footer">
+    Last updated: February 19, 2026 · Built by Clawdy 🦞<br>
+    Prices are estimates and subject to change. Book with free cancellation when possible.
+  </div>
+
+</div>
+</body>
+</html>
