@@ -327,16 +327,69 @@
   }
   details[open] summary { margin-bottom: 8px; }
 
+  /* Photos */
+  .photo-strip {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 16px;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .photo-strip.three { grid-template-columns: 1fr 1fr 1fr; }
+  .photo-strip img {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    border-radius: 8px;
+    transition: transform 0.3s;
+  }
+  .photo-strip img:hover { transform: scale(1.03); }
+  .photo-strip .wide {
+    grid-column: span 2;
+    height: 200px;
+  }
+  .photo-caption {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.75em;
+    margin-top: -10px;
+    margin-bottom: 16px;
+  }
+  .day-photo {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 12px;
+  }
+  .spot-photo {
+    width: 100%;
+    height: 140px;
+    object-fit: cover;
+    border-radius: 8px 8px 0 0;
+  }
+
   /* Responsive */
   @media (max-width: 500px) {
     .hero h1 { font-size: 1.5em; }
     .flight-code { font-size: 1.3em; }
     .container { padding: 16px 12px; }
+    .photo-strip img { height: 120px; }
+    .photo-strip .wide { height: 150px; }
+    .day-photo { height: 140px; }
   }
 </style>
 </head>
 <body>
 <div class="container">
+
+  <!-- Hero photos -->
+  <div class="photo-strip">
+    <img src="https://images.unsplash.com/photo-1534351590666-13e3e96b5017?w=600&h=400&fit=crop" alt="Amsterdam canals" class="wide">
+    <img src="https://images.unsplash.com/photo-1513622470522-26c3c8a854bc?w=400&h=300&fit=crop" alt="Amsterdam bikes">
+    <img src="https://images.unsplash.com/photo-1552560880-2482ddf56649?w=400&h=300&fit=crop" alt="Copenhagen Nyhavn">
+  </div>
 
   <!-- Hero -->
   <div class="hero">
@@ -367,13 +420,14 @@
       <div class="flight-details">
         <div><div class="flight-detail-label">Date</div>Fri, March 20</div>
         <div><div class="flight-detail-label">Airline</div>KLM KL602 (SkyTeam ✅)</div>
-        <div><div class="flight-detail-label">Departs</div>~4:30 PM LAX</div>
-        <div><div class="flight-detail-label">Arrives</div>~11:30 AM+1 AMS</div>
-        <div><div class="flight-detail-label">Aircraft</div>Boeing 787 Dreamliner</div>
-        <div><div class="flight-detail-label">Duration</div>~10h 30m nonstop</div>
+        <div><div class="flight-detail-label">Departs</div>1:45 PM LAX (TBIT)</div>
+        <div><div class="flight-detail-label">Arrives</div>9:05 AM+1 AMS</div>
+        <div><div class="flight-detail-label">Aircraft</div>Boeing 787-10 Dreamliner</div>
+        <div><div class="flight-detail-label">Duration</div>10h 20m nonstop</div>
       </div>
       <div style="margin-top: 12px; font-size: 0.85em; color: var(--muted);">
-        💰 Est. $350–500/person one-way · Earns Delta SkyMiles · Gold status perks on KLM
+        💰 <strong>$543/person</strong> (Google Flights confirmed) · Earns Delta SkyMiles · Gold perks on KLM<br>
+        💡 Depart Thu Mar 19 instead = <strong>$414/person</strong> (saves $129/pp!)
       </div>
     </div>
 
@@ -393,7 +447,7 @@
         <div><div class="flight-detail-label">Date</div>Wed, March 25</div>
         <div><div class="flight-detail-label">Airline</div>easyJet / KLM / SAS</div>
         <div><div class="flight-detail-label">Duration</div>~1h 30m nonstop</div>
-        <div><div class="flight-detail-label">Est. Price</div>$72–150/person</div>
+        <div><div class="flight-detail-label">Price</div><strong>~$90/pp</strong> (easyJet confirmed)</div>
       </div>
       <div style="margin-top: 12px; font-size: 0.85em; color: var(--muted);">
         💡 easyJet is cheapest (~$72). KLM/SAS earn Delta miles but cost more.
@@ -415,13 +469,14 @@
       <div class="flight-details">
         <div><div class="flight-detail-label">Date</div>Sat, March 28</div>
         <div><div class="flight-detail-label">Airline</div>SAS SK931 (SkyTeam ✅)</div>
-        <div><div class="flight-detail-label">Departs</div>~1:00 PM CPH T3</div>
-        <div><div class="flight-detail-label">Arrives</div>~4:00 PM LAX TB</div>
+        <div><div class="flight-detail-label">Departs</div>2:15 PM CPH T3</div>
+        <div><div class="flight-detail-label">Arrives</div>5:00 PM LAX TB</div>
         <div><div class="flight-detail-label">Aircraft</div>Airbus A350-900</div>
-        <div><div class="flight-detail-label">Duration</div>~11h 40m nonstop</div>
+        <div><div class="flight-detail-label">Duration</div>11h 05m nonstop</div>
       </div>
       <div style="margin-top: 12px; font-size: 0.85em; color: var(--muted);">
-        💰 Est. $400–500/person one-way · Earns Delta SkyMiles · SAS joined SkyTeam Sept 2024
+        💰 <strong>~$500–600/person</strong> one-way · Earns Delta SkyMiles · SAS joined SkyTeam Sept 2024<br>
+        💡 Budget alt: Finnair via Helsinki ~$419/pp or Air France via Paris ~$430/pp (both add 3-5h)
       </div>
     </div>
   </div>
@@ -492,6 +547,7 @@
 
     <!-- Day 2 -->
     <div class="day">
+      <img class="day-photo" src="https://images.unsplash.com/photo-1576924542622-772281b13aa8?w=800&h=400&fit=crop" alt="Amsterdam Jordaan canals">
       <div class="day-header">
         <div><span class="day-label">Day 2</span><span class="day-date"> · Sat, March 21</span></div>
         <span class="city-tag amsterdam">Amsterdam</span>
@@ -506,7 +562,7 @@
       <div class="activity">
         <div class="activity-time">2pm</div>
         <div class="activity-content">
-          <div class="activity-title">Explore Jordaan Neighborhood</div>
+          <div class="activity-title">🏘️ Explore Jordaan Neighborhood</div>
           <div class="activity-note">Canals, cafés, vintage shops. Get your bearings.</div>
         </div>
       </div>
@@ -521,6 +577,7 @@
 
     <!-- Day 3 -->
     <div class="day">
+      <img class="day-photo" src="https://images.unsplash.com/photo-1580996267840-8e85e4056e98?w=800&h=400&fit=crop" alt="Anne Frank House Amsterdam">
       <div class="day-header">
         <div><span class="day-label">Day 3</span><span class="day-date"> · Sun, March 22</span></div>
         <span class="city-tag amsterdam">Amsterdam</span>
@@ -550,6 +607,7 @@
 
     <!-- Day 4 -->
     <div class="day">
+      <img class="day-photo" src="https://images.unsplash.com/photo-1583037189850-1921ae7c6c22?w=800&h=400&fit=crop" alt="Rijksmuseum Amsterdam">
       <div class="day-header">
         <div><span class="day-label">Day 4</span><span class="day-date"> · Mon, March 23</span></div>
         <span class="city-tag amsterdam">Amsterdam</span>
@@ -586,6 +644,7 @@
 
     <!-- Day 5 -->
     <div class="day">
+      <img class="day-photo" src="https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=800&h=400&fit=crop" alt="Amsterdam bike canal">
       <div class="day-header">
         <div><span class="day-label">Day 5</span><span class="day-date"> · Tue, March 24</span></div>
         <span class="city-tag amsterdam">Amsterdam</span>
@@ -615,6 +674,7 @@
 
     <!-- Day 6 -->
     <div class="day">
+      <img class="day-photo" src="https://images.unsplash.com/photo-1515542622106-78bda8ba0e5b?w=800&h=400&fit=crop" alt="Nyhavn Copenhagen">
       <div class="day-header">
         <div><span class="day-label">Day 6</span><span class="day-date"> · Wed, March 25</span></div>
         <span class="city-tag travel">✈️ AMS → CPH</span>
@@ -644,6 +704,7 @@
 
     <!-- Day 7 -->
     <div class="day">
+      <img class="day-photo" src="https://images.unsplash.com/photo-1606826732758-7170605b8052?w=800&h=400&fit=crop" alt="Christiania Copenhagen">
       <div class="day-header">
         <div><span class="day-label">Day 7</span><span class="day-date"> · Thu, March 26</span></div>
         <span class="city-tag copenhagen">Copenhagen</span>
@@ -680,6 +741,7 @@
 
     <!-- Day 8 -->
     <div class="day">
+      <img class="day-photo" src="https://images.unsplash.com/photo-1564399263809-d2e4e8b1e478?w=800&h=400&fit=crop" alt="Louisiana Museum Denmark">
       <div class="day-header">
         <div><span class="day-label">Day 8</span><span class="day-date"> · Fri, March 27</span></div>
         <span class="city-tag copenhagen">Copenhagen</span>
@@ -738,39 +800,71 @@
     </div>
 
     <div style="margin-bottom: 12px; color: var(--muted); font-size: 0.9em;">Amsterdam</div>
+
     <div class="film-spot">
-      <div class="film-spot-name">EYE Filmmuseum</div>
-      <div class="film-spot-desc">Free ferry from Centraal. €16 student. Iconic building, rotating film exhibitions. CineDans Festival Mar 25–29.</div>
-    </div>
-    <div class="film-spot">
-      <div class="film-spot-name">FOAM Photography Museum</div>
-      <div class="film-spot-desc">~€13 student. Canal house. Emerging + established photographers. Visual storytelling gold.</div>
-    </div>
-    <div class="film-spot">
-      <div class="film-spot-name">Tuschinski Theater</div>
-      <div class="film-spot-desc">1921 Art Deco cinema. Buy any ticket for Zaal 1 to experience the main auditorium.</div>
-    </div>
-    <div class="film-spot">
-      <div class="film-spot-name">NDSM Wharf</div>
-      <div class="film-spot-desc">Post-industrial shipyard turned art space. Graffiti, installations, film-worthy textures.</div>
+      <img class="spot-photo" src="https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=700&h=300&fit=crop" alt="EYE Filmmuseum Amsterdam">
+      <div style="padding: 14px 16px;">
+        <div class="film-spot-name">EYE Filmmuseum</div>
+        <div class="film-spot-desc">Free ferry from Centraal. €16 student. Iconic angular building on the IJ waterfront, rotating film exhibitions. CineDans Festival Mar 25–29.</div>
+      </div>
     </div>
 
-    <div style="margin: 16px 0 12px; color: var(--muted); font-size: 0.9em;">Copenhagen</div>
     <div class="film-spot">
-      <div class="film-spot-name">Louisiana Museum of Modern Art</div>
-      <div class="film-spot-desc">One of the most photographed museums in Europe. Sculpture garden overlooking the Øresund strait.</div>
+      <img class="spot-photo" src="https://images.unsplash.com/photo-1584996131484-a4c928861cf1?w=700&h=300&fit=crop" alt="Amsterdam canal house FOAM">
+      <div style="padding: 14px 16px;">
+        <div class="film-spot-name">FOAM Photography Museum</div>
+        <div class="film-spot-desc">~€13 student. Beautiful canal house on Keizersgracht. Emerging + established photographers. Visual storytelling gold.</div>
+      </div>
     </div>
+
     <div class="film-spot">
-      <div class="film-spot-name">Freetown Christiania</div>
-      <div class="film-spot-desc">Counterculture commune since 1971. Documentary-worthy. No photos on Pusher Street.</div>
+      <img class="spot-photo" src="https://images.unsplash.com/photo-1601569246193-92e3307ea895?w=700&h=300&fit=crop" alt="Art Deco theater">
+      <div style="padding: 14px 16px;">
+        <div class="film-spot-name">Tuschinski Theater</div>
+        <div class="film-spot-desc">1921 Art Deco cinema — one of the most beautiful in the world. Buy any ticket for Zaal 1 to experience the main auditorium.</div>
+      </div>
     </div>
+
     <div class="film-spot">
-      <div class="film-spot-name">Danish Film Institute / Cinemateket</div>
-      <div class="film-spot-desc">Denmark's national film house. Arthouse screenings, film archive, bookshop.</div>
+      <img class="spot-photo" src="https://images.unsplash.com/photo-1605101100278-5d1deb2b6498?w=700&h=300&fit=crop" alt="Street art graffiti">
+      <div style="padding: 14px 16px;">
+        <div class="film-spot-name">NDSM Wharf</div>
+        <div class="film-spot-desc">Post-industrial shipyard turned art space. Graffiti, installations, film-worthy textures everywhere.</div>
+      </div>
     </div>
+
+    <div style="margin: 20px 0 12px; color: var(--muted); font-size: 0.9em;">Copenhagen</div>
+
     <div class="film-spot">
-      <div class="film-spot-name">Superkilen Park</div>
-      <div class="film-spot-desc">Wild urban design in Nørrebro. Objects from 60 countries. Visually insane for photography.</div>
+      <img class="spot-photo" src="https://images.unsplash.com/photo-1564399263809-d2e4e8b1e478?w=700&h=300&fit=crop" alt="Louisiana Museum Denmark">
+      <div style="padding: 14px 16px;">
+        <div class="film-spot-name">Louisiana Museum of Modern Art</div>
+        <div class="film-spot-desc">One of the most photographed museums in Europe. Stunning sculpture garden overlooking the Øresund strait. 40 min train north.</div>
+      </div>
+    </div>
+
+    <div class="film-spot">
+      <img class="spot-photo" src="https://images.unsplash.com/photo-1559070169-a3077159ee16?w=700&h=300&fit=crop" alt="Christiania Copenhagen">
+      <div style="padding: 14px 16px;">
+        <div class="film-spot-name">Freetown Christiania</div>
+        <div class="film-spot-desc">Counterculture commune since 1971. DIY architecture, street art, documentary-worthy. ⚠️ No photos on Pusher Street.</div>
+      </div>
+    </div>
+
+    <div class="film-spot">
+      <img class="spot-photo" src="https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=700&h=300&fit=crop" alt="Copenhagen architecture">
+      <div style="padding: 14px 16px;">
+        <div class="film-spot-name">Danish Film Institute / Cinemateket</div>
+        <div class="film-spot-desc">Denmark's national film house. Arthouse screenings, film archive, bookshop. Central location on Gothersgade.</div>
+      </div>
+    </div>
+
+    <div class="film-spot">
+      <img class="spot-photo" src="https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb?w=700&h=300&fit=crop" alt="Copenhagen urban design">
+      <div style="padding: 14px 16px;">
+        <div class="film-spot-name">Superkilen Park</div>
+        <div class="film-spot-desc">Wild urban design in Nørrebro. Objects from 60 countries. Red, black, and green zones. Visually insane for photography.</div>
+      </div>
     </div>
   </div>
 
@@ -786,13 +880,13 @@
         <tr><th>Item</th><th>Budget</th><th>Mid-Range</th></tr>
       </thead>
       <tbody>
-        <tr><td>Flights (3 legs)</td><td>~$795</td><td>~$1,020</td></tr>
+        <tr><td>Flights (3 legs)</td><td>~$909</td><td>~$1,183</td></tr>
         <tr><td>Amsterdam stay (4 nights)</td><td>$87</td><td>~$140</td></tr>
         <tr><td>Copenhagen stay (3 nights)</td><td>~$107</td><td>~$120</td></tr>
         <tr><td>Food (~$40–60/day × 8 days)</td><td>$320</td><td>$480</td></tr>
         <tr><td>Activities & museums</td><td>~$165</td><td>~$200</td></tr>
         <tr><td>Transit passes</td><td>~$100</td><td>~$168</td></tr>
-        <tr class="total"><td>TOTAL</td><td>~$1,575</td><td>~$2,130</td></tr>
+        <tr class="total"><td>TOTAL</td><td>~$1,690</td><td>~$2,290</td></tr>
       </tbody>
     </table>
 
