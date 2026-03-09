@@ -3,123 +3,253 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Amsterdam Hotels & Attractions</title>
+<title>Amsterdam — Hotels, Sights & Transit</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0a0a0a; color: #e0e0e0; }
-  #map { width: 100%; height: 65vh; border-bottom: 2px solid #222; }
-  .legend { padding: 16px 20px; display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
-  .legend-section { min-width: 280px; }
-  .legend-section h3 { font-size: 13px; text-transform: uppercase; letter-spacing: 1.5px; color: #888; margin-bottom: 10px; }
-  .legend-item { display: flex; align-items: center; gap: 8px; padding: 5px 0; font-size: 13px; }
-  .legend-item .dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-  .hotel-dot { background: #e74c3c; }
-  .sight-dot { background: #3498db; }
-  .legend-item a { color: #ccc; text-decoration: none; }
-  .legend-item a:hover { color: #fff; }
-  .legend-item .price { color: #888; font-size: 11px; margin-left: 4px; }
-  .title-bar { background: #111; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #222; }
-  .title-bar h1 { font-size: 16px; font-weight: 600; letter-spacing: 0.5px; }
-  .title-bar span { font-size: 12px; color: #666; }
-  /* Custom popup */
-  .leaflet-popup-content-wrapper { background: #1a1a1a; color: #e0e0e0; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
+  #map { width: 100%; height: 72vh; min-height: 420px; }
+  .title-bar { background: #111; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #222; flex-wrap: wrap; gap: 6px; }
+  .title-bar h1 { font-size: 15px; font-weight: 600; letter-spacing: 0.3px; }
+  .title-bar span { font-size: 11px; color: #666; }
+  .map-legend { background: #111; padding: 12px 16px; display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; border-top: 1px solid #222; font-size: 11px; color: #999; }
+  .map-legend .item { display: flex; align-items: center; gap: 5px; }
+  .map-legend .line { width: 20px; height: 3px; border-radius: 2px; }
+
+  /* Popup styles */
+  .leaflet-popup-content-wrapper { background: #1a1a1a; color: #e0e0e0; border-radius: 10px; box-shadow: 0 4px 24px rgba(0,0,0,0.6); }
   .leaflet-popup-tip { background: #1a1a1a; }
-  .leaflet-popup-content { margin: 10px 14px; font-size: 13px; line-height: 1.5; }
-  .leaflet-popup-content b { color: #fff; }
-  .leaflet-popup-content a { color: #5dade2; }
-  .popup-hotel { border-left: 3px solid #e74c3c; padding-left: 10px; }
-  .popup-sight { border-left: 3px solid #3498db; padding-left: 10px; }
+  .leaflet-popup-content { margin: 10px 14px; font-size: 12.5px; line-height: 1.5; min-width: 180px; }
+  .leaflet-popup-content b { color: #fff; font-size: 13.5px; }
+  .leaflet-popup-content a { color: #5dade2; text-decoration: none; }
+  .leaflet-popup-content a:hover { text-decoration: underline; }
+  .popup-hotel { border-left: 3px solid #ff6b6b; padding-left: 10px; }
+  .popup-sight { border-left: 3px solid #ffd93d; padding-left: 10px; }
+  .popup-transit { border-left: 3px solid #6bcb77; padding-left: 10px; }
+  .tag { display: inline-block; font-size: 10px; padding: 1px 6px; border-radius: 3px; margin-top: 4px; }
+  .tag-price { background: #2d2d2d; color: #ff6b6b; }
+  .tag-area { background: #2d2d2d; color: #aaa; }
+
+  /* Bottom cards */
+  .cards { padding: 12px 16px; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px; }
+  .card { background: #141414; border: 1px solid #222; border-radius: 8px; padding: 12px 14px; }
+  .card h3 { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #666; margin-bottom: 8px; }
+  .card-item { font-size: 12px; padding: 3px 0; display: flex; justify-content: space-between; align-items: center; }
+  .card-item .name { color: #ccc; }
+  .card-item .price { color: #ff6b6b; font-weight: 600; font-size: 11px; }
+  .card-item .loc { color: #888; font-size: 10px; }
 </style>
 </head>
 <body>
 <div class="title-bar">
-  <h1>🏨 Amsterdam — Hotels & Top Sights</h1>
-  <span>Mar 22–25 · 3 people</span>
+  <h1>🇳🇱 Amsterdam — Hotels, Sights & Transit</h1>
+  <span>Spring Break · Mar 22–25 · 3 people</span>
 </div>
 <div id="map"></div>
-<div class="legend">
-  <div class="legend-section">
-    <h3>🔴 Hotels</h3>
-    <div class="legend-item"><span class="dot hotel-dot"></span> Sir Adam Hotel <span class="price">~$530/pp</span></div>
-    <div class="legend-item"><span class="dot hotel-dot"></span> Hotel De Hallen <span class="price">~$490/pp</span></div>
-    <div class="legend-item"><span class="dot hotel-dot"></span> Volkshotel <span class="price">~$330/pp</span></div>
-    <div class="legend-item"><span class="dot hotel-dot"></span> The Hoxton <span class="price">~$425/pp</span></div>
-    <div class="legend-item"><span class="dot hotel-dot"></span> Hotel Not Hotel <span class="price">~$290/pp</span></div>
-    <div class="legend-item"><span class="dot hotel-dot"></span> Andaz Prinsengracht <span class="price">~$670/pp</span></div>
+<div class="map-legend">
+  <div class="item"><div style="width:12px;height:12px;background:#ff6b6b;border-radius:50%;border:2px solid #fff;"></div> Hotels</div>
+  <div class="item"><div style="width:12px;height:12px;background:#ffd93d;border-radius:50%;border:2px solid #fff;"></div> Sights</div>
+  <div class="item"><div class="line" style="background:#2196F3;"></div> M52 Metro (Noord↔Zuid)</div>
+  <div class="item"><div class="line" style="background:#E91E63;"></div> M51/53/54 Metro</div>
+  <div class="item"><div class="line" style="background:#4CAF50;"></div> Tram 2 (Museums)</div>
+  <div class="item"><div class="line" style="background:#FF9800;"></div> Tram 13/17 (Jordaan)</div>
+  <div class="item"><div class="line" style="background:#00BCD4;border-style:dashed;height:2px;"></div> Free Ferry (Noord)</div>
+</div>
+<div class="cards">
+  <div class="card">
+    <h3>🏨 Hotels by Price (per person, 3 nights)</h3>
+    <div class="card-item"><span class="name">Hotel Not Hotel</span><span class="price">~$290</span></div>
+    <div class="card-item"><span class="name">Volkshotel</span><span class="price">~$330</span></div>
+    <div class="card-item"><span class="name">art'otel</span><span class="price">~$390</span></div>
+    <div class="card-item"><span class="name">The Hoxton</span><span class="price">~$425</span></div>
+    <div class="card-item"><span class="name">Hotel De Hallen</span><span class="price">~$490</span></div>
+    <div class="card-item"><span class="name">Sir Adam</span><span class="price">~$530</span></div>
+    <div class="card-item"><span class="name">Andaz Prinsengracht</span><span class="price">~$670</span></div>
   </div>
-  <div class="legend-section">
-    <h3>🔵 Top Sights</h3>
-    <div class="legend-item"><span class="dot sight-dot"></span> Dam Square</div>
-    <div class="legend-item"><span class="dot sight-dot"></span> Anne Frank House</div>
-    <div class="legend-item"><span class="dot sight-dot"></span> Rijksmuseum</div>
-    <div class="legend-item"><span class="dot sight-dot"></span> Van Gogh Museum</div>
-    <div class="legend-item"><span class="dot sight-dot"></span> Vondelpark</div>
-    <div class="legend-item"><span class="dot sight-dot"></span> Jordaan</div>
-    <div class="legend-item"><span class="dot sight-dot"></span> Red Light District</div>
-    <div class="legend-item"><span class="dot sight-dot"></span> Heineken Experience</div>
-    <div class="legend-item"><span class="dot sight-dot"></span> Albert Cuyp Market</div>
-    <div class="legend-item"><span class="dot sight-dot"></span> Foodhallen</div>
+  <div class="card">
+    <h3>🚇 Transit Tips</h3>
+    <div class="card-item"><span class="name">GVB Day Pass: €10/day — unlimited metro + tram + bus</span></div>
+    <div class="card-item"><span class="name">M52 (blue): Key line. Noord ↔ Central ↔ Rokin ↔ De Pijp ↔ Zuid</span></div>
+    <div class="card-item"><span class="name">Tram 2: Central → Rijksmuseum → Vondelpark</span></div>
+    <div class="card-item"><span class="name">Tram 13/17: Central → Anne Frank House → Jordaan → West</span></div>
+    <div class="card-item"><span class="name">Free ferry: Central Station → Noord (Sir Adam) — runs 24/7</span></div>
+    <div class="card-item"><span class="name">Rent bikes from hotel (~€15/day) — fastest way around</span></div>
   </div>
 </div>
 <script>
-const map = L.map('map', { zoomControl: true }).setView([52.3676, 4.8850], 14);
+const map = L.map('map', { zoomControl: true }).setView([52.3680, 4.8900], 14);
 L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
   attribution: '© OpenStreetMap © CARTO',
   maxZoom: 19
 }).addTo(map);
 
-function hotelIcon() {
+// --- TRANSIT LINES ---
+
+// Metro 52 (North-South) — Blue
+const m52 = [
+  [52.3917, 4.9030], // Noord
+  [52.3893, 4.9218], // Noorderpark
+  [52.3791, 4.9003], // Centraal
+  [52.3706, 4.8937], // Rokin
+  [52.3627, 4.8896], // Vijzelgracht
+  [52.3554, 4.8920], // De Pijp
+  [52.3390, 4.8888], // Europaplein
+  [52.3389, 4.8730]  // Zuid
+];
+L.polyline(m52, { color: '#2196F3', weight: 4, opacity: 0.7, dashArray: null }).addTo(map);
+
+// Metro 51/53/54 shared segment — Pink
+const m51_53_54 = [
+  [52.3791, 4.9003], // Centraal
+  [52.3755, 4.9000], // Nieuwmarkt area
+  [52.3701, 4.9020], // Waterlooplein
+  [52.3640, 4.9060], // Weesperplein
+  [52.3510, 4.9070], // Wibautstraat (Volkshotel!)
+  [52.3450, 4.9185], // Amstel
+];
+L.polyline(m51_53_54, { color: '#E91E63', weight: 3.5, opacity: 0.6 }).addTo(map);
+
+// Tram 2 — Green (Central → Leidseplein → Museumplein → Vondelpark)
+const tram2 = [
+  [52.3791, 4.9003], // Centraal
+  [52.3773, 4.8930], // Dam area
+  [52.3740, 4.8870], // Spui
+  [52.3700, 4.8810], // Koningsplein
+  [52.3643, 4.8828], // Leidseplein area
+  [52.3600, 4.8852], // Rijksmuseum
+  [52.3584, 4.8811], // Van Gogh Museum
+  [52.3580, 4.8750], // Vondelpark
+  [52.3575, 4.8686], // Overtoom
+];
+L.polyline(tram2, { color: '#4CAF50', weight: 3, opacity: 0.55, dashArray: '8,6' }).addTo(map);
+
+// Tram 13/17 — Orange (Central → Jordaan → West)
+const tram13 = [
+  [52.3791, 4.9003], // Centraal
+  [52.3773, 4.8930], // Dam
+  [52.3755, 4.8860], // Magna Plaza
+  [52.3752, 4.8840], // Westermarkt/Anne Frank
+  [52.3740, 4.8790], // Rozengracht
+  [52.3700, 4.8700], // Marnixstraat
+  [52.3668, 4.8680], // De Hallen area
+  [52.3656, 4.8637], // Hotel Not Hotel area
+];
+L.polyline(tram13, { color: '#FF9800', weight: 3, opacity: 0.55, dashArray: '8,6' }).addTo(map);
+
+// Free ferry — Cyan dashed (Central → Noord)
+const ferry = [
+  [52.3810, 4.9003], // Central ferry terminal
+  [52.3844, 4.9013], // Sir Adam / A'DAM Tower
+];
+L.polyline(ferry, { color: '#00BCD4', weight: 3, opacity: 0.7, dashArray: '6,8' }).addTo(map);
+
+// --- METRO STATION DOTS ---
+const metroStations = [
+  { name: "Noord", lat: 52.3917, lng: 4.9030, line: "M52" },
+  { name: "Centraal", lat: 52.3791, lng: 4.9003, line: "M52/51/53/54" },
+  { name: "Rokin", lat: 52.3706, lng: 4.8937, line: "M52" },
+  { name: "Vijzelgracht", lat: 52.3627, lng: 4.8896, line: "M52" },
+  { name: "De Pijp", lat: 52.3554, lng: 4.8920, line: "M52" },
+  { name: "Waterlooplein", lat: 52.3701, lng: 4.9020, line: "M51/53/54" },
+  { name: "Weesperplein", lat: 52.3640, lng: 4.9060, line: "M51/53/54" },
+  { name: "Wibautstraat", lat: 52.3510, lng: 4.9070, line: "M51/53/54" },
+];
+
+metroStations.forEach(s => {
+  L.circleMarker([s.lat, s.lng], {
+    radius: 4, fillColor: '#fff', color: '#666', weight: 1.5, fillOpacity: 0.9
+  }).bindPopup(`<div class="popup-transit"><b>🚇 ${s.name}</b><br>Line: ${s.line}</div>`).addTo(map);
+});
+
+// --- CUSTOM MARKERS ---
+function makeMarker(emoji, color, size) {
   return L.divIcon({
     className: '',
-    html: '<div style="width:14px;height:14px;background:#e74c3c;border:2px solid #fff;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,0.5);"></div>',
-    iconSize: [14, 14],
-    iconAnchor: [7, 7]
-  });
-}
-function sightIcon() {
-  return L.divIcon({
-    className: '',
-    html: '<div style="width:12px;height:12px;background:#3498db;border:2px solid #fff;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,0.5);"></div>',
-    iconSize: [12, 12],
-    iconAnchor: [6, 6]
+    html: `<div style="
+      width:${size}px; height:${size}px;
+      background:${color};
+      border: 2.5px solid rgba(255,255,255,0.9);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: ${size * 0.5}px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.5), 0 0 12px ${color}44;
+      position: relative;
+    ">${emoji}</div>`,
+    iconSize: [size, size],
+    iconAnchor: [size/2, size/2]
   });
 }
 
+function labelMarker(text, offsetY) {
+  return L.divIcon({
+    className: '',
+    html: `<div style="
+      white-space: nowrap;
+      font-size: 10.5px;
+      font-weight: 600;
+      color: #fff;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.9), 0 0 8px rgba(0,0,0,0.7);
+      letter-spacing: 0.3px;
+      pointer-events: none;
+    ">${text}</div>`,
+    iconSize: [0, 0],
+    iconAnchor: [-14, offsetY || 4]
+  });
+}
+
+// --- HOTELS ---
 const hotels = [
-  { name: "Sir Adam Hotel", lat: 52.3844, lng: 4.9013, price: "~$530/pp", desc: "A'DAM Tower, rooftop swing, IJ river views, in-room turntables", url: "https://www.sirhotels.com/en/adam/" },
-  { name: "Hotel De Hallen", lat: 52.3668, lng: 4.8680, price: "~$490/pp", desc: "1902 tram depot, industrial-chic, cinema + Foodhallen in same complex", url: "https://www.hoteldehallen.com/en" },
-  { name: "Volkshotel", lat: 52.3510, lng: 4.9070, price: "~$330/pp", desc: "Brutalist newspaper HQ, rooftop hot tubs, two nightclubs, co-working", url: "https://www.volkshotel.nl/en" },
-  { name: "The Hoxton", lat: 52.3750, lng: 4.8850, price: "~$425/pp", desc: "Five canal houses on Herengracht, Nine Streets area, Lotti's restaurant", url: "https://thehoxton.com/amsterdam/" },
-  { name: "Hotel Not Hotel", lat: 52.3656, lng: 4.8637, price: "~$290/pp", desc: "Sleep in a tram carriage or behind a secret bookcase. Art installations.", url: "https://www.hotelnothotel.com" },
-  { name: "Andaz Prinsengracht", lat: 52.3653, lng: 4.8830, price: "~$670/pp", desc: "Marcel Wanders design, Alice in Wonderland garden, Hyatt", url: "https://www.hyatt.com/andaz/amsaz-andaz-amsterdam-prinsengracht" }
+  { name: "Sir Adam", lat: 52.3844, lng: 4.9013, price: "~$530/pp", area: "Noord", desc: "A'DAM Tower, rooftop swing, IJ views, in-room turntables. Free ferry from Central.", url: "https://www.sirhotels.com/en/adam/" },
+  { name: "Hotel De Hallen", lat: 52.3668, lng: 4.8680, price: "~$490/pp", area: "West", desc: "1902 tram depot, industrial-chic. Cinema + Foodhallen in same building.", url: "https://www.hoteldehallen.com/en" },
+  { name: "Volkshotel", lat: 52.3510, lng: 4.9070, price: "~$330/pp", area: "East", desc: "Brutalist newspaper HQ, rooftop hot tubs, two nightclubs. Metro right outside.", url: "https://www.volkshotel.nl/en" },
+  { name: "The Hoxton", lat: 52.3750, lng: 4.8850, price: "~$425/pp", area: "Center", desc: "Five canal houses on Herengracht. Nine Streets. Lotti's restaurant. Walk to everything.", url: "https://thehoxton.com/amsterdam/" },
+  { name: "Hotel Not Hotel", lat: 52.3656, lng: 4.8637, price: "~$290/pp", area: "West", desc: "Sleep in a tram carriage or behind a secret bookcase. Art installations.", url: "https://www.hotelnothotel.com" },
+  { name: "Andaz Prinsengracht", lat: 52.3653, lng: 4.8830, price: "~$670/pp", area: "Center", desc: "Marcel Wanders design. Alice in Wonderland garden. Hyatt. Dead center.", url: "https://www.hyatt.com/andaz/amsaz-andaz-amsterdam-prinsengracht" },
+  { name: "art'otel", lat: 52.3785, lng: 4.9022, price: "~$390/pp", area: "Center", desc: "Across from Central Station. Atelier van Lieshout art. Pool + sauna. Walk to everything.", url: "https://artotel.com/en/hotels/amsterdam/central-amsterdam/" },
 ];
 
 const sights = [
-  { name: "Dam Square", lat: 52.3731, lng: 4.8932, desc: "City center, Royal Palace, national monument" },
-  { name: "Anne Frank House", lat: 52.3752, lng: 4.8840, desc: "Historic WWII museum — book tickets in advance" },
-  { name: "Rijksmuseum", lat: 52.3600, lng: 4.8852, desc: "Dutch masters, Rembrandt's Night Watch" },
+  { name: "Dam Square", lat: 52.3731, lng: 4.8932, desc: "City center · Royal Palace · National monument" },
+  { name: "Anne Frank House", lat: 52.3752, lng: 4.8840, desc: "Historic WWII museum — book tickets weeks ahead" },
+  { name: "Rijksmuseum", lat: 52.3600, lng: 4.8852, desc: "Dutch masters · Rembrandt's Night Watch" },
   { name: "Van Gogh Museum", lat: 52.3584, lng: 4.8811, desc: "World's largest Van Gogh collection" },
-  { name: "Vondelpark", lat: 52.3580, lng: 4.8686, desc: "Amsterdam's Central Park — cafés, open air theatre" },
-  { name: "Jordaan", lat: 52.3770, lng: 4.8810, desc: "Canals, cafés, galleries, best neighborhood to wander" },
+  { name: "Vondelpark", lat: 52.3580, lng: 4.8686, desc: "Amsterdam's Central Park — cafés, chill" },
+  { name: "Jordaan", lat: 52.3770, lng: 4.8810, desc: "Best neighborhood — canals, cafés, galleries" },
   { name: "Red Light District", lat: 52.3724, lng: 4.8981, desc: "De Wallen — iconic, lively at night" },
-  { name: "Heineken Experience", lat: 52.3579, lng: 4.8919, desc: "Interactive brewery tour" },
-  { name: "Albert Cuyp Market", lat: 52.3558, lng: 4.8924, desc: "Biggest outdoor market in NL — food, clothes, everything" },
-  { name: "Foodhallen", lat: 52.3666, lng: 4.8678, desc: "Indoor food market in De Hallen complex — right by Hotel De Hallen" }
+  { name: "Heineken Experience", lat: 52.3579, lng: 4.8919, desc: "Interactive brewery tour · book online" },
+  { name: "Albert Cuyp Market", lat: 52.3558, lng: 4.8924, desc: "Biggest outdoor market in NL — food, everything" },
+  { name: "Foodhallen", lat: 52.3666, lng: 4.8678, desc: "Indoor food market — right by Hotel De Hallen" },
+  { name: "A'DAM Lookout", lat: 52.3843, lng: 4.9000, desc: "Observation deck + Over the Edge swing" },
+  { name: "Nine Streets", lat: 52.3710, lng: 4.8840, desc: "Boutique shopping, vintage stores, canal-side cafés" },
+  { name: "Leidseplein", lat: 52.3643, lng: 4.8828, desc: "Nightlife hub — bars, clubs, live music" },
 ];
 
+// Draw hotels
 hotels.forEach(h => {
-  L.marker([h.lat, h.lng], { icon: hotelIcon() })
-    .bindPopup(`<div class="popup-hotel"><b>${h.name}</b><br>${h.desc}<br><b>${h.price}</b> (3 nights)<br><a href="${h.url}" target="_blank">Book →</a></div>`)
+  L.marker([h.lat, h.lng], { icon: makeMarker('', '#ff6b6b', 22), zIndexOffset: 1000 })
+    .bindPopup(`<div class="popup-hotel">
+      <b>🏨 ${h.name}</b><br>
+      ${h.desc}<br>
+      <span class="tag tag-price">${h.price} · 3 nights</span>
+      <span class="tag tag-area">${h.area}</span><br>
+      <a href="${h.url}" target="_blank">Book →</a>
+    </div>`)
     .addTo(map);
+  L.marker([h.lat, h.lng], { icon: labelMarker(h.name, 4), interactive: false }).addTo(map);
 });
 
+// Draw sights
 sights.forEach(s => {
-  L.marker([s.lat, s.lng], { icon: sightIcon() })
-    .bindPopup(`<div class="popup-sight"><b>${s.name}</b><br>${s.desc}</div>`)
+  L.marker([s.lat, s.lng], { icon: makeMarker('', '#ffd93d', 18), zIndexOffset: 500 })
+    .bindPopup(`<div class="popup-sight"><b>📍 ${s.name}</b><br>${s.desc}</div>`)
     .addTo(map);
+  L.marker([s.lat, s.lng], { icon: labelMarker(s.name, 3), interactive: false }).addTo(map);
 });
+
+// Fit bounds to show everything
+const allCoords = [...hotels, ...sights].map(x => [x.lat, x.lng]);
+map.fitBounds(allCoords, { padding: [30, 30] });
 </script>
 </body>
 </html>
