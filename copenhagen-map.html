@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Copenhagen — Hotels, Sights & Transit</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0a0a0a; color: #e0e0e0; }
+  #map { width: 100%; height: 72vh; min-height: 420px; }
+  .title-bar { background: #111; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #222; flex-wrap: wrap; gap: 6px; }
+  .title-bar h1 { font-size: 15px; font-weight: 600; letter-spacing: 0.3px; }
+  .title-bar span { font-size: 11px; color: #666; }
+  .map-legend { background: #111; padding: 12px 16px; display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; border-top: 1px solid #222; font-size: 11px; color: #999; }
+  .map-legend .item { display: flex; align-items: center; gap: 5px; }
+  .map-legend .line { width: 20px; height: 3px; border-radius: 2px; }
+
+  .leaflet-popup-content-wrapper { background: #1a1a1a; color: #e0e0e0; border-radius: 10px; box-shadow: 0 4px 24px rgba(0,0,0,0.6); }
+  .leaflet-popup-tip { background: #1a1a1a; }
+  .leaflet-popup-content { margin: 10px 14px; font-size: 12.5px; line-height: 1.5; min-width: 180px; }
+  .leaflet-popup-content b { color: #fff; font-size: 13.5px; }
+  .leaflet-popup-content a { color: #5dade2; text-decoration: none; }
+  .leaflet-popup-content a:hover { text-decoration: underline; }
+  .popup-hotel { border-left: 3px solid #ff6b6b; padding-left: 10px; }
+  .popup-hostel { border-left: 3px solid #ff9800; padding-left: 10px; }
+  .popup-sight { border-left: 3px solid #ffd93d; padding-left: 10px; }
+  .popup-transit { border-left: 3px solid #6bcb77; padding-left: 10px; }
+  .tag { display: inline-block; font-size: 10px; padding: 1px 6px; border-radius: 3px; margin-top: 4px; }
+  .tag-price { background: #2d2d2d; color: #ff6b6b; }
+  .tag-budget { background: #2d2d2d; color: #ff9800; }
+  .tag-area { background: #2d2d2d; color: #aaa; }
+
+  .cards { padding: 12px 16px; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px; }
+  .card { background: #141414; border: 1px solid #222; border-radius: 8px; padding: 12px 14px; }
+  .card h3 { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #666; margin-bottom: 8px; }
+  .card-item { font-size: 12px; padding: 3px 0; display: flex; justify-content: space-between; align-items: center; }
+  .card-item .name { color: #ccc; }
+  .card-item .price { color: #ff6b6b; font-weight: 600; font-size: 11px; }
+  .card-item .budget { color: #ff9800; font-weight: 600; font-size: 11px; }
+</style>
+</head>
+<body>
+<div class="title-bar">
+  <h1>🇩🇰 Copenhagen — Hotels, Sights & Transit</h1>
+  <span>Spring Break · Mar 25–28 · 4 travelers</span>
+</div>
+<div id="map"></div>
+<div class="map-legend">
+  <div class="item"><div style="width:12px;height:12px;background:#ff6b6b;border-radius:50%;border:2px solid #fff;"></div> Boutique Hotels</div>
+  <div class="item"><div style="width:12px;height:12px;background:#ff9800;border-radius:50%;border:2px solid #fff;"></div> Hostels</div>
+  <div class="item"><div style="width:12px;height:12px;background:#ffd93d;border-radius:50%;border:2px solid #fff;"></div> Sights</div>
+  <div class="item"><div class="line" style="background:#F44336;"></div> M3 Cityringen</div>
+  <div class="item"><div class="line" style="background:#4CAF50;"></div> M1/M2</div>
+  <div class="item"><div class="line" style="background:#2196F3;"></div> M4 Nordhavn</div>
+</div>
+<div class="cards">
+  <div class="card">
+    <h3>🏨 Boutique Hotels (per person, 3 nights)</h3>
+    <div class="card-item"><span class="name">Coco Hotel</span><span class="price">~$350/pp</span></div>
+    <div class="card-item"><span class="name">Hotel SP34</span><span class="price">~$380/pp</span></div>
+    <div class="card-item"><span class="name">Manon Les Suites</span><span class="price">~$450/pp</span></div>
+  </div>
+  <div class="card">
+    <h3>🛏️ Hostels (per person, 3 nights)</h3>
+    <div class="card-item"><span class="name">Steel House ⭐</span><span class="budget">~$120/pp</span></div>
+    <div class="card-item"><span class="name">Next House</span><span class="budget">~$130/pp</span></div>
+    <div class="card-item"><span class="name">Downtown Hostel</span><span class="budget">~$140/pp</span></div>
+    <div class="card-item"><span class="name">Generator</span><span class="budget">~$150/pp</span></div>
+  </div>
+  <div class="card" style="grid-column: 1 / -1;">
+    <h3>🚇 Transit Tips</h3>
+    <div class="card-item"><span class="name">Copenhagen Card: 80+ attractions FREE + unlimited transit · 48h = ~$95 · Pays for itself in 2 museums</span></div>
+    <div class="card-item"><span class="name">M3 Cityringen (red circle): Hits everything — Nyhavn, Tivoli, Vesterbro, Nørrebro. Runs 24/7.</span></div>
+    <div class="card-item"><span class="name">M1/M2 (green): Central → Frederiksberg → Vanløse · M2 goes to Airport</span></div>
+    <div class="card-item"><span class="name">M4 (blue): Central → Kongens Nytorv → Nordhavn. Good for harbor area.</span></div>
+    <div class="card-item"><span class="name">City is very bikeable — rent from hotel or Donkey Republic app (~$12/day)</span></div>
+  </div>
+</div>
+<script>
+const map = L.map('map', { zoomControl: true }).setView([55.6790, 12.5770], 14);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+  attribution: '© OpenStreetMap © CARTO',
+  maxZoom: 19
+}).addTo(map);
+
+// --- TRANSIT LINES ---
+
+// M3 Cityringen (circular) — Red
+const m3 = [
+  [55.6735, 12.5645], // København H
+  [55.6750, 12.5590], // Enghave Plads
+  [55.6752, 12.5510], // Frederiksberg Allé
+  [55.6770, 12.5460], // Frederiksberg
+  [55.6800, 12.5440], // Aksel Møllers Have
+  [55.6830, 12.5480], // Nuuks Plads
+  [55.6855, 12.5510], // Nørrebros Runddel
+  [55.6870, 12.5580], // Nørrebro
+  [55.6875, 12.5660], // Skjolds Plads
+  [55.6870, 12.5740], // Vibenshus Runddel
+  [55.6860, 12.5810], // Poul Henningsens Pl
+  [55.6840, 12.5860], // Trianglen
+  [55.6820, 12.5900], // Østerport
+  [55.6830, 12.5930], // Marmorkirken
+  [55.6810, 12.5900], // Kongens Nytorv
+  [55.6785, 12.5830], // Gammel Strand
+  [55.6768, 12.5760], // Rådhuspladsen
+  [55.6735, 12.5645], // back to København H
+];
+L.polyline(m3, { color: '#F44336', weight: 4, opacity: 0.65 }).addTo(map);
+
+// M1/M2 shared segment — Green
+const m1m2 = [
+  [55.6810, 12.5900], // Kongens Nytorv
+  [55.6770, 12.5460], // Frederiksberg (shared stretch simplified)
+];
+// More accurate M1/M2 path
+const m1m2full = [
+  [55.6810, 12.5900], // Kongens Nytorv
+  [55.6785, 12.5830], // Gammel Strand
+  [55.6768, 12.5760], // Rådhuspladsen
+  [55.6735, 12.5645], // København H
+  [55.6720, 12.5570], // Vesterbro area
+  [55.6730, 12.5500], // Frederiksberg Allé
+  [55.6770, 12.5460], // Frederiksberg
+  [55.6790, 12.5370], // Fasanvej
+  [55.6830, 12.5300], // Lindevang
+  [55.6850, 12.5250], // Vanløse
+];
+L.polyline(m1m2full, { color: '#4CAF50', weight: 3.5, opacity: 0.5, dashArray: '10,6' }).addTo(map);
+
+// M2 to Airport branch
+const m2airport = [
+  [55.6810, 12.5900], // Kongens Nytorv
+  [55.6770, 12.5950], // Christianshavn
+  [55.6700, 12.5990], // Islands Brygge
+  [55.6630, 12.5960], // DR Byen
+  [55.6280, 12.6520], // Airport (way south-east, won't show)
+];
+// Just show the first few stops
+L.polyline(m2airport.slice(0,4), { color: '#4CAF50', weight: 3, opacity: 0.4, dashArray: '6,8' }).addTo(map);
+
+// M4 — Blue (København H → Kongens Nytorv → Nordhavn)
+const m4 = [
+  [55.6735, 12.5645], // København H
+  [55.6768, 12.5760], // Rådhuspladsen
+  [55.6785, 12.5830], // Gammel Strand
+  [55.6810, 12.5900], // Kongens Nytorv
+  [55.6830, 12.5930], // Marmorkirken
+  [55.6820, 12.5900], // Østerport
+  [55.6870, 12.5960], // Nordhavn
+  [55.6900, 12.5980], // Orientkaj
+];
+L.polyline(m4, { color: '#2196F3', weight: 3.5, opacity: 0.55 }).addTo(map);
+
+// --- METRO STATION DOTS ---
+const metroStations = [
+  { name: "København H (Central)", lat: 55.6735, lng: 12.5645, line: "M3/M4" },
+  { name: "Kongens Nytorv", lat: 55.6810, lng: 12.5900, line: "M1/M2/M3/M4" },
+  { name: "Nørreport", lat: 55.6835, lng: 12.5710, line: "S-train + nearby M3" },
+  { name: "Rådhuspladsen", lat: 55.6768, lng: 12.5760, line: "M3/M4" },
+  { name: "Gammel Strand", lat: 55.6785, lng: 12.5830, line: "M3/M4" },
+  { name: "Trianglen", lat: 55.6840, lng: 12.5860, line: "M3" },
+  { name: "Østerport", lat: 55.6820, lng: 12.5900, line: "M3/M4" },
+  { name: "Frederiksberg", lat: 55.6770, lng: 12.5460, line: "M1/M2/M3" },
+  { name: "Christianshavn", lat: 55.6770, lng: 12.5950, line: "M1/M2" },
+  { name: "Enghave Plads", lat: 55.6750, lng: 12.5590, line: "M3" },
+];
+
+metroStations.forEach(s => {
+  L.circleMarker([s.lat, s.lng], {
+    radius: 4, fillColor: '#fff', color: '#666', weight: 1.5, fillOpacity: 0.9
+  }).bindPopup(`<div class="popup-transit"><b>🚇 ${s.name}</b><br>Lines: ${s.line}</div>`).addTo(map);
+});
+
+// --- MARKER HELPERS ---
+function makeMarker(color, size) {
+  return L.divIcon({
+    className: '',
+    html: `<div style="
+      width:${size}px; height:${size}px;
+      background:${color};
+      border: 2.5px solid rgba(255,255,255,0.9);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.5), 0 0 12px ${color}44;
+    "></div>`,
+    iconSize: [size, size],
+    iconAnchor: [size/2, size/2]
+  });
+}
+
+function labelMarker(text, offsetY) {
+  return L.divIcon({
+    className: '',
+    html: `<div style="
+      white-space: nowrap;
+      font-size: 10.5px;
+      font-weight: 600;
+      color: #fff;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.9), 0 0 8px rgba(0,0,0,0.7);
+      letter-spacing: 0.3px;
+      pointer-events: none;
+    ">${text}</div>`,
+    iconSize: [0, 0],
+    iconAnchor: [-14, offsetY || 4]
+  });
+}
+
+// --- BOUTIQUE HOTELS (Red) ---
+const hotels = [
+  { name: "Coco Hotel", lat: 55.6718, lng: 12.5555, price: "~$350/pp", area: "Vesterbro", desc: "Parisian-chic meets Copenhagen cool. Locals hang at the lobby café. Leafy courtyard. 88 rooms.", url: "https://coco-hotel.com/" },
+  { name: "Hotel SP34", lat: 55.6785, lng: 12.5700, price: "~$380/pp", area: "Latin Quarter", desc: "Scandi-minimalist design. Rooftop terrace, wine bar. Steps from Strøget shopping street.", url: "https://www.brochner-hotels.com/hotel-sp34/" },
+  { name: "Manon Les Suites", lat: 55.6798, lng: 12.5620, price: "~$450/pp", area: "City Center", desc: "Bali-jungle vibe. Indoor pool, tropical atrium, rooftop dining. Organic everything. Wildest interiors in CPH.", url: "https://guldsmedenhotels.com/manon-les-suites/" },
+];
+
+// --- HOSTELS (Orange) ---
+const hostels = [
+  { name: "Steel House ⭐", lat: 55.6722, lng: 12.5655, price: "~$120/pp", area: "Central", desc: "Industrial-chic hostel in old steel factory. Pool, gym, cinema room, rooftop. Best hostel in CPH. Near Tivoli & Central Station.", url: "https://www.steelhousecopenhagen.com/" },
+  { name: "Generator", lat: 55.6835, lng: 12.5905, price: "~$150/pp", area: "Adelgade", desc: "Design-led hostel chain. Near Nyhavn + Kongens Nytorv. Bar, café, co-working. Great location.", url: "https://staygenerator.com/hostels/copenhagen" },
+  { name: "Next House", lat: 55.6685, lng: 12.5600, price: "~$130/pp", area: "Vesterbro", desc: "Modern, clean, social. Near Central Station. Bar + events every night.", url: "https://www.nexthousecopenhagen.com/" },
+  { name: "Downtown Hostel", lat: 55.6760, lng: 12.5733, price: "~$140/pp", area: "City Center", desc: "Right on a canal in the absolute center. Can't beat the location. Basic but solid.", url: "https://www.copenhagendowntown.com/" },
+];
+
+// --- SIGHTS (Yellow) ---
+const sights = [
+  { name: "Nyhavn", lat: 55.6800, lng: 12.5900, desc: "Iconic colorful harbor — the postcard shot. Bars, restaurants, canal boats." },
+  { name: "Tivoli Gardens", lat: 55.6735, lng: 12.5680, desc: "World's 2nd oldest amusement park (1843). Rides, gardens, live music. Opens late March!" },
+  { name: "The Little Mermaid", lat: 55.6929, lng: 12.5998, desc: "Iconic 1913 bronze statue on the waterfront. Quick visit — combine with Kastellet." },
+  { name: "Rosenborg Castle", lat: 55.6859, lng: 12.5773, desc: "Renaissance castle + King's Garden. Crown jewels inside." },
+  { name: "Christiansborg Palace", lat: 55.6760, lng: 12.5790, desc: "Danish Parliament. Free tower with best panoramic view in the city." },
+  { name: "Freetown Christiania", lat: 55.6735, lng: 12.5970, desc: "Self-governing commune since 1971. Street art, DIY architecture, unique vibe. No photos on Pusher Street." },
+  { name: "Amalienborg Palace", lat: 55.6840, lng: 12.5930, desc: "Royal residence. Guard changing at noon daily. Free to watch." },
+  { name: "Rundetårn", lat: 55.6812, lng: 12.5757, desc: "Round Tower (1642). Spiral ramp to the top. City views. €5 entry." },
+  { name: "Strøget", lat: 55.6780, lng: 12.5760, desc: "Europe's longest pedestrian shopping street. 1.1 km of shops." },
+  { name: "Torvehallerne", lat: 55.6835, lng: 12.5715, desc: "Glass food market halls. Danish smørrebrød, pastries, coffee. Must-visit for lunch." },
+  { name: "Designmuseum Danmark", lat: 55.6860, lng: 12.5920, desc: "Danish design history — furniture, fashion, posters. Beautiful building + garden." },
+  { name: "Reffen Street Food", lat: 55.6910, lng: 12.6060, desc: "Huge open-air street food market on the waterfront. 50+ stalls. Sunsets." },
+  { name: "Kastellet", lat: 55.6910, lng: 12.5950, desc: "Star-shaped 17th-century fortress. Beautiful grounds. Near Little Mermaid." },
+  { name: "Vesterbro", lat: 55.6700, lng: 12.5530, desc: "Meatpacking District. Best nightlife, craft cocktails, restaurants. Copenhagen's coolest neighborhood." },
+];
+
+// Draw boutique hotels
+hotels.forEach(h => {
+  L.marker([h.lat, h.lng], { icon: makeMarker('#ff6b6b', 22), zIndexOffset: 1000 })
+    .bindPopup(`<div class="popup-hotel">
+      <b>🏨 ${h.name}</b><br>
+      ${h.desc}<br>
+      <span class="tag tag-price">${h.price} · 3 nights</span>
+      <span class="tag tag-area">${h.area}</span><br>
+      <a href="${h.url}" target="_blank">Book →</a>
+    </div>`)
+    .addTo(map);
+  L.marker([h.lat, h.lng], { icon: labelMarker(h.name, 4), interactive: false }).addTo(map);
+});
+
+// Draw hostels
+hostels.forEach(h => {
+  L.marker([h.lat, h.lng], { icon: makeMarker('#ff9800', 20), zIndexOffset: 900 })
+    .bindPopup(`<div class="popup-hostel">
+      <b>🛏️ ${h.name}</b><br>
+      ${h.desc}<br>
+      <span class="tag tag-budget">${h.price} · 3 nights</span>
+      <span class="tag tag-area">${h.area}</span><br>
+      <a href="${h.url}" target="_blank">Book →</a>
+    </div>`)
+    .addTo(map);
+  L.marker([h.lat, h.lng], { icon: labelMarker(h.name, 4), interactive: false }).addTo(map);
+});
+
+// Draw sights
+sights.forEach(s => {
+  L.marker([s.lat, s.lng], { icon: makeMarker('#ffd93d', 18), zIndexOffset: 500 })
+    .bindPopup(`<div class="popup-sight"><b>📍 ${s.name}</b><br>${s.desc}</div>`)
+    .addTo(map);
+  L.marker([s.lat, s.lng], { icon: labelMarker(s.name, 3), interactive: false }).addTo(map);
+});
+
+// Fit bounds
+const allCoords = [...hotels, ...hostels, ...sights].map(x => [x.lat, x.lng]);
+map.fitBounds(allCoords, { padding: [30, 30] });
+</script>
+</body>
+</html>
