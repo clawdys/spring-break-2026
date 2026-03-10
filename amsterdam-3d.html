@@ -95,9 +95,35 @@
     #neighborhoodPanel { max-width: 220px; font-size: 11px; bottom: 12px; left: 12px; }
     #infoCard { max-width: 260px; right: 12px; bottom: 12px; }
   }
+
+  /* Loading overlay */
+  #loadingOverlay {
+    position: absolute; inset: 0; z-index: 100;
+    background: #0a0a0a;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    transition: opacity 1.2s ease-out;
+    pointer-events: none;
+  }
+  #loadingOverlay.fade-out { opacity: 0; }
+  #loadingOverlay.hidden { display: none; }
+  .loader-ring {
+    width: 48px; height: 48px;
+    border: 3px solid #222; border-top-color: #ff6b6b;
+    border-radius: 50%; animation: spin 1s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loader-text { margin-top: 16px; font-size: 13px; color: #666; letter-spacing: 1px; }
+  .loader-sub { margin-top: 6px; font-size: 11px; color: #444; }
 </style>
 </head>
 <body>
+
+<!-- Loading Overlay -->
+<div id="loadingOverlay">
+  <div class="loader-ring"></div>
+  <div class="loader-text">Loading 3D City</div>
+  <div class="loader-sub">Streaming photorealistic tiles…</div>
+</div>
 
 <!-- Title Bar -->
 <div id="titleBar">
@@ -168,16 +194,64 @@ viewer.infoBox.frame.sandbox = 'allow-same-origin allow-top-navigation-by-user-a
 // Hide Cesium's default infobox entirely
 viewer.infoBox.container.style.display = 'none';
 
-// --- Google 3D Tiles ---
+// --- Google 3D Tiles (optimized for smooth loading) ---
 async function init() {
   try {
-    const tileset = await Cesium.createGooglePhotorealistic3DTileset();
+    const tileset = await Cesium.createGooglePhotorealistic3DTileset({
+      // Smooth loading: skip intermediate LODs, jump to final quality faster
+      skipLevelOfDetail: true,
+      baseScreenSpaceError: 1024,
+      skipScreenSpaceErrorFactor: 16,
+      skipLevels: 1,
+      immediatelyLoadDesiredLevelOfDetail: false,
+      loadSiblings: false,
+
+      // Dynamic SSE: reduce detail for distant tiles while camera moves
+      dynamicScreenSpaceError: true,
+      dynamicScreenSpaceErrorDensity: 2.0e-4,
+      dynamicScreenSpaceErrorFactor: 24.0,
+      dynamicScreenSpaceErrorHeightFalloff: 0.25,
+
+      // Foveated rendering: prioritize center of screen
+      foveatedScreenSpaceError: true,
+      foveatedConeSize: 0.1,
+      foveatedMinimumScreenSpaceErrorRelaxation: 0.0,
+
+      // Higher quality target
+      maximumScreenSpaceError: 8,
+
+      // Bigger cache = less pop-in when panning back
+      cacheBytes: 1024 * 1024 * 1024, // 1 GB
+      maximumCacheOverflowBytes: 512 * 1024 * 1024, // 512 MB overflow
+
+      // Preload siblings and ancestors for smoother panning
+      preloadWhenHidden: true,
+      preferLeaves: true,
+
+      // Reduce popping by culling fewer requests while moving
+      cullRequestsWhileMoving: true,
+      cullRequestsWhileMovingMultiplier: 30.0,
+
+      showCreditsOnScreen: true,
+    });
     viewer.scene.primitives.add(tileset);
+
+    // Fade out loading overlay when initial tiles are in
+    tileset.initialTilesLoaded.addEventListener(() => {
+      const overlay = document.getElementById('loadingOverlay');
+      overlay.classList.add('fade-out');
+      setTimeout(() => overlay.classList.add('hidden'), 1300);
+    });
+
   } catch (e) {
     console.error('Failed to load Google 3D Tiles:', e);
+    // Hide overlay on error too
+    const overlay = document.getElementById('loadingOverlay');
+    overlay.classList.add('fade-out');
+    setTimeout(() => overlay.classList.add('hidden'), 1300);
   }
 
-  // Fly to Amsterdam
+  // Smooth camera fly-in (2 second ease to let tiles stream progressively)
   viewer.camera.flyTo({
     destination: Cesium.Cartesian3.fromDegrees(4.8952, 52.3702, 1500),
     orientation: {
@@ -185,7 +259,8 @@ async function init() {
       pitch: Cesium.Math.toRadians(-45),
       roll: 0
     },
-    duration: 0
+    duration: 2.0,
+    easingFunction: Cesium.EasingFunction.CUBIC_IN_OUT,
   });
 
   addAllPins();
