@@ -3,454 +3,490 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🇩🇰 Copenhagen — 3D Guide Map</title>
+<title>Copenhagen 3D Guide Map</title>
 <script src="https://cesium.com/downloads/cesiumjs/releases/1.125/Build/Cesium/Cesium.js"></script>
 <link href="https://cesium.com/downloads/cesiumjs/releases/1.125/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  html, body { width: 100%; height: 100%; overflow: hidden; background: #0a0a0a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #e0e0e0; }
-  #cesiumContainer { width: 100%; height: 100%; }
-
-  /* Dark theme overrides for Cesium */
-  .cesium-viewer { background: #0a0a0a !important; }
-  .cesium-viewer-bottom { background: transparent !important; }
-  .cesium-widget-credits { background: rgba(10,10,10,0.7) !important; font-size: 10px !important; }
-  .cesium-geocoder-input { background: rgba(30,30,30,0.9) !important; color: #e0e0e0 !important; border: 1px solid #333 !important; }
-  .cesium-button { background: rgba(30,30,30,0.9) !important; color: #e0e0e0 !important; border: 1px solid #333 !important; }
-  .cesium-infoBox { background: rgba(17,17,17,0.95) !important; color: #e0e0e0 !important; border: 1px solid #333 !important; }
-  .cesium-infoBox-title { background: rgba(20,20,20,0.95) !important; color: #fff !important; }
-  .cesium-infoBox-iframe { background: #111 !important; }
-
-  /* Title bar */
-  #titleBar {
-    position: absolute; top: 0; left: 0; right: 0; z-index: 10;
-    background: linear-gradient(180deg, rgba(10,10,10,0.95) 0%, rgba(10,10,10,0.7) 80%, transparent 100%);
-    padding: 16px 20px 28px; display: flex; align-items: center; justify-content: space-between;
-    pointer-events: none;
-  }
-  #titleBar h1 { font-size: 18px; font-weight: 700; letter-spacing: -0.3px; pointer-events: auto; }
-  #titleBar .subtitle { font-size: 13px; color: #999; margin-top: 2px; }
-  #titleBar .right { text-align: right; pointer-events: auto; }
-
-  /* Toggle buttons */
-  #togglePanel {
-    position: absolute; top: 72px; right: 16px; z-index: 10;
-    display: flex; flex-direction: column; gap: 6px;
-  }
-  .toggle-btn {
-    display: flex; align-items: center; gap: 8px;
-    padding: 8px 14px; border-radius: 8px;
-    background: rgba(20,20,20,0.88); border: 1px solid #333;
-    color: #e0e0e0; font-size: 13px; font-weight: 500;
-    cursor: pointer; transition: all 0.2s; backdrop-filter: blur(12px);
-    user-select: none; white-space: nowrap;
-  }
-  .toggle-btn:hover { background: rgba(40,40,40,0.95); border-color: #555; }
-  .toggle-btn.off { opacity: 0.45; }
-  .toggle-btn .dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; border: 1.5px solid rgba(255,255,255,0.3); }
-
-  /* Neighborhood panel */
-  #neighborhoodPanel {
-    position: absolute; bottom: 36px; left: 16px; z-index: 10;
-    background: rgba(15,15,15,0.9); border: 1px solid #2a2a2a; border-radius: 12px;
-    padding: 14px 16px; max-width: 300px; backdrop-filter: blur(14px);
-  }
-  #neighborhoodPanel h3 { font-size: 13px; font-weight: 700; margin-bottom: 10px; color: #ccc; letter-spacing: 0.5px; text-transform: uppercase; }
-  .hood { margin-bottom: 8px; }
-  .hood:last-child { margin-bottom: 0; }
-  .hood .name { font-size: 13px; font-weight: 600; color: #fff; }
-  .hood .tip { font-size: 11.5px; color: #888; margin-top: 1px; line-height: 1.4; }
-  #nhToggle {
-    position: absolute; bottom: 36px; left: 16px; z-index: 9;
-    background: rgba(15,15,15,0.9); border: 1px solid #2a2a2a; border-radius: 8px;
-    padding: 8px 12px; font-size: 12px; color: #999; cursor: pointer; display: none;
-    backdrop-filter: blur(14px);
-  }
-
-  /* Info popup */
-  #infoPopup {
-    display: none; position: absolute; z-index: 20;
-    background: rgba(17,17,17,0.96); border: 1px solid #333; border-radius: 12px;
-    padding: 16px 18px; min-width: 220px; max-width: 300px;
-    backdrop-filter: blur(16px); box-shadow: 0 8px 32px rgba(0,0,0,0.6);
-    pointer-events: auto;
-  }
-  #infoPopup .close-btn {
-    position: absolute; top: 8px; right: 10px; background: none; border: none;
-    color: #666; font-size: 18px; cursor: pointer; line-height: 1;
-  }
-  #infoPopup .close-btn:hover { color: #fff; }
-  #infoPopup .cat-badge {
-    display: inline-block; font-size: 10px; font-weight: 600; text-transform: uppercase;
-    letter-spacing: 0.8px; padding: 2px 8px; border-radius: 4px; margin-bottom: 8px;
-  }
-  #infoPopup h4 { font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 6px; }
-  #infoPopup .desc { font-size: 12.5px; color: #aaa; line-height: 1.5; }
-
-  /* Mobile adjustments */
-  @media (max-width: 600px) {
-    #titleBar h1 { font-size: 15px; }
-    #titleBar .subtitle { font-size: 11px; }
-    #togglePanel { top: 64px; right: 10px; }
-    .toggle-btn { padding: 6px 10px; font-size: 12px; }
-    #neighborhoodPanel { max-width: 260px; padding: 12px 14px; bottom: 28px; left: 10px; }
-    #infoPopup { min-width: 180px; max-width: 260px; }
-  }
-
-  /* Loading overlay */
-  #loadingOverlay {
-    position: absolute; inset: 0; z-index: 100;
-    background: #0a0a0a;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    transition: opacity 1.2s ease-out;
-    pointer-events: none;
-  }
-  #loadingOverlay.fade-out { opacity: 0; }
-  #loadingOverlay.hidden { display: none; }
-  .loader-ring {
-    width: 48px; height: 48px;
-    border: 3px solid #222; border-top-color: #ffd93d;
-    border-radius: 50%; animation: spin 1s linear infinite;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .loader-text { margin-top: 16px; font-size: 13px; color: #666; letter-spacing: 1px; }
-  .loader-sub { margin-top: 6px; font-size: 11px; color: #444; }
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;overflow:hidden;font-family:'Inter',system-ui,sans-serif;background:#0a0a0a;color:#fff}
+#cesiumContainer{width:100%;height:100%}
+.cesium-viewer-toolbar,.cesium-viewer-animationContainer,.cesium-viewer-timelineContainer,
+.cesium-viewer-bottom,.cesium-viewer-fullscreenContainer,.cesium-viewer-vrContainer,
+.cesium-viewer-geocoderContainer,.cesium-viewer-infoBoxContainer,
+.cesium-viewer-selectionIndicatorContainer{display:none!important}
+.cesium-credit-logoContainer{opacity:0.3!important}
+.cesium-widget canvas{border-radius:0}
+.glass{background:rgba(10,10,10,0.72);backdrop-filter:blur(20px) saturate(1.4);-webkit-backdrop-filter:blur(20px) saturate(1.4);border:1px solid rgba(255,255,255,0.08);border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,0.5),inset 0 0.5px 0 rgba(255,255,255,0.06)}
+#titleBar{position:fixed;top:16px;left:16px;z-index:100;padding:14px 20px}
+#titleBar h1{font-size:17px;font-weight:700;letter-spacing:-0.3px;line-height:1.3}
+#titleBar .sub{font-size:12px;font-weight:400;color:rgba(255,255,255,0.5);margin-top:3px}
+#togglePanel{position:fixed;top:16px;right:16px;z-index:100;padding:8px;display:flex;flex-direction:column;gap:4px}
+.tog-btn{display:flex;align-items:center;gap:8px;padding:8px 14px;border:none;border-radius:10px;background:rgba(255,255,255,0.05);color:#fff;font-size:12.5px;font-weight:500;cursor:pointer;transition:all 0.2s;font-family:inherit;white-space:nowrap;text-align:left}
+.tog-btn:hover{background:rgba(255,255,255,0.1)}
+.tog-btn.active{background:rgba(255,255,255,0.13)}
+.tog-btn .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;transition:opacity 0.2s}
+.tog-btn:not(.active) .dot{opacity:0.3}
+#detailCard{position:fixed;bottom:20px;right:16px;z-index:100;width:340px;padding:0;opacity:0;transform:translateY(12px);transition:opacity 0.3s,transform 0.3s;pointer-events:none;overflow:hidden}
+#detailCard.show{opacity:1;transform:translateY(0);pointer-events:auto}
+.dc-header{padding:16px 18px 10px;display:flex;align-items:flex-start;gap:10px}
+.dc-badge{padding:3px 8px;border-radius:6px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;flex-shrink:0;margin-top:2px}
+.dc-name{font-size:16px;font-weight:700;line-height:1.3}
+.dc-stars{color:#facc15;font-size:13px;margin-top:2px}
+.dc-body{padding:0 18px 16px}
+.dc-price{font-size:13px;font-weight:600;color:rgba(255,255,255,0.8);margin-bottom:6px}
+.dc-desc{font-size:12.5px;line-height:1.55;color:rgba(255,255,255,0.6)}
+.dc-hood{font-size:11px;color:rgba(255,255,255,0.35);margin-top:8px}
+.dc-close{position:absolute;top:10px;right:12px;background:none;border:none;color:rgba(255,255,255,0.4);font-size:16px;cursor:pointer;line-height:1}
+.dc-close:hover{color:#fff}
+#hoodPanel{position:fixed;bottom:20px;left:16px;z-index:100;width:300px;max-height:340px;overflow:hidden;transition:max-height 0.35s ease}
+#hoodPanel.collapsed{max-height:44px}
+.hp-toggle{padding:11px 16px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;font-size:12.5px;font-weight:600;border-bottom:1px solid rgba(255,255,255,0.06);user-select:none}
+.hp-toggle .arrow{transition:transform 0.3s;font-size:10px}
+#hoodPanel.collapsed .hp-toggle .arrow{transform:rotate(-90deg)}
+.hp-body{padding:12px 16px;overflow-y:auto;max-height:290px}
+.hp-item{margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.04)}
+.hp-item:last-child{border:none;margin:0;padding:0}
+.hp-name{font-size:12.5px;font-weight:600;margin-bottom:3px;display:flex;align-items:center;gap:6px}
+.hp-name .hdot{width:6px;height:6px;border-radius:50%}
+.hp-desc{font-size:11.5px;color:rgba(255,255,255,0.45);line-height:1.45}
+#loadingOverlay{position:fixed;inset:0;z-index:999;background:#0a0a0a;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 1.2s ease}
+#loadingOverlay.fade{opacity:0;pointer-events:none}
+.spinner{width:36px;height:36px;border:2.5px solid rgba(255,255,255,0.1);border-top-color:rgba(255,255,255,0.7);border-radius:50%;animation:spin 0.8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+#loadingOverlay .lt{margin-top:16px;font-size:13px;font-weight:500;color:rgba(255,255,255,0.5)}
+#loadingOverlay .ls{margin-top:6px;font-size:11px;color:rgba(255,255,255,0.25)}
 </style>
 </head>
 <body>
-
-<!-- Loading Overlay -->
-<div id="loadingOverlay">
-  <div class="loader-ring"></div>
-  <div class="loader-text">Loading 3D City</div>
-  <div class="loader-sub">Streaming photorealistic tiles…</div>
+<div id="loadingOverlay"><div class="spinner"></div><div class="lt">Loading Copenhagen</div><div class="ls">Streaming 3D tiles…</div></div>
+<div id="titleBar" class="glass"><h1>🇩🇰 Copenhagen — 3D Guide Map</h1><div class="sub">Mar 25–28, 2026 · 4 travelers</div></div>
+<div id="togglePanel" class="glass">
+<button class="tog-btn active" data-cat="hotel" onclick="toggleCat('hotel',this)"><span class="dot" style="background:#f87171"></span>🏨 Hotels</button>
+<button class="tog-btn active" data-cat="hostel" onclick="toggleCat('hostel',this)"><span class="dot" style="background:#fb923c"></span>🛏 Hostels</button>
+<button class="tog-btn active" data-cat="sight" onclick="toggleCat('sight',this)"><span class="dot" style="background:#facc15"></span>⭐ Sights</button>
+<button class="tog-btn active" data-cat="restaurant" onclick="toggleCat('restaurant',this)"><span class="dot" style="background:#4ade80"></span>🍽 Restaurants</button>
+<div style="height:1px;background:rgba(255,255,255,0.06);margin:4px 0"></div>
+<button class="tog-btn" data-cat="neighborhood" onclick="toggleCat('neighborhood',this)"><span class="dot" style="background:#60a5fa"></span>🏘 Neighborhoods</button>
+<button class="tog-btn" data-cat="heatmap" onclick="toggleCat('heatmap',this)"><span class="dot" style="background:#f97316"></span>🔥 Heat Map</button>
+<div style="height:1px;background:rgba(255,255,255,0.06);margin:4px 0"></div>
+<button class="tog-btn active" data-cat="minimal" onclick="toggleMinimal(this)"><span class="dot" style="background:#c084fc"></span>🎨 Minimal</button>
 </div>
-
-<!-- Title Bar -->
-<div id="titleBar">
-  <div>
-    <h1>🇩🇰 Copenhagen — 3D Guide Map</h1>
-    <div class="subtitle">Mar 25–28 · 4 travelers</div>
-  </div>
-  <div class="right">
-    <div style="font-size:12px;color:#666;">Spring Break 2026</div>
-  </div>
+<div id="hoodPanel" class="glass collapsed">
+<div class="hp-toggle" onclick="this.parentElement.classList.toggle('collapsed')"><span>📍 Neighborhood Tips</span><span class="arrow">▼</span></div>
+<div class="hp-body">
+<div class="hp-item"><div class="hp-name"><span class="hdot" style="background:#f87171"></span>Indre By / City Center</div><div class="hp-desc">Heart of Copenhagen. Strøget shopping, Nyhavn, Tivoli. Most sights walkable. Priciest but unbeatable location.</div></div>
+<div class="hp-item"><div class="hp-name"><span class="hdot" style="background:#fb923c"></span>Vesterbro / Kødbyen</div><div class="hp-desc">Trendy meatpacking district. Best nightlife, craft cocktails, indie restaurants. Full of energy. Near Central Station.</div></div>
+<div class="hp-item"><div class="hp-name"><span class="hdot" style="background:#4ade80"></span>Nørrebro</div><div class="hp-desc">Multicultural & hipster. Cheapest eats, best coffee, street art. Superkilen park. 15min bike to center.</div></div>
+<div class="hp-item"><div class="hp-name"><span class="hdot" style="background:#60a5fa"></span>Christianshavn</div><div class="hp-desc">Canal-lined charm. Christiania freetown, Church of Our Saviour. Cozy waterfront dining. 10min walk to center.</div></div>
+<div class="hp-item"><div class="hp-name"><span class="hdot" style="background:#c084fc"></span>Frederiksberg</div><div class="hp-desc">Upscale residential. Beautiful gardens & zoo. Quieter, local feel. Great brunch spots. 20min walk to Tivoli.</div></div>
+<div class="hp-item"><div class="hp-name"><span class="hdot" style="background:#2dd4bf"></span>Østerbro</div><div class="hp-desc">Leafy, family-friendly. Near Kastellet & Little Mermaid. Excellent bakeries. Residential & relaxed.</div></div>
 </div>
-
-<!-- Toggle Buttons -->
-<div id="togglePanel">
-  <div class="toggle-btn" data-cat="hotel" onclick="toggleCategory('hotel')">
-    <span class="dot" style="background:#ff6b6b;"></span> Hotels <span style="color:#666;font-size:11px;">(3)</span>
-  </div>
-  <div class="toggle-btn" data-cat="hostel" onclick="toggleCategory('hostel')">
-    <span class="dot" style="background:#ff9800;"></span> Hostels <span style="color:#666;font-size:11px;">(4)</span>
-  </div>
-  <div class="toggle-btn" data-cat="sight" onclick="toggleCategory('sight')">
-    <span class="dot" style="background:#ffd93d;"></span> Sights <span style="color:#666;font-size:11px;">(12)</span>
-  </div>
-  <div class="toggle-btn" data-cat="restaurant" onclick="toggleCategory('restaurant')">
-    <span class="dot" style="background:#6bcb77;"></span> Restaurants <span style="color:#666;font-size:11px;">(14)</span>
-  </div>
 </div>
-
-<!-- Neighborhood Tips -->
-<div id="neighborhoodPanel">
-  <h3>📍 Neighborhoods</h3>
-  <div class="hood">
-    <div class="name">Vesterbro / Kødbyen</div>
-    <div class="tip">Meatpacking District — trendy bars, street food, budget eats. Our hostel hub.</div>
-  </div>
-  <div class="hood">
-    <div class="name">Nørrebro</div>
-    <div class="tip">Multicultural & artsy — Superkilen park, craft coffee, local vibes.</div>
-  </div>
-  <div class="hood">
-    <div class="name">Indre By (City Center)</div>
-    <div class="tip">Strøget shopping, Rundetårn, Tivoli — walkable core of Copenhagen.</div>
-  </div>
-  <div class="hood">
-    <div class="name">Christianshavn</div>
-    <div class="tip">Canals, Christiania freetown, Reffen street food market on the harbor.</div>
-  </div>
+<div id="detailCard" class="glass">
+<button class="dc-close" onclick="closeDetail()">✕</button>
+<div class="dc-header"><span class="dc-badge" id="dcBadge">HOTEL</span><div><div class="dc-name" id="dcName">—</div><div class="dc-stars" id="dcStars"></div></div></div>
+<div class="dc-body"><div class="dc-price" id="dcPrice"></div><div class="dc-desc" id="dcDesc"></div><div class="dc-hood" id="dcHood"></div></div>
 </div>
-<div id="nhToggle" onclick="document.getElementById('neighborhoodPanel').style.display='block';this.style.display='none';">📍 Neighborhoods</div>
-
-<!-- Info Popup -->
-<div id="infoPopup">
-  <button class="close-btn" onclick="closeInfo()">×</button>
-  <div id="infoBadge" class="cat-badge"></div>
-  <h4 id="infoName"></h4>
-  <div id="infoDesc" class="desc"></div>
-</div>
-
-<!-- Cesium Container -->
 <div id="cesiumContainer"></div>
-
 <script>
-// Token support: URL param or placeholder
-const params = new URLSearchParams(window.location.search);
-const TOKEN = params.get('token') || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI5Zjk1ODRlMi1hNjlmLTQ0NDktOTU3OS0wMjUxNTYyNWFhZDkiLCJpZCI6NDAxMDM0LCJpYXQiOjE3NzMxMDE0MDB9.JQg2NhsCuLeNn_3wLEdrtEVuvGu6_R445H6wVaSLTks';
-Cesium.Ion.defaultAccessToken = TOKEN;
+Cesium.Ion.defaultAccessToken='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI5Zjk1ODRlMi1hNjlmLTQ0NDktOTU3OS0wMjUxNTYyNWFhZDkiLCJpZCI6NDAxMDM0LCJpYXQiOjE3NzMxMDE0MDB9.JQg2NhsCuLeNn_3wLEdrtEVuvGu6_R445H6wVaSLTks';
 
-// ── Data ──────────────────────────────────────────────
-const PIN_DATA = {
-  hotel: {
-    label: 'Boutique Hotel',
-    color: '#ff6b6b',
-    items: [
-      { name: 'Coco Hotel', lat: 55.6724, lon: 12.5566, desc: '~$350/pp · Vesterbro · Parisian-chic' },
-      { name: 'Hotel SP34', lat: 55.6788, lon: 12.5672, desc: '~$380/pp · Latin Quarter · Rooftop' },
-      { name: 'Manon Les Suites', lat: 55.6804, lon: 12.5612, desc: '~$450/pp · Tropical atrium + pool' },
-    ]
-  },
-  hostel: {
-    label: 'Hostel',
-    color: '#ff9800',
-    items: [
-      { name: 'Steel House ⭐', lat: 55.6763, lon: 12.5601, desc: '~$120/pp · Pool, gym, cinema' },
-      { name: 'Generator', lat: 55.6827, lon: 12.5823, desc: '~$150/pp · Near Kongens Nytorv' },
-      { name: 'Next House', lat: 55.6714, lon: 12.5626, desc: '~$130/pp · Vesterbro · Events' },
-      { name: 'Downtown Hostel', lat: 55.6759, lon: 12.5743, desc: '~$140/pp · Canal center' },
-    ]
-  },
-  sight: {
-    label: 'Sight',
-    color: '#ffd93d',
-    items: [
-      { name: 'Nyhavn', lat: 55.6797, lon: 12.5909, desc: 'Iconic colorful harbor — must-see photo spot' },
-      { name: 'Tivoli Gardens', lat: 55.6747, lon: 12.5657, desc: 'Historic amusement park — open late Mar' },
-      { name: 'Little Mermaid', lat: 55.6929, lon: 12.5993, desc: 'Bronze statue on the waterfront since 1913' },
-      { name: 'Rosenborg Castle', lat: 55.6862, lon: 12.5765, desc: 'Renaissance castle — crown jewels inside' },
-      { name: 'Christiansborg', lat: 55.6768, lon: 12.5799, desc: 'Parliament — free tower with panoramic views' },
-      { name: 'Christiania', lat: 55.6739, lon: 12.5968, desc: 'Self-governing freetown — street art & culture' },
-      { name: 'Amalienborg', lat: 55.6845, lon: 12.5936, desc: 'Royal residence — guard change at noon' },
-      { name: 'Rundetårn', lat: 55.6813, lon: 12.5758, desc: '17th-century tower — spiral ramp to the top' },
-      { name: 'Strøget', lat: 55.6800, lon: 12.5834, desc: 'Europe\'s longest pedestrian street — shops & buskers' },
-      { name: 'Kastellet', lat: 55.6914, lon: 12.5937, desc: 'Star-shaped fortress — beautiful park walk' },
-      { name: 'Designmuseum', lat: 55.6866, lon: 12.5928, desc: 'Danish design & craft — stunning Rococo building' },
-      { name: 'Superkilen', lat: 55.6997, lon: 12.5424, desc: 'Urban park in Nørrebro — global art installations' },
-    ]
-  },
-  restaurant: {
-    label: 'Restaurant',
-    color: '#6bcb77',
-    items: [
-      { name: 'Absalon', lat: 55.6654, lon: 12.5503, desc: 'Community dinner · DKK 60–100' },
-      { name: 'Høst', lat: 55.6834, lon: 12.5662, desc: 'New Nordic · DKK 395' },
-      { name: 'Reffen', lat: 55.6931, lon: 12.6099, desc: 'Street Food Market · DKK 60–120' },
-      { name: 'Torvehallerne', lat: 55.6843, lon: 12.5695, desc: 'Food Market · DKK 50–120' },
-      { name: 'Poulette', lat: 55.6889, lon: 12.5549, desc: 'Fried Chicken · DKK 95' },
-      { name: 'Kødbyens Fiskebar', lat: 55.6679, lon: 12.5593, desc: 'Seafood · DKK 200–400' },
-      { name: 'Hija de Sanchez', lat: 55.6689, lon: 12.5585, desc: 'Ex-Noma Tacos · DKK 45–65' },
-      { name: "Tommi's Burger", lat: 55.6683, lon: 12.5580, desc: 'Burgers · DKK 99–119' },
-      { name: 'Madglad', lat: 55.6707, lon: 12.5557, desc: 'Community · DKK 50–85' },
-      { name: 'La Neta', lat: 55.6879, lon: 12.5603, desc: 'Mexican · DKK 120' },
-      { name: 'Bottega Barlie', lat: 55.6872, lon: 12.5855, desc: 'Mediterranean · DKK 85–200' },
-      { name: 'Admiralgade 26', lat: 55.6776, lon: 12.5821, desc: 'Fusion · DKK 600' },
-      { name: 'RizRaz', lat: 55.6800, lon: 12.5740, desc: 'Vegetarian Buffet · DKK 145–185' },
-      { name: 'Gasoline Grill', lat: 55.6832, lon: 12.5851, desc: 'Burgers · DKK 100–150' },
-    ]
-  }
+const CAT={
+  hotel:{css:'#f87171',label:'HOTEL',icon:'🏨'},
+  hostel:{css:'#fb923c',label:'HOSTEL',icon:'🛏'},
+  sight:{css:'#facc15',label:'SIGHT',icon:'⭐'},
+  restaurant:{css:'#4ade80',label:'RESTAURANT',icon:'🍽'}
 };
 
-// Category visibility state
-const catVisible = { hotel: true, hostel: true, sight: true, restaurant: true };
-const catEntities = { hotel: [], hostel: [], sight: [], restaurant: [] };
+const POIS=[
+// HOTELS
+{c:'hotel',n:'Coco Hotel',lat:55.6725,lon:12.5640,s:4,r:'8.3/10',p:'$130/night',h:'Vesterbro',d:'Charming courtyard boutique near Tivoli. Cozy rooms with vintage Danish design. Free coffee & bikes. Great value for location.'},
+{c:'hotel',n:'Hotel SP34',lat:55.6785,lon:12.5710,s:4,r:'8.5/10',p:'$145/night',h:'Latin Quarter',d:'Stylish design hotel in the Latin Quarter by Brøchner Hotels. Wine hour, rooftop bar, two restaurants. Walkable to everything.'},
+{c:'hotel',n:'Manon Les Suites',lat:55.6830,lon:12.5680,s:5,r:'8.9/10',p:'$210/night',h:'Indre By',d:'Tropical-chic urban resort with jungle pool. Suites have kitchenettes. Instagram-famous interiors. Splurge-worthy for groups.'},
+{c:'hotel',n:'Hotel Sanders',lat:55.6785,lon:12.5855,s:5,r:'9.2/10',p:'$350/night',h:'Indre By',d:'Luxury boutique by ballet dancer Alexander Kølpin. Rooftop terrace, TaTa bar, impeccable service. Steps from Nyhavn.'},
+{c:'hotel',n:'Nobis Hotel',lat:55.6762,lon:12.5720,s:5,r:'9.0/10',p:'$290/night',h:'Indre By',d:'Swedish-owned luxury in a 1903 Royal Danish Conservatory building. Stunning atrium, NOX restaurant, marble bathrooms.'},
+{c:'hotel',n:'Andersen Boutique',lat:55.6710,lon:12.5585,s:4,r:'8.4/10',p:'$135/night',h:'Vesterbro',d:'Colorful Designers Guild interiors, 200m from Central Station. Free afternoon wine & snacks. Part of Brøchner Hotels.'},
+{c:'hotel',n:'Hotel Alexandra',lat:55.6748,lon:12.5665,s:3,r:'7.8/10',p:'$115/night',h:'Indre By',d:'Mid-century Danish design museum-hotel. Arne Jacobsen & Finn Juhl furniture in every room. Near Tivoli & City Hall.'},
+{c:'hotel',n:'Admiral Hotel',lat:55.6810,lon:12.5920,s:4,r:'8.1/10',p:'$155/night',h:'Waterfront',d:'Historic 1787 warehouse on the harbor. Exposed Pomeranian pine beams, waterfront views. Walking distance to Nyhavn & Opera.'},
+{c:'hotel',n:'Hotel Herman K',lat:55.6790,lon:12.5755,s:4,r:'8.6/10',p:'$160/night',h:'Indre By',d:'Design-forward hotel in former power station. Clever room layouts, free wine hour, rooftop terrace. By Brøchner Hotels.'},
+{c:'hotel',n:'Urban House',lat:55.6700,lon:12.5590,s:3,r:'7.5/10',p:'$85/night',h:'Vesterbro',d:'Budget-boutique hybrid near Central Station. Rooftop bar, co-working spaces, private rooms & dorms. Best value pick.'},
+// HOSTELS
+{c:'hostel',n:'Steel House',lat:55.6720,lon:12.5620,s:4,r:'8.7/10',p:'$35–55/bed',h:'Vesterbro',d:'Award-winning design hostel with indoor pool, gym & cinema. Industrial-chic interiors. 5min walk to Tivoli. Best hostel in CPH.'},
+{c:'hostel',n:'Generator CPH',lat:55.6642,lon:12.5510,s:3,r:'7.8/10',p:'$30–45/bed',h:'Vesterbro',d:'Stylish chain hostel with buzzing bar and event nights. Private rooms available. Near Kødbyen nightlife. Social atmosphere.'},
+{c:'hostel',n:'Next House',lat:55.6556,lon:12.5370,s:4,r:'8.5/10',p:'$32–50/bed',h:'Sydhavnen',d:'Modern design hostel with rooftop terrace & harbor views. Pod-style dorms, co-working space. 10min metro to center.'},
+{c:'hostel',n:'Downtown Hostel',lat:55.6778,lon:12.5730,s:3,r:'7.6/10',p:'$28–42/bed',h:'Indre By',d:'Central location on Vandkunsten square. Lively bar downstairs. Walking distance to Strøget and Nyhavn.'},
+// SIGHTS
+{c:'sight',n:'Nyhavn',lat:55.6798,lon:12.5894,s:5,r:'4.7/5',p:'Free',h:'Indre By',d:"Iconic 17th-century canal lined with colorful townhouses. Street food, jazz bars, canal boat tours. Copenhagen's most photographed spot."},
+{c:'sight',n:'Tivoli Gardens',lat:55.6737,lon:12.5681,s:5,r:'4.5/5',p:'165 DKK entry',h:'Indre By',d:"World's second-oldest amusement park (1843). Rides, gardens, restaurants & live music. Spring season opens March 20. Magical at dusk."},
+{c:'sight',n:'Little Mermaid',lat:55.6929,lon:12.5996,s:3,r:'3.8/5',p:'Free',h:'Østerbro',d:'Bronze statue from 1913 inspired by Hans Christian Andersen. Smaller than expected but iconic. Best visited early morning.'},
+{c:'sight',n:'Rosenborg Castle',lat:55.6860,lon:12.5773,s:5,r:'4.6/5',p:'140 DKK',h:'Indre By',d:"Renaissance castle housing Crown Jewels and royal regalia. Beautiful King's Garden surrounds it. Allow 1.5–2 hours."},
+{c:'sight',n:'Christiansborg',lat:55.6754,lon:12.5803,s:4,r:'4.5/5',p:'175 DKK combo',h:'Indre By',d:"Seat of Danish Parliament & Supreme Court. Royal Reception Rooms, ruins & tower (free). The tower has best free city views."},
+{c:'sight',n:'Christiania',lat:55.6735,lon:12.5970,s:4,r:'4.2/5',p:'Free',h:'Christianshavn',d:'Self-governing commune since 1971. Street art, DIY architecture, organic restaurants. No photos on Pusher Street. Unique experience.'},
+{c:'sight',n:'Amalienborg',lat:55.6840,lon:12.5930,s:4,r:'4.4/5',p:'120 DKK museum',h:'Indre By',d:'Royal residence with changing of the guard at noon daily. Four identical rococo palaces around an octagonal courtyard.'},
+{c:'sight',n:'Rundetårn',lat:55.6815,lon:12.5757,s:4,r:'4.5/5',p:'40 DKK',h:'Indre By',d:'17th-century tower with unique spiral ramp (no stairs!). Panoramic views from 35m. Quick 30-min visit.'},
+{c:'sight',n:'Strøget',lat:55.6770,lon:12.5755,s:4,r:'4.3/5',p:'Free',h:'Indre By',d:"Europe's longest pedestrian shopping street (1.1km). From City Hall to Kongens Nytorv. Mix of designer brands & Danish shops."},
+{c:'sight',n:'Kastellet',lat:55.6910,lon:12.5940,s:4,r:'4.6/5',p:'Free',h:'Østerbro',d:'Star-shaped 17th-century fortress, best-preserved in Northern Europe. Peaceful paths, historic windmill, moat.'},
+{c:'sight',n:'Designmuseum',lat:55.6852,lon:12.5905,s:4,r:'4.4/5',p:'130 DKK',h:'Indre By',d:'Danish & international design in a stunning rococo hospital building. Arne Jacobsen chairs, poster collection, lovely café.'},
+{c:'sight',n:'Superkilen',lat:55.7010,lon:12.5400,s:4,r:'4.3/5',p:'Free',h:'Nørrebro',d:'Award-winning urban park in three zones (red, black, green). Objects from 60+ countries. Designed by BIG architects.'},
+{c:'sight',n:'Opera House',lat:55.6815,lon:12.6010,s:4,r:'4.5/5',p:'100–600 DKK',h:'Holmen',d:"Henning Larsen's iconic waterfront opera (2005). Stunning at night. Guided tours available. Faces Amalienborg across the harbor."},
+{c:'sight',n:'Botanical Garden',lat:55.6875,lon:12.5730,s:4,r:'4.4/5',p:'Free (palm 60 DKK)',h:'Indre By',d:'10-hectare garden with 13,000 species. Beautiful 19th-century Palm House. Free outdoor entry. Near Rosenborg.'},
+{c:'sight',n:'Church of Our Saviour',lat:55.6725,lon:12.5940,s:5,r:'4.6/5',p:'65 DKK tower',h:'Christianshavn',d:'Baroque church with famous external spiral staircase. 400 steps for 360° views. Not for vertigo sufferers! Golden spire.'},
+{c:'sight',n:'National Museum',lat:55.6745,lon:12.5740,s:4,r:'4.5/5',p:'Free',h:'Indre By',d:"Denmark's largest museum of cultural history. Viking artifacts, Egyptian mummies. Permanent exhibitions free."},
+{c:'sight',n:'CopenHill',lat:55.6830,lon:12.6110,s:4,r:'4.3/5',p:'200 DKK ski',h:'Amager',d:'Ski slope & hiking trail on a waste-to-energy plant by BIG. Year-round dry ski slope, climbing wall. Architectural marvel.'},
+// RESTAURANTS
+{c:'restaurant',n:'Absalon',lat:55.6685,lon:12.5530,s:4,r:'4.4/5',p:'95–150 DKK',h:'Vesterbro',d:'Community dining hall in a former church. Long shared tables, affordable set menu. Bingo nights. Warm & communal.'},
+{c:'restaurant',n:'Høst',lat:55.6820,lon:12.5730,s:4,r:'4.5/5',p:'250–400 DKK',h:'Indre By',d:'New Nordic in a stunning rustic-modern interior. Set menu changes seasonally. Michelin recommended. Book ahead.'},
+{c:'restaurant',n:'Reffen',lat:55.6920,lon:12.6050,s:4,r:'4.2/5',p:'60–120 DKK',h:'Refshaleøen',d:"Copenhagen's largest street food market. 40+ stalls with global cuisine. Seasonal (opens April). Great harbor views."},
+{c:'restaurant',n:'Torvehallerne',lat:55.6838,lon:12.5715,s:4,r:'4.4/5',p:'50–150 DKK',h:'Indre By',d:'Covered food market with 60+ stalls. Danish smørrebrød, açai bowls, specialty coffee. Perfect for lunch. Two glass halls.'},
+{c:'restaurant',n:'Poulette',lat:55.6785,lon:12.5820,s:4,r:'4.3/5',p:'200–350 DKK',h:'Indre By',d:'French-Danish bistro with rotisserie chicken. Cozy Latin Quarter location. Great natural wine list. Relaxed atmosphere.'},
+{c:'restaurant',n:'Kødbyens Fiskebar',lat:55.6655,lon:12.5565,s:5,r:'4.5/5',p:'250–450 DKK',h:'Kødbyen',d:'Michelin-recommended seafood in the meatpacking district. Industrial-chic space. Raw bar, creative cocktails. Reserve ahead.'},
+{c:'restaurant',n:'Hija de Sanchez',lat:55.6832,lon:12.5708,s:4,r:'4.6/5',p:'45–90 DKK',h:'Torvehallerne',d:'Legendary tacos by ex-Noma chef Rosio Sanchez. Handmade tortillas, incredible salsas. Must-try.'},
+{c:'restaurant',n:"Tommi's Burger",lat:55.6705,lon:12.5545,s:3,r:'4.2/5',p:'80–130 DKK',h:'Vesterbro',d:'Icelandic-style smash burgers. No-frills, insanely good. Free toppings bar. The Classic burger is all you need.'},
+{c:'restaurant',n:'La Neta',lat:55.6802,lon:12.5695,s:4,r:'4.3/5',p:'55–100 DKK',h:'Indre By',d:'Authentic Mexican street food. Burritos, quesadillas, mezcal. Two locations. Cheap, filling, legit. Late-night friendly.'},
+{c:'restaurant',n:'Gasoline Grill',lat:55.6790,lon:12.5800,s:4,r:'4.5/5',p:'85–120 DKK',h:'Indre By',d:'Legendary burgers from a converted gas station. Simple menu, perfect execution. Usually a queue—worth it.'},
+{c:'restaurant',n:'Paté Paté',lat:55.6660,lon:12.5570,s:4,r:'4.3/5',p:'150–280 DKK',h:'Kødbyen',d:'Wine bar & restaurant in a former pâté factory. Mediterranean tapas. Great cocktails. Transitions to bar/DJ late night.'},
+{c:'restaurant',n:'Bæst',lat:55.6930,lon:12.5560,s:5,r:'4.6/5',p:'150–250 DKK',h:'Nørrebro',d:'Organic Italian by ex-Noma chef. House-made mozzarella, sourdough pizza, charcuterie. The pizza is extraordinary.'},
+{c:'restaurant',n:'Grød',lat:55.6835,lon:12.5710,s:3,r:'4.1/5',p:'45–80 DKK',h:'Torvehallerne',d:'Porridge & grain bowls elevated to art. Sweet and savory options. Perfect breakfast spot.'},
+{c:'restaurant',n:'Väkst',lat:55.6812,lon:12.5722,s:4,r:'4.4/5',p:'200–350 DKK',h:'Indre By',d:'Nordic greenhouse restaurant. Plants everywhere, seasonal set menu. Beautiful interior. Owned by Cofoco group.'},
+{c:'restaurant',n:'RizRaz',lat:55.6775,lon:12.5755,s:3,r:'4.0/5',p:'95–145 DKK',h:'Indre By',d:'Mediterranean vegetarian buffet at a fixed price. All-you-can-eat salads, falafel, hummus. Best budget lunch in central CPH.'},
+{c:'restaurant',n:'Admiralgade 26',lat:55.6780,lon:12.5830,s:4,r:'4.4/5',p:'200–350 DKK',h:'Indre By',d:'Hidden gem wine bar with seasonal small plates. Intimate candlelit space. Natural wines, Danish-French cuisine.'},
+{c:'restaurant',n:'Madglad',lat:55.6795,lon:12.5615,s:3,r:'4.0/5',p:'50–95 DKK',h:'Indre By',d:'Healthy bowls & smoothies near the lakes. Vegan-friendly, affordable. Good for a quick lunch between sightseeing.'},
+{c:'restaurant',n:'Bottega Barlie',lat:55.6772,lon:12.5785,s:4,r:'4.2/5',p:'100–180 DKK',h:'Indre By',d:'Italian wine bar & deli. Great pasta, charcuterie boards, aperitivo vibes. Perfect pre-dinner or casual evening spot.'},
+];
 
-// ── Viewer ─────────────────────────────────────────────
-const viewer = new Cesium.Viewer('cesiumContainer', {
-  globe: false,
-  baseLayerPicker: false,
-  timeline: false,
-  animation: false,
-  homeButton: false,
-  sceneModePicker: false,
-  navigationHelpButton: false,
-  fullscreenButton: false,
-  geocoder: true,
-  infoBox: false,
-  selectionIndicator: false,
-  showCreditsOnScreen: true,
-  skyBox: false,
-  skyAtmosphere: false,
-  orderIndependentTranslucency: true,
-  contextOptions: { requestWebgl2: true },
-  msaaSamples: 2,
+// ─── NEIGHBORHOOD POLYGONS ──────────────────────────
+const HOODS=[
+{name:'Indre By',color:'#f87171',coords:[[12.565,55.680],[12.568,55.672],[12.575,55.670],[12.585,55.672],[12.593,55.676],[12.595,55.680],[12.592,55.685],[12.585,55.688],[12.575,55.687],[12.568,55.685]]},
+{name:'Vesterbro',color:'#fb923c',coords:[[12.545,55.672],[12.555,55.665],[12.568,55.664],[12.572,55.668],[12.568,55.672],[12.565,55.676],[12.558,55.676],[12.548,55.675]]},
+{name:'Nørrebro',color:'#4ade80',coords:[[12.535,55.690],[12.545,55.685],[12.558,55.684],[12.568,55.685],[12.572,55.690],[12.572,55.698],[12.565,55.705],[12.548,55.705],[12.538,55.700],[12.535,55.695]]},
+{name:'Christianshavn',color:'#60a5fa',coords:[[12.585,55.668],[12.593,55.668],[12.603,55.672],[12.608,55.678],[12.603,55.682],[12.595,55.680],[12.590,55.676],[12.585,55.672]]},
+{name:'Frederiksberg',color:'#c084fc',coords:[[12.515,55.678],[12.530,55.672],[12.545,55.672],[12.548,55.676],[12.545,55.685],[12.535,55.690],[12.520,55.690],[12.512,55.685]]},
+{name:'Østerbro',color:'#2dd4bf',coords:[[12.565,55.688],[12.575,55.688],[12.585,55.690],[12.598,55.692],[12.605,55.698],[12.598,55.705],[12.580,55.705],[12.568,55.700],[12.565,55.695]]}
+];
+
+// ─── HEAT MAP DATA ──────────────────────────────────
+const HEAT_POINTS=[
+// Nyhavn cluster (high)
+{lat:55.6798,lon:12.5894,r:120,a:0.22,clr:'#ff4444'},
+{lat:55.6805,lon:12.5870,r:100,a:0.18,clr:'#ff5533'},
+{lat:55.6790,lon:12.5910,r:80,a:0.15,clr:'#ff6622'},
+// Strøget / City Hall
+{lat:55.6770,lon:12.5755,r:150,a:0.20,clr:'#ff5533'},
+{lat:55.6755,lon:12.5700,r:120,a:0.18,clr:'#ff6622'},
+{lat:55.6760,lon:12.5800,r:100,a:0.15,clr:'#ff7711'},
+// Tivoli
+{lat:55.6737,lon:12.5681,r:140,a:0.20,clr:'#ff4444'},
+{lat:55.6730,lon:12.5660,r:100,a:0.15,clr:'#ff5533'},
+// Vesterbro / Kødbyen
+{lat:55.6660,lon:12.5565,r:130,a:0.20,clr:'#ff5533'},
+{lat:55.6680,lon:12.5540,r:110,a:0.16,clr:'#ff6622'},
+{lat:55.6650,lon:12.5580,r:90,a:0.14,clr:'#ff7711'},
+// Torvehallerne
+{lat:55.6838,lon:12.5715,r:100,a:0.18,clr:'#ff5533'},
+{lat:55.6845,lon:12.5700,r:80,a:0.14,clr:'#ff6622'},
+// Christianshavn
+{lat:55.6735,lon:12.5960,r:110,a:0.14,clr:'#ff8800'},
+{lat:55.6725,lon:12.5940,r:90,a:0.12,clr:'#ff9922'},
+// Latin Quarter
+{lat:55.6790,lon:12.5730,r:110,a:0.16,clr:'#ff6622'},
+// Nørrebro
+{lat:55.6930,lon:12.5560,r:100,a:0.12,clr:'#ffaa33'},
+{lat:55.6940,lon:12.5540,r:80,a:0.10,clr:'#ffbb44'},
+// Outer/cool zones
+{lat:55.6875,lon:12.5730,r:80,a:0.08,clr:'#44aaff'},
+{lat:55.6910,lon:12.5940,r:90,a:0.08,clr:'#44aaff'},
+{lat:55.6929,lon:12.5996,r:70,a:0.06,clr:'#4488ff'},
+{lat:55.6860,lon:12.5905,r:80,a:0.07,clr:'#55bbff'},
+{lat:55.6556,lon:12.5370,r:80,a:0.06,clr:'#4488ff'},
+{lat:55.6830,lon:12.6110,r:80,a:0.06,clr:'#4488ff'},
+];
+
+// ─── ENTITY TRACKING ────────────────────────────────
+const entityGroups={hotel:[],hostel:[],sight:[],restaurant:[],neighborhood:[],heatmap:[]};
+const glowEntities=[];
+let minimalMode=true;
+let tileset=null;
+
+const grayscaleShader=new Cesium.CustomShader({
+  fragmentShaderText:`
+    void fragmentMain(FragmentInput fsInput, inout czm_modelMaterial material) {
+      float gray = dot(material.diffuse, vec3(0.299, 0.587, 0.114));
+      gray = pow(gray, 0.7) * 1.3;
+      gray = clamp(gray, 0.0, 1.0);
+      material.diffuse = vec3(gray);
+    }
+  `
 });
 
-// Dark background
-viewer.scene.backgroundColor = Cesium.Color.fromCssColorString('#0a0a0a');
+function starsStr(n){ return '★'.repeat(n)+'☆'.repeat(5-n); }
 
-// Load Google Photorealistic 3D Tiles (optimized for smooth loading)
-async function init() {
-  try {
-    const tileset = await Cesium.createGooglePhotorealistic3DTileset({
-      // Smooth loading: skip intermediate LODs, jump to final quality faster
-      skipLevelOfDetail: true,
-      baseScreenSpaceError: 1024,
-      skipScreenSpaceErrorFactor: 16,
-      skipLevels: 1,
-      immediatelyLoadDesiredLevelOfDetail: false,
-      loadSiblings: false,
+// ─── INIT VIEWER ─────────────────────────────────────
+const viewer=new Cesium.Viewer('cesiumContainer',{
+  baseLayerPicker:false,animation:false,timeline:false,
+  fullscreenButton:false,vrButton:false,geocoder:false,
+  homeButton:false,infoBox:false,selectionIndicator:false,
+  navigationHelpButton:false,sceneModePicker:false,
+  skyAtmosphere:new Cesium.SkyAtmosphere(),
+  orderIndependentTranslucency:true,
+  contextOptions:{requestWebgl2:true},
+  msaaSamples:4,
+});
+viewer.scene.globe.show=false;
+viewer.scene.skyBox.show=false;
+viewer.scene.backgroundColor=Cesium.Color.fromCssColorString('#0a0a0a');
 
-      // Dynamic SSE: reduce detail for distant tiles while camera moves
-      dynamicScreenSpaceError: true,
-      dynamicScreenSpaceErrorDensity: 2.0e-4,
-      dynamicScreenSpaceErrorFactor: 24.0,
-      dynamicScreenSpaceErrorHeightFalloff: 0.25,
+// Camera controls — Google Earth style
+const ctrl=viewer.scene.screenSpaceCameraController;
+ctrl.enableTilt=true;
+ctrl.enableLook=false;
+ctrl.minimumZoomDistance=50;
+ctrl.maximumZoomDistance=18000;
+ctrl.inertiaZoom=0.6;
+ctrl.inertiaSpin=0.85;
+ctrl.inertiaTranslate=0.85;
 
-      // Foveated rendering: prioritize center of screen
-      foveatedScreenSpaceError: true,
-      foveatedConeSize: 0.1,
-      foveatedMinimumScreenSpaceErrorRelaxation: 0.0,
-
-      // Higher quality target
-      maximumScreenSpaceError: 8,
-
-      // Bigger cache = less pop-in when panning back
-      cacheBytes: 1024 * 1024 * 1024,
-      maximumCacheOverflowBytes: 512 * 1024 * 1024,
-
-      // Preload for smoother panning
-      preloadWhenHidden: true,
-      preferLeaves: true,
-      cullRequestsWhileMoving: true,
-      cullRequestsWhileMovingMultiplier: 30.0,
-
-      showCreditsOnScreen: true,
+// ─── LOAD 3D TILES ──────────────────────────────────
+(async()=>{
+  try{
+    tileset=await Cesium.createGooglePhotorealistic3DTileset({
+      skipLevelOfDetail:true,
+      baseScreenSpaceError:1024,
+      skipScreenSpaceErrorFactor:16,
+      skipLevels:1,
+      immediatelyLoadDesiredLevelOfDetail:false,
+      loadSiblings:false,
+      dynamicScreenSpaceError:true,
+      dynamicScreenSpaceErrorDensity:2.0e-4,
+      dynamicScreenSpaceErrorFactor:24.0,
+      dynamicScreenSpaceErrorHeightFalloff:0.25,
+      foveatedScreenSpaceError:true,
+      foveatedConeSize:0.1,
+      foveatedMinimumScreenSpaceErrorRelaxation:0.0,
+      maximumScreenSpaceError:8,
+      cacheBytes:1024*1024*1024,
+      maximumCacheOverflowBytes:512*1024*1024,
+      preloadWhenHidden:true,
+      preferLeaves:true,
+      cullRequestsWhileMoving:true,
+      cullRequestsWhileMovingMultiplier:30.0,
+      showCreditsOnScreen:true,
     });
     viewer.scene.primitives.add(tileset);
 
-    // Fade out loading overlay when initial tiles are in
-    tileset.initialTilesLoaded.addEventListener(() => {
-      const overlay = document.getElementById('loadingOverlay');
-      overlay.classList.add('fade-out');
-      setTimeout(() => overlay.classList.add('hidden'), 1300);
+    // Apply grayscale by default
+    if(minimalMode) tileset.customShader=grayscaleShader;
+
+    // Hide loading when tiles loaded
+    const hideLoading=()=>{
+      const el=document.getElementById('loadingOverlay');
+      if(el){el.classList.add('fade');setTimeout(()=>el.remove(),1500);}
+    };
+    if(tileset.ready) hideLoading();
+    else tileset.initialTilesLoaded.addEventListener(hideLoading);
+
+    // Fly to Copenhagen
+    viewer.camera.flyTo({
+      destination:Cesium.Cartesian3.fromDegrees(12.5750,55.6780,1500),
+      orientation:{heading:Cesium.Math.toRadians(0),pitch:Cesium.Math.toRadians(-45),roll:0},
+      duration:2.5,
+      easingFunction:Cesium.EasingFunction.CUBIC_IN_OUT
     });
 
-  } catch (e) {
-    console.error('Failed to load Google 3D Tiles:', e);
-    const overlay = document.getElementById('loadingOverlay');
-    overlay.classList.add('fade-out');
-    setTimeout(() => overlay.classList.add('hidden'), 1300);
+    // Create POI entities
+    createPOIs();
+    createNeighborhoods();
+    createHeatmap();
+  }catch(e){
+    console.error('Tileset error:',e);
+    document.getElementById('loadingOverlay').querySelector('.lt').textContent='Error loading tiles';
   }
+})();
 
-  // Add all pins
-  for (const [cat, data] of Object.entries(PIN_DATA)) {
-    const cesiumColor = Cesium.Color.fromCssColorString(data.color);
-    for (const item of data.items) {
-      const entity = viewer.entities.add({
-        name: item.name,
-        position: Cesium.Cartesian3.fromDegrees(item.lon, item.lat),
-        point: {
-          pixelSize: 12,
-          color: cesiumColor,
-          outlineColor: Cesium.Color.WHITE,
-          outlineWidth: 2,
-          heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
-          disableDepthTestDistance: Number.POSITIVE_INFINITY,
-        },
-        label: {
-          text: item.name,
-          font: '12px sans-serif',
-          fillColor: cesiumColor,
-          outlineColor: Cesium.Color.fromCssColorString('rgba(0,0,0,0.85)'),
-          outlineWidth: 3,
-          style: Cesium.LabelStyle.FILL_AND_OUTLINE,
-          verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
-          pixelOffset: new Cesium.Cartesian2(0, -14),
-          heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
-          disableDepthTestDistance: Number.POSITIVE_INFINITY,
-          scaleByDistance: new Cesium.NearFarScalar(200, 1.2, 6000, 0.5),
-          translucencyByDistance: new Cesium.NearFarScalar(200, 1.0, 12000, 0.3),
-        },
-        properties: {
-          category: cat,
-          categoryLabel: data.label,
-          color: data.color,
-          description: item.desc,
-        },
-      });
-      catEntities[cat].push(entity);
-    }
-  }
+// ─── CREATE POI ENTITIES ─────────────────────────────
+function createPOIs(){
+  const POLE_H=70;
+  POIS.forEach((poi,idx)=>{
+    const cc=CAT[poi.c];
+    const cesColor=Cesium.Color.fromCssColorString(cc.css);
+    const groundPos=Cesium.Cartesian3.fromDegrees(poi.lon,poi.lat,0);
+    const elevPos=Cesium.Cartesian3.fromDegrees(poi.lon,poi.lat,POLE_H);
 
-  // Smooth camera fly-in (2 second ease to let tiles stream progressively)
-  viewer.camera.flyTo({
-    destination: Cesium.Cartesian3.fromDegrees(12.5750, 55.6780, 1500),
-    orientation: {
-      heading: Cesium.Math.toRadians(0),
-      pitch: Cesium.Math.toRadians(-45),
-      roll: 0,
-    },
-    duration: 2.0,
-    easingFunction: Cesium.EasingFunction.CUBIC_IN_OUT,
+    // Line text
+    const line1=cc.icon+' '+poi.n;
+    const line2=starsStr(poi.s)+' '+poi.r;
+    const line3=poi.p;
+    const labelText=line1+'\n'+line2+'\n'+line3;
+
+    // Ground dot
+    const dot=viewer.entities.add({
+      position:Cesium.Cartesian3.fromDegrees(poi.lon,poi.lat),
+      point:{
+        pixelSize:7,
+        color:cesColor,
+        outlineColor:cesColor.withAlpha(0.4),
+        outlineWidth:3,
+        heightReference:Cesium.HeightReference.CLAMP_TO_GROUND,
+        disableDepthTestDistance:Number.POSITIVE_INFINITY
+      },
+      properties:{poiIdx:idx}
+    });
+
+    // Label entity with pole line
+    const label=viewer.entities.add({
+      position:elevPos,
+      polyline:{
+        positions:[groundPos,elevPos],
+        width:1.5,
+        material:new Cesium.ColorMaterialProperty(cesColor.withAlpha(0.5)),
+        clampToGround:false,
+      },
+      label:{
+        text:labelText,
+        font:'bold 12px Inter, sans-serif',
+        fillColor:Cesium.Color.WHITE,
+        backgroundColor:Cesium.Color.fromCssColorString('rgba(0,0,0,0.78)'),
+        showBackground:true,
+        backgroundPadding:new Cesium.Cartesian2(10,7),
+        pixelOffset:new Cesium.Cartesian2(0,-8),
+        verticalOrigin:Cesium.VerticalOrigin.BOTTOM,
+        horizontalOrigin:Cesium.HorizontalOrigin.CENTER,
+        disableDepthTestDistance:Number.POSITIVE_INFINITY,
+        scaleByDistance:new Cesium.NearFarScalar(300,1.0,8000,0.35),
+        translucencyByDistance:new Cesium.NearFarScalar(300,1.0,15000,0.5),
+      },
+      properties:{poiIdx:idx}
+    });
+
+    // Ground glow ellipse
+    const glow=viewer.entities.add({
+      position:Cesium.Cartesian3.fromDegrees(poi.lon,poi.lat),
+      ellipse:{
+        semiMajorAxis:30,
+        semiMinorAxis:30,
+        material:cesColor.withAlpha(0.22),
+        heightReference:Cesium.HeightReference.CLAMP_TO_GROUND,
+      }
+    });
+
+    entityGroups[poi.c].push(dot,label,glow);
+    glowEntities.push(glow);
   });
 }
 
-init();
+// ─── NEIGHBORHOODS ───────────────────────────────────
+function createNeighborhoods(){
+  HOODS.forEach(hood=>{
+    const clr=Cesium.Color.fromCssColorString(hood.color);
+    const positions=hood.coords.map(c=>Cesium.Cartesian3.fromDegrees(c[0],c[1]));
+    // Polygon
+    const poly=viewer.entities.add({
+      polygon:{
+        hierarchy:new Cesium.PolygonHierarchy(positions),
+        material:clr.withAlpha(0.12),
+        outline:true,
+        outlineColor:clr.withAlpha(0.4),
+        outlineWidth:2,
+        heightReference:Cesium.HeightReference.CLAMP_TO_GROUND,
+      },
+      show:false
+    });
+    // Center label
+    const cx=hood.coords.reduce((s,c)=>s+c[0],0)/hood.coords.length;
+    const cy=hood.coords.reduce((s,c)=>s+c[1],0)/hood.coords.length;
+    const lbl=viewer.entities.add({
+      position:Cesium.Cartesian3.fromDegrees(cx,cy,100),
+      label:{
+        text:hood.name,
+        font:'bold 14px Inter, sans-serif',
+        fillColor:Cesium.Color.fromCssColorString(hood.color),
+        outlineColor:Cesium.Color.BLACK,
+        outlineWidth:3,
+        style:Cesium.LabelStyle.FILL_AND_OUTLINE,
+        disableDepthTestDistance:Number.POSITIVE_INFINITY,
+        scaleByDistance:new Cesium.NearFarScalar(500,1.0,10000,0.4),
+        translucencyByDistance:new Cesium.NearFarScalar(500,1.0,18000,0.5),
+      },
+      show:false
+    });
+    entityGroups.neighborhood.push(poly,lbl);
+  });
+}
 
-// ── Click handler for info popup ──────────────────────
-const infoPopup = document.getElementById('infoPopup');
-const infoName = document.getElementById('infoName');
-const infoDesc = document.getElementById('infoDesc');
-const infoBadge = document.getElementById('infoBadge');
+// ─── HEATMAP ─────────────────────────────────────────
+function createHeatmap(){
+  HEAT_POINTS.forEach(hp=>{
+    const ent=viewer.entities.add({
+      position:Cesium.Cartesian3.fromDegrees(hp.lon,hp.lat),
+      ellipse:{
+        semiMajorAxis:hp.r,
+        semiMinorAxis:hp.r,
+        material:Cesium.Color.fromCssColorString(hp.clr).withAlpha(hp.a),
+        heightReference:Cesium.HeightReference.CLAMP_TO_GROUND,
+      },
+      show:false
+    });
+    entityGroups.heatmap.push(ent);
+  });
+}
 
-const handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
-handler.setInputAction(function(click) {
-  const picked = viewer.scene.pick(click.position);
-  if (Cesium.defined(picked) && picked.id && picked.id.properties) {
-    const props = picked.id.properties;
-    const cat = props.category.getValue();
-    const color = props.color.getValue();
-    const name = picked.id.name;
-    const desc = props.description.getValue();
-    const catLabel = props.categoryLabel.getValue();
+// ─── TOGGLE CATEGORIES ──────────────────────────────
+function toggleCat(cat,btn){
+  const isActive=btn.classList.toggle('active');
+  entityGroups[cat].forEach(e=>e.show=isActive);
+}
 
-    infoBadge.textContent = catLabel;
-    infoBadge.style.background = color + '22';
-    infoBadge.style.color = color;
-    infoName.textContent = name;
-    infoDesc.textContent = desc;
-
-    // Position popup near click
-    const x = Math.min(click.position.x, window.innerWidth - 320);
-    const y = Math.min(click.position.y, window.innerHeight - 160);
-    infoPopup.style.left = Math.max(8, x) + 'px';
-    infoPopup.style.top = Math.max(8, y - 120) + 'px';
-    infoPopup.style.display = 'block';
-  } else {
-    closeInfo();
+function toggleMinimal(btn){
+  minimalMode=btn.classList.toggle('active');
+  if(tileset){
+    tileset.customShader=minimalMode?grayscaleShader:undefined;
   }
-}, Cesium.ScreenSpaceEventType.LEFT_CLICK);
-
-function closeInfo() {
-  infoPopup.style.display = 'none';
 }
 
-// ── Toggle categories ──────────────────────────────────
-function toggleCategory(cat) {
-  catVisible[cat] = !catVisible[cat];
-  const show = catVisible[cat];
-  catEntities[cat].forEach(e => { e.show = show; });
-  const btn = document.querySelector(`.toggle-btn[data-cat="${cat}"]`);
-  if (btn) btn.classList.toggle('off', !show);
-}
-
-// ── Neighborhood panel toggle on mobile ────────────────
-function checkMobile() {
-  const panel = document.getElementById('neighborhoodPanel');
-  const toggle = document.getElementById('nhToggle');
-  if (window.innerWidth < 600) {
-    panel.style.display = 'none';
-    toggle.style.display = 'block';
-  } else {
-    panel.style.display = 'block';
-    toggle.style.display = 'none';
+// ─── CLICK HANDLING ──────────────────────────────────
+const handler=new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
+handler.setInputAction(function(click){
+  const picked=viewer.scene.pick(click.position);
+  if(Cesium.defined(picked)&&Cesium.defined(picked.id)&&Cesium.defined(picked.id.properties)){
+    const idx=picked.id.properties.poiIdx;
+    if(Cesium.defined(idx)){
+      const poi=POIS[idx.getValue()];
+      showDetail(poi);
+    }
+  }else{
+    closeDetail();
   }
+},Cesium.ScreenSpaceEventType.LEFT_CLICK);
+
+function showDetail(poi){
+  const cc=CAT[poi.c];
+  const card=document.getElementById('detailCard');
+  document.getElementById('dcBadge').textContent=cc.label;
+  document.getElementById('dcBadge').style.background=cc.css;
+  document.getElementById('dcBadge').style.color='#000';
+  document.getElementById('dcName').textContent=poi.n;
+  document.getElementById('dcStars').textContent=starsStr(poi.s)+' '+poi.r;
+  document.getElementById('dcPrice').textContent=poi.p;
+  document.getElementById('dcDesc').textContent=poi.d;
+  document.getElementById('dcHood').textContent='📍 '+poi.h;
+  card.classList.add('show');
+
+  // Fly to POI
+  viewer.camera.flyTo({
+    destination:Cesium.Cartesian3.fromDegrees(poi.lon,poi.lat,400),
+    orientation:{
+      heading:Cesium.Math.toRadians(15),
+      pitch:Cesium.Math.toRadians(-40),
+      roll:0
+    },
+    duration:1.5,
+    easingFunction:Cesium.EasingFunction.CUBIC_IN_OUT
+  });
 }
-window.addEventListener('resize', checkMobile);
-checkMobile();
+
+function closeDetail(){
+  document.getElementById('detailCard').classList.remove('show');
+}
 </script>
 </body>
 </html>
