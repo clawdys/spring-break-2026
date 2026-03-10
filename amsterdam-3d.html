@@ -271,13 +271,17 @@ var viewer, tileset, grayscaleShader;
   ctrl.inertiaTranslate = 0.6;
   ctrl.inertiaZoom = 0.7;
 
-  /* Grayscale shader */
+  /* Dark minimal shader — dark base, white highlights, posterized */
   grayscaleShader = new Cesium.CustomShader({
     fragmentShaderText: '\
       void fragmentMain(FragmentInput fsInput, inout czm_modelMaterial material) {\
         float gray = dot(material.diffuse, vec3(0.299, 0.587, 0.114));\
-        gray = pow(gray, 0.7) * 1.3;\
-        gray = clamp(gray, 0.0, 1.0);\
+        /* High contrast S-curve: crush darks, boost highlights */\
+        gray = smoothstep(0.05, 0.85, gray);\
+        /* Posterize to ~6 discrete shades for a cleaner graphic look */\
+        gray = floor(gray * 6.0) / 6.0;\
+        /* Dark overall with white highlights: remap 0-1 to 0.06-0.75 */\
+        gray = mix(0.06, 0.75, gray);\
         material.diffuse = vec3(gray);\
       }\
     '
@@ -501,6 +505,8 @@ function tgl(layer){
   if(layer==='minimal'){
     if(tileset){
       tileset.customShader = layers.minimal ? grayscaleShader : undefined;
+      /* Lower LOD in minimal mode = blockier, simpler geometry */
+      tileset.maximumScreenSpaceError = layers.minimal ? 24 : 8;
     }
     /* Toggle glow visibility based on minimal mode */
     ['hotels','sights','restaurants'].forEach(function(cat){
