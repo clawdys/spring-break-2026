@@ -9,490 +9,467 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{width:100%;height:100%;overflow:hidden;font-family:'Inter',system-ui,sans-serif;background:#0a0a0a;color:#fff}
-#cesiumContainer{width:100%;height:100%}
-.cesium-viewer-toolbar,.cesium-viewer-animationContainer,.cesium-viewer-timelineContainer,
-.cesium-viewer-bottom,.cesium-viewer-fullscreenContainer,.cesium-viewer-vrContainer,
-.cesium-viewer-geocoderContainer,.cesium-viewer-infoBoxContainer,
-.cesium-viewer-selectionIndicatorContainer{display:none!important}
-.cesium-credit-logoContainer{opacity:0.3!important}
-.cesium-widget canvas{border-radius:0}
-.glass{background:rgba(10,10,10,0.72);backdrop-filter:blur(20px) saturate(1.4);-webkit-backdrop-filter:blur(20px) saturate(1.4);border:1px solid rgba(255,255,255,0.08);border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,0.5),inset 0 0.5px 0 rgba(255,255,255,0.06)}
-#titleBar{position:fixed;top:16px;left:16px;z-index:100;padding:14px 20px}
-#titleBar h1{font-size:17px;font-weight:700;letter-spacing:-0.3px;line-height:1.3}
-#titleBar .sub{font-size:12px;font-weight:400;color:rgba(255,255,255,0.5);margin-top:3px}
-#togglePanel{position:fixed;top:16px;right:16px;z-index:100;padding:8px;display:flex;flex-direction:column;gap:4px}
-.tog-btn{display:flex;align-items:center;gap:8px;padding:8px 14px;border:none;border-radius:10px;background:rgba(255,255,255,0.05);color:#fff;font-size:12.5px;font-weight:500;cursor:pointer;transition:all 0.2s;font-family:inherit;white-space:nowrap;text-align:left}
-.tog-btn:hover{background:rgba(255,255,255,0.1)}
-.tog-btn.active{background:rgba(255,255,255,0.13)}
-.tog-btn .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;transition:opacity 0.2s}
-.tog-btn:not(.active) .dot{opacity:0.3}
-#detailCard{position:fixed;bottom:20px;right:16px;z-index:100;width:340px;padding:0;opacity:0;transform:translateY(12px);transition:opacity 0.3s,transform 0.3s;pointer-events:none;overflow:hidden}
-#detailCard.show{opacity:1;transform:translateY(0);pointer-events:auto}
-.dc-header{padding:16px 18px 10px;display:flex;align-items:flex-start;gap:10px}
-.dc-badge{padding:3px 8px;border-radius:6px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;flex-shrink:0;margin-top:2px}
-.dc-name{font-size:16px;font-weight:700;line-height:1.3}
-.dc-stars{color:#facc15;font-size:13px;margin-top:2px}
-.dc-body{padding:0 18px 16px}
-.dc-price{font-size:13px;font-weight:600;color:rgba(255,255,255,0.8);margin-bottom:6px}
-.dc-desc{font-size:12.5px;line-height:1.55;color:rgba(255,255,255,0.6)}
-.dc-hood{font-size:11px;color:rgba(255,255,255,0.35);margin-top:8px}
-.dc-close{position:absolute;top:10px;right:12px;background:none;border:none;color:rgba(255,255,255,0.4);font-size:16px;cursor:pointer;line-height:1}
-.dc-close:hover{color:#fff}
-#hoodPanel{position:fixed;bottom:20px;left:16px;z-index:100;width:300px;max-height:340px;overflow:hidden;transition:max-height 0.35s ease}
-#hoodPanel.collapsed{max-height:44px}
-.hp-toggle{padding:11px 16px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;font-size:12.5px;font-weight:600;border-bottom:1px solid rgba(255,255,255,0.06);user-select:none}
-.hp-toggle .arrow{transition:transform 0.3s;font-size:10px}
-#hoodPanel.collapsed .hp-toggle .arrow{transform:rotate(-90deg)}
-.hp-body{padding:12px 16px;overflow-y:auto;max-height:290px}
-.hp-item{margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.04)}
-.hp-item:last-child{border:none;margin:0;padding:0}
-.hp-name{font-size:12.5px;font-weight:600;margin-bottom:3px;display:flex;align-items:center;gap:6px}
-.hp-name .hdot{width:6px;height:6px;border-radius:50%}
-.hp-desc{font-size:11.5px;color:rgba(255,255,255,0.45);line-height:1.45}
-#loadingOverlay{position:fixed;inset:0;z-index:999;background:#0a0a0a;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 1.2s ease}
-#loadingOverlay.fade{opacity:0;pointer-events:none}
-.spinner{width:36px;height:36px;border:2.5px solid rgba(255,255,255,0.1);border-top-color:rgba(255,255,255,0.7);border-radius:50%;animation:spin 0.8s linear infinite}
+html,body,#cesiumContainer{width:100%;height:100%;overflow:hidden;background:#0a0a0a;font-family:'Inter',system-ui,sans-serif}
+#cesiumContainer{position:absolute;top:0;left:0}
+.cesium-viewer-bottom,.cesium-viewer-toolbar{display:none!important}
+.cesium-widget-credits{font-size:9px!important;opacity:0.3!important}
+#loadingOverlay{position:fixed;inset:0;z-index:9999;background:#0a0a0a;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .8s,visibility .8s}
+#loadingOverlay.hidden{opacity:0;visibility:hidden;pointer-events:none}
+.loader{width:48px;height:48px;border:3px solid rgba(255,255,255,.1);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-#loadingOverlay .lt{margin-top:16px;font-size:13px;font-weight:500;color:rgba(255,255,255,0.5)}
-#loadingOverlay .ls{margin-top:6px;font-size:11px;color:rgba(255,255,255,0.25)}
+.loader-text{color:rgba(255,255,255,.6);margin-top:16px;font-size:14px;letter-spacing:.5px}
+.glass{background:rgba(10,10,10,.82);backdrop-filter:blur(24px) saturate(1.4);-webkit-backdrop-filter:blur(24px) saturate(1.4);border:1px solid rgba(255,255,255,.08);border-radius:14px;color:#e8e8e8}
+#titlePanel{position:fixed;top:16px;left:16px;z-index:100;padding:14px 20px}
+#titlePanel h1{font-size:17px;font-weight:700;letter-spacing:-.3px}
+#titlePanel .sub{font-size:11.5px;color:rgba(255,255,255,.45);margin-top:3px}
+#togglePanel{position:fixed;top:16px;right:16px;z-index:100;padding:10px 6px;min-width:200px}
+.toggle-row{display:flex;align-items:center;gap:10px;padding:7px 12px;border-radius:8px;cursor:pointer;transition:background .15s;user-select:none;font-size:12.5px;font-weight:500}
+.toggle-row:hover{background:rgba(255,255,255,.06)}
+.toggle-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;transition:box-shadow .2s}
+.toggle-dot.on{box-shadow:0 0 6px 2px currentColor}
+.toggle-label{flex:1}
+.toggle-state{font-size:10px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;opacity:.45;min-width:24px;text-align:right}
+#detailCard{position:fixed;bottom:20px;right:16px;z-index:100;width:320px;padding:0;opacity:0;transform:translateY(12px);pointer-events:none;transition:opacity .3s,transform .3s;overflow:hidden}
+#detailCard.show{opacity:1;transform:translateY(0);pointer-events:auto}
+.dc-header{padding:16px 18px 12px;border-bottom:1px solid rgba(255,255,255,.06);position:relative}
+.dc-close{position:absolute;top:12px;right:14px;background:none;border:none;color:rgba(255,255,255,.4);cursor:pointer;font-size:18px}
+.dc-close:hover{color:#fff}
+.dc-cat{font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}
+.dc-name{font-size:16px;font-weight:700;letter-spacing:-.2px;padding-right:24px}
+.dc-body{padding:14px 18px 18px}
+.dc-stars{color:#f5c842;font-size:13px;margin-bottom:6px}
+.dc-price{font-size:14px;font-weight:600;color:#4fc3f7;margin-bottom:8px}
+.dc-desc{font-size:12px;line-height:1.6;color:rgba(255,255,255,.6)}
+.dc-neighborhood{display:inline-block;margin-top:10px;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:600;background:rgba(255,255,255,.06);color:rgba(255,255,255,.5)}
+#neighborhoodGuide{position:fixed;bottom:20px;left:16px;z-index:100;width:260px;max-height:400px;overflow:hidden;transition:max-height .35s}
+#neighborhoodGuide.collapsed{max-height:42px}
+.ng-header{padding:10px 14px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;font-size:12.5px;font-weight:600;border-bottom:1px solid rgba(255,255,255,.06)}
+.ng-header .arrow{transition:transform .3s;font-size:10px}
+#neighborhoodGuide.collapsed .arrow{transform:rotate(-90deg)}
+.ng-list{padding:8px 0;max-height:340px;overflow-y:auto}
+.ng-item{padding:8px 14px;cursor:pointer;transition:background .15s;display:flex;align-items:flex-start;gap:10px;font-size:11.5px}
+.ng-item:hover{background:rgba(255,255,255,.05)}
+.ng-color{width:10px;height:10px;border-radius:3px;flex-shrink:0;margin-top:2px}
+.ng-item-name{font-weight:600}
+.ng-item-desc{color:rgba(255,255,255,.4);font-size:10.5px;margin-top:2px;line-height:1.4}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:4px}
 </style>
 </head>
 <body>
-<div id="loadingOverlay"><div class="spinner"></div><div class="lt">Loading Copenhagen</div><div class="ls">Streaming 3D tiles…</div></div>
-<div id="titleBar" class="glass"><h1>🇩🇰 Copenhagen — 3D Guide Map</h1><div class="sub">Mar 25–28, 2026 · 4 travelers</div></div>
+<div id="loadingOverlay"><div class="loader"></div><div class="loader-text">Loading Copenhagen…</div></div>
+<div id="titlePanel" class="glass"><h1>🇩🇰 Copenhagen — 3D Guide Map</h1><div class="sub">Mar 25–28, 2026 · 4 travelers</div></div>
 <div id="togglePanel" class="glass">
-<button class="tog-btn active" data-cat="hotel" onclick="toggleCat('hotel',this)"><span class="dot" style="background:#f87171"></span>🏨 Hotels</button>
-<button class="tog-btn active" data-cat="hostel" onclick="toggleCat('hostel',this)"><span class="dot" style="background:#fb923c"></span>🛏 Hostels</button>
-<button class="tog-btn active" data-cat="sight" onclick="toggleCat('sight',this)"><span class="dot" style="background:#facc15"></span>⭐ Sights</button>
-<button class="tog-btn active" data-cat="restaurant" onclick="toggleCat('restaurant',this)"><span class="dot" style="background:#4ade80"></span>🍽 Restaurants</button>
-<div style="height:1px;background:rgba(255,255,255,0.06);margin:4px 0"></div>
-<button class="tog-btn" data-cat="neighborhood" onclick="toggleCat('neighborhood',this)"><span class="dot" style="background:#60a5fa"></span>🏘 Neighborhoods</button>
-<button class="tog-btn" data-cat="heatmap" onclick="toggleCat('heatmap',this)"><span class="dot" style="background:#f97316"></span>🔥 Heat Map</button>
-<div style="height:1px;background:rgba(255,255,255,0.06);margin:4px 0"></div>
-<button class="tog-btn active" data-cat="minimal" onclick="toggleMinimal(this)"><span class="dot" style="background:#c084fc"></span>🎨 Minimal</button>
-</div>
-<div id="hoodPanel" class="glass collapsed">
-<div class="hp-toggle" onclick="this.parentElement.classList.toggle('collapsed')"><span>📍 Neighborhood Tips</span><span class="arrow">▼</span></div>
-<div class="hp-body">
-<div class="hp-item"><div class="hp-name"><span class="hdot" style="background:#f87171"></span>Indre By / City Center</div><div class="hp-desc">Heart of Copenhagen. Strøget shopping, Nyhavn, Tivoli. Most sights walkable. Priciest but unbeatable location.</div></div>
-<div class="hp-item"><div class="hp-name"><span class="hdot" style="background:#fb923c"></span>Vesterbro / Kødbyen</div><div class="hp-desc">Trendy meatpacking district. Best nightlife, craft cocktails, indie restaurants. Full of energy. Near Central Station.</div></div>
-<div class="hp-item"><div class="hp-name"><span class="hdot" style="background:#4ade80"></span>Nørrebro</div><div class="hp-desc">Multicultural & hipster. Cheapest eats, best coffee, street art. Superkilen park. 15min bike to center.</div></div>
-<div class="hp-item"><div class="hp-name"><span class="hdot" style="background:#60a5fa"></span>Christianshavn</div><div class="hp-desc">Canal-lined charm. Christiania freetown, Church of Our Saviour. Cozy waterfront dining. 10min walk to center.</div></div>
-<div class="hp-item"><div class="hp-name"><span class="hdot" style="background:#c084fc"></span>Frederiksberg</div><div class="hp-desc">Upscale residential. Beautiful gardens & zoo. Quieter, local feel. Great brunch spots. 20min walk to Tivoli.</div></div>
-<div class="hp-item"><div class="hp-name"><span class="hdot" style="background:#2dd4bf"></span>Østerbro</div><div class="hp-desc">Leafy, family-friendly. Near Kastellet & Little Mermaid. Excellent bakeries. Residential & relaxed.</div></div>
-</div>
+<div class="toggle-row" onclick="toggleLayer('hotels')"><div class="toggle-dot on" id="dot-hotels" style="color:#ef5350;background:#ef5350"></div><span class="toggle-label">🏨 Hotels</span><span class="toggle-state" id="state-hotels">ON</span></div>
+<div class="toggle-row" onclick="toggleLayer('hostels')"><div class="toggle-dot on" id="dot-hostels" style="color:#ff9800;background:#ff9800"></div><span class="toggle-label">🛏 Hostels</span><span class="toggle-state" id="state-hostels">ON</span></div>
+<div class="toggle-row" onclick="toggleLayer('sights')"><div class="toggle-dot on" id="dot-sights" style="color:#f5c842;background:#f5c842"></div><span class="toggle-label">⭐ Sights</span><span class="toggle-state" id="state-sights">ON</span></div>
+<div class="toggle-row" onclick="toggleLayer('restaurants')"><div class="toggle-dot on" id="dot-restaurants" style="color:#66bb6a;background:#66bb6a"></div><span class="toggle-label">🍽 Restaurants</span><span class="toggle-state" id="state-restaurants">ON</span></div>
+<div class="toggle-row" onclick="toggleLayer('neighborhoods')"><div class="toggle-dot" id="dot-neighborhoods" style="color:#42a5f5;background:#42a5f5"></div><span class="toggle-label">🏘 Neighborhoods</span><span class="toggle-state" id="state-neighborhoods">OFF</span></div>
+<div class="toggle-row" onclick="toggleLayer('heatmap')"><div class="toggle-dot" id="dot-heatmap" style="color:#ff7043;background:#ff7043"></div><span class="toggle-label">🔥 Heat Map</span><span class="toggle-state" id="state-heatmap">OFF</span></div>
+<div class="toggle-row" onclick="togglePhotoMode()"><div class="toggle-dot" id="dot-photo" style="color:#fff;background:#fff"></div><span class="toggle-label">📸 Photo Mode</span><span class="toggle-state" id="state-photo">OFF</span></div>
 </div>
 <div id="detailCard" class="glass">
-<button class="dc-close" onclick="closeDetail()">✕</button>
-<div class="dc-header"><span class="dc-badge" id="dcBadge">HOTEL</span><div><div class="dc-name" id="dcName">—</div><div class="dc-stars" id="dcStars"></div></div></div>
-<div class="dc-body"><div class="dc-price" id="dcPrice"></div><div class="dc-desc" id="dcDesc"></div><div class="dc-hood" id="dcHood"></div></div>
+<div class="dc-header"><button class="dc-close" onclick="closeDetail()">&times;</button><div class="dc-cat" id="dc-cat"></div><div class="dc-name" id="dc-name"></div></div>
+<div class="dc-body"><div class="dc-stars" id="dc-stars"></div><div class="dc-price" id="dc-price"></div><div class="dc-desc" id="dc-desc"></div><div class="dc-neighborhood" id="dc-neighborhood"></div></div>
+</div>
+<div id="neighborhoodGuide" class="glass collapsed">
+<div class="ng-header" onclick="toggleNeighborhoodGuide()"><span>📍 Neighborhood Guide</span><span class="arrow">▼</span></div>
+<div class="ng-list" id="ngList"></div>
 </div>
 <div id="cesiumContainer"></div>
 <script>
 Cesium.Ion.defaultAccessToken='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI5Zjk1ODRlMi1hNjlmLTQ0NDktOTU3OS0wMjUxNTYyNWFhZDkiLCJpZCI6NDAxMDM0LCJpYXQiOjE3NzMxMDE0MDB9.JQg2NhsCuLeNn_3wLEdrtEVuvGu6_R445H6wVaSLTks';
 
-const CAT={
-  hotel:{css:'#f87171',label:'HOTEL',icon:'🏨'},
-  hostel:{css:'#fb923c',label:'HOSTEL',icon:'🛏'},
-  sight:{css:'#facc15',label:'SIGHT',icon:'⭐'},
-  restaurant:{css:'#4ade80',label:'RESTAURANT',icon:'🍽'}
+const CC={
+  hotels:Cesium.Color.fromCssColorString('#ef5350'),
+  hostels:Cesium.Color.fromCssColorString('#ff9800'),
+  sights:Cesium.Color.fromCssColorString('#f5c842'),
+  restaurants:Cesium.Color.fromCssColorString('#66bb6a')
 };
 
-const POIS=[
-// HOTELS
-{c:'hotel',n:'Coco Hotel',lat:55.6725,lon:12.5640,s:4,r:'8.3/10',p:'$130/night',h:'Vesterbro',d:'Charming courtyard boutique near Tivoli. Cozy rooms with vintage Danish design. Free coffee & bikes. Great value for location.'},
-{c:'hotel',n:'Hotel SP34',lat:55.6785,lon:12.5710,s:4,r:'8.5/10',p:'$145/night',h:'Latin Quarter',d:'Stylish design hotel in the Latin Quarter by Brøchner Hotels. Wine hour, rooftop bar, two restaurants. Walkable to everything.'},
-{c:'hotel',n:'Manon Les Suites',lat:55.6830,lon:12.5680,s:5,r:'8.9/10',p:'$210/night',h:'Indre By',d:'Tropical-chic urban resort with jungle pool. Suites have kitchenettes. Instagram-famous interiors. Splurge-worthy for groups.'},
-{c:'hotel',n:'Hotel Sanders',lat:55.6785,lon:12.5855,s:5,r:'9.2/10',p:'$350/night',h:'Indre By',d:'Luxury boutique by ballet dancer Alexander Kølpin. Rooftop terrace, TaTa bar, impeccable service. Steps from Nyhavn.'},
-{c:'hotel',n:'Nobis Hotel',lat:55.6762,lon:12.5720,s:5,r:'9.0/10',p:'$290/night',h:'Indre By',d:'Swedish-owned luxury in a 1903 Royal Danish Conservatory building. Stunning atrium, NOX restaurant, marble bathrooms.'},
-{c:'hotel',n:'Andersen Boutique',lat:55.6710,lon:12.5585,s:4,r:'8.4/10',p:'$135/night',h:'Vesterbro',d:'Colorful Designers Guild interiors, 200m from Central Station. Free afternoon wine & snacks. Part of Brøchner Hotels.'},
-{c:'hotel',n:'Hotel Alexandra',lat:55.6748,lon:12.5665,s:3,r:'7.8/10',p:'$115/night',h:'Indre By',d:'Mid-century Danish design museum-hotel. Arne Jacobsen & Finn Juhl furniture in every room. Near Tivoli & City Hall.'},
-{c:'hotel',n:'Admiral Hotel',lat:55.6810,lon:12.5920,s:4,r:'8.1/10',p:'$155/night',h:'Waterfront',d:'Historic 1787 warehouse on the harbor. Exposed Pomeranian pine beams, waterfront views. Walking distance to Nyhavn & Opera.'},
-{c:'hotel',n:'Hotel Herman K',lat:55.6790,lon:12.5755,s:4,r:'8.6/10',p:'$160/night',h:'Indre By',d:'Design-forward hotel in former power station. Clever room layouts, free wine hour, rooftop terrace. By Brøchner Hotels.'},
-{c:'hotel',n:'Urban House',lat:55.6700,lon:12.5590,s:3,r:'7.5/10',p:'$85/night',h:'Vesterbro',d:'Budget-boutique hybrid near Central Station. Rooftop bar, co-working spaces, private rooms & dorms. Best value pick.'},
-// HOSTELS
-{c:'hostel',n:'Steel House',lat:55.6720,lon:12.5620,s:4,r:'8.7/10',p:'$35–55/bed',h:'Vesterbro',d:'Award-winning design hostel with indoor pool, gym & cinema. Industrial-chic interiors. 5min walk to Tivoli. Best hostel in CPH.'},
-{c:'hostel',n:'Generator CPH',lat:55.6642,lon:12.5510,s:3,r:'7.8/10',p:'$30–45/bed',h:'Vesterbro',d:'Stylish chain hostel with buzzing bar and event nights. Private rooms available. Near Kødbyen nightlife. Social atmosphere.'},
-{c:'hostel',n:'Next House',lat:55.6556,lon:12.5370,s:4,r:'8.5/10',p:'$32–50/bed',h:'Sydhavnen',d:'Modern design hostel with rooftop terrace & harbor views. Pod-style dorms, co-working space. 10min metro to center.'},
-{c:'hostel',n:'Downtown Hostel',lat:55.6778,lon:12.5730,s:3,r:'7.6/10',p:'$28–42/bed',h:'Indre By',d:'Central location on Vandkunsten square. Lively bar downstairs. Walking distance to Strøget and Nyhavn.'},
-// SIGHTS
-{c:'sight',n:'Nyhavn',lat:55.6798,lon:12.5894,s:5,r:'4.7/5',p:'Free',h:'Indre By',d:"Iconic 17th-century canal lined with colorful townhouses. Street food, jazz bars, canal boat tours. Copenhagen's most photographed spot."},
-{c:'sight',n:'Tivoli Gardens',lat:55.6737,lon:12.5681,s:5,r:'4.5/5',p:'165 DKK entry',h:'Indre By',d:"World's second-oldest amusement park (1843). Rides, gardens, restaurants & live music. Spring season opens March 20. Magical at dusk."},
-{c:'sight',n:'Little Mermaid',lat:55.6929,lon:12.5996,s:3,r:'3.8/5',p:'Free',h:'Østerbro',d:'Bronze statue from 1913 inspired by Hans Christian Andersen. Smaller than expected but iconic. Best visited early morning.'},
-{c:'sight',n:'Rosenborg Castle',lat:55.6860,lon:12.5773,s:5,r:'4.6/5',p:'140 DKK',h:'Indre By',d:"Renaissance castle housing Crown Jewels and royal regalia. Beautiful King's Garden surrounds it. Allow 1.5–2 hours."},
-{c:'sight',n:'Christiansborg',lat:55.6754,lon:12.5803,s:4,r:'4.5/5',p:'175 DKK combo',h:'Indre By',d:"Seat of Danish Parliament & Supreme Court. Royal Reception Rooms, ruins & tower (free). The tower has best free city views."},
-{c:'sight',n:'Christiania',lat:55.6735,lon:12.5970,s:4,r:'4.2/5',p:'Free',h:'Christianshavn',d:'Self-governing commune since 1971. Street art, DIY architecture, organic restaurants. No photos on Pusher Street. Unique experience.'},
-{c:'sight',n:'Amalienborg',lat:55.6840,lon:12.5930,s:4,r:'4.4/5',p:'120 DKK museum',h:'Indre By',d:'Royal residence with changing of the guard at noon daily. Four identical rococo palaces around an octagonal courtyard.'},
-{c:'sight',n:'Rundetårn',lat:55.6815,lon:12.5757,s:4,r:'4.5/5',p:'40 DKK',h:'Indre By',d:'17th-century tower with unique spiral ramp (no stairs!). Panoramic views from 35m. Quick 30-min visit.'},
-{c:'sight',n:'Strøget',lat:55.6770,lon:12.5755,s:4,r:'4.3/5',p:'Free',h:'Indre By',d:"Europe's longest pedestrian shopping street (1.1km). From City Hall to Kongens Nytorv. Mix of designer brands & Danish shops."},
-{c:'sight',n:'Kastellet',lat:55.6910,lon:12.5940,s:4,r:'4.6/5',p:'Free',h:'Østerbro',d:'Star-shaped 17th-century fortress, best-preserved in Northern Europe. Peaceful paths, historic windmill, moat.'},
-{c:'sight',n:'Designmuseum',lat:55.6852,lon:12.5905,s:4,r:'4.4/5',p:'130 DKK',h:'Indre By',d:'Danish & international design in a stunning rococo hospital building. Arne Jacobsen chairs, poster collection, lovely café.'},
-{c:'sight',n:'Superkilen',lat:55.7010,lon:12.5400,s:4,r:'4.3/5',p:'Free',h:'Nørrebro',d:'Award-winning urban park in three zones (red, black, green). Objects from 60+ countries. Designed by BIG architects.'},
-{c:'sight',n:'Opera House',lat:55.6815,lon:12.6010,s:4,r:'4.5/5',p:'100–600 DKK',h:'Holmen',d:"Henning Larsen's iconic waterfront opera (2005). Stunning at night. Guided tours available. Faces Amalienborg across the harbor."},
-{c:'sight',n:'Botanical Garden',lat:55.6875,lon:12.5730,s:4,r:'4.4/5',p:'Free (palm 60 DKK)',h:'Indre By',d:'10-hectare garden with 13,000 species. Beautiful 19th-century Palm House. Free outdoor entry. Near Rosenborg.'},
-{c:'sight',n:'Church of Our Saviour',lat:55.6725,lon:12.5940,s:5,r:'4.6/5',p:'65 DKK tower',h:'Christianshavn',d:'Baroque church with famous external spiral staircase. 400 steps for 360° views. Not for vertigo sufferers! Golden spire.'},
-{c:'sight',n:'National Museum',lat:55.6745,lon:12.5740,s:4,r:'4.5/5',p:'Free',h:'Indre By',d:"Denmark's largest museum of cultural history. Viking artifacts, Egyptian mummies. Permanent exhibitions free."},
-{c:'sight',n:'CopenHill',lat:55.6830,lon:12.6110,s:4,r:'4.3/5',p:'200 DKK ski',h:'Amager',d:'Ski slope & hiking trail on a waste-to-energy plant by BIG. Year-round dry ski slope, climbing wall. Architectural marvel.'},
-// RESTAURANTS
-{c:'restaurant',n:'Absalon',lat:55.6685,lon:12.5530,s:4,r:'4.4/5',p:'95–150 DKK',h:'Vesterbro',d:'Community dining hall in a former church. Long shared tables, affordable set menu. Bingo nights. Warm & communal.'},
-{c:'restaurant',n:'Høst',lat:55.6820,lon:12.5730,s:4,r:'4.5/5',p:'250–400 DKK',h:'Indre By',d:'New Nordic in a stunning rustic-modern interior. Set menu changes seasonally. Michelin recommended. Book ahead.'},
-{c:'restaurant',n:'Reffen',lat:55.6920,lon:12.6050,s:4,r:'4.2/5',p:'60–120 DKK',h:'Refshaleøen',d:"Copenhagen's largest street food market. 40+ stalls with global cuisine. Seasonal (opens April). Great harbor views."},
-{c:'restaurant',n:'Torvehallerne',lat:55.6838,lon:12.5715,s:4,r:'4.4/5',p:'50–150 DKK',h:'Indre By',d:'Covered food market with 60+ stalls. Danish smørrebrød, açai bowls, specialty coffee. Perfect for lunch. Two glass halls.'},
-{c:'restaurant',n:'Poulette',lat:55.6785,lon:12.5820,s:4,r:'4.3/5',p:'200–350 DKK',h:'Indre By',d:'French-Danish bistro with rotisserie chicken. Cozy Latin Quarter location. Great natural wine list. Relaxed atmosphere.'},
-{c:'restaurant',n:'Kødbyens Fiskebar',lat:55.6655,lon:12.5565,s:5,r:'4.5/5',p:'250–450 DKK',h:'Kødbyen',d:'Michelin-recommended seafood in the meatpacking district. Industrial-chic space. Raw bar, creative cocktails. Reserve ahead.'},
-{c:'restaurant',n:'Hija de Sanchez',lat:55.6832,lon:12.5708,s:4,r:'4.6/5',p:'45–90 DKK',h:'Torvehallerne',d:'Legendary tacos by ex-Noma chef Rosio Sanchez. Handmade tortillas, incredible salsas. Must-try.'},
-{c:'restaurant',n:"Tommi's Burger",lat:55.6705,lon:12.5545,s:3,r:'4.2/5',p:'80–130 DKK',h:'Vesterbro',d:'Icelandic-style smash burgers. No-frills, insanely good. Free toppings bar. The Classic burger is all you need.'},
-{c:'restaurant',n:'La Neta',lat:55.6802,lon:12.5695,s:4,r:'4.3/5',p:'55–100 DKK',h:'Indre By',d:'Authentic Mexican street food. Burritos, quesadillas, mezcal. Two locations. Cheap, filling, legit. Late-night friendly.'},
-{c:'restaurant',n:'Gasoline Grill',lat:55.6790,lon:12.5800,s:4,r:'4.5/5',p:'85–120 DKK',h:'Indre By',d:'Legendary burgers from a converted gas station. Simple menu, perfect execution. Usually a queue—worth it.'},
-{c:'restaurant',n:'Paté Paté',lat:55.6660,lon:12.5570,s:4,r:'4.3/5',p:'150–280 DKK',h:'Kødbyen',d:'Wine bar & restaurant in a former pâté factory. Mediterranean tapas. Great cocktails. Transitions to bar/DJ late night.'},
-{c:'restaurant',n:'Bæst',lat:55.6930,lon:12.5560,s:5,r:'4.6/5',p:'150–250 DKK',h:'Nørrebro',d:'Organic Italian by ex-Noma chef. House-made mozzarella, sourdough pizza, charcuterie. The pizza is extraordinary.'},
-{c:'restaurant',n:'Grød',lat:55.6835,lon:12.5710,s:3,r:'4.1/5',p:'45–80 DKK',h:'Torvehallerne',d:'Porridge & grain bowls elevated to art. Sweet and savory options. Perfect breakfast spot.'},
-{c:'restaurant',n:'Väkst',lat:55.6812,lon:12.5722,s:4,r:'4.4/5',p:'200–350 DKK',h:'Indre By',d:'Nordic greenhouse restaurant. Plants everywhere, seasonal set menu. Beautiful interior. Owned by Cofoco group.'},
-{c:'restaurant',n:'RizRaz',lat:55.6775,lon:12.5755,s:3,r:'4.0/5',p:'95–145 DKK',h:'Indre By',d:'Mediterranean vegetarian buffet at a fixed price. All-you-can-eat salads, falafel, hummus. Best budget lunch in central CPH.'},
-{c:'restaurant',n:'Admiralgade 26',lat:55.6780,lon:12.5830,s:4,r:'4.4/5',p:'200–350 DKK',h:'Indre By',d:'Hidden gem wine bar with seasonal small plates. Intimate candlelit space. Natural wines, Danish-French cuisine.'},
-{c:'restaurant',n:'Madglad',lat:55.6795,lon:12.5615,s:3,r:'4.0/5',p:'50–95 DKK',h:'Indre By',d:'Healthy bowls & smoothies near the lakes. Vegan-friendly, affordable. Good for a quick lunch between sightseeing.'},
-{c:'restaurant',n:'Bottega Barlie',lat:55.6772,lon:12.5785,s:4,r:'4.2/5',p:'100–180 DKK',h:'Indre By',d:'Italian wine bar & deli. Great pasta, charcuterie boards, aperitivo vibes. Perfect pre-dinner or casual evening spot.'},
+const hotels=[
+{n:'Coco Hotel',lat:55.6698,lon:12.5580,s:4,sc:'8.6',p:'$180/night',d:'Boutique tropical courtyard hotel in trendy Vesterbro. Stylish rooms, rooftop terrace.',h:'Vesterbro'},
+{n:'Hotel SP34',lat:55.6787,lon:12.5718,s:4,sc:'8.4',p:'$195/night',d:'Hip Latin Quarter boutique with free wine hour, rooftop terrace & Väkst restaurant.',h:'Indre By'},
+{n:'Manon Les Suites',lat:55.6832,lon:12.5667,s:4,sc:'8.2',p:'$290/night',d:'Bali-inspired urban jungle with tropical pool, organic restaurant & lush interiors.',h:'Nørrebro border'},
+{n:'Hotel Sanders',lat:55.6798,lon:12.5870,s:5,sc:'8.8',p:'$350/night',d:'Elegant 54-room boutique near Nyhavn. Theater-inspired design, rooftop bar.',h:'Indre By'},
+{n:'Nobis Hotel',lat:55.6778,lon:12.5750,s:5,sc:'9.0',p:'$380/night',d:'Contemporary luxury in Royal Danish Academy building. Michelin-level dining.',h:'Indre By'},
+{n:'Andersen Boutique Hotel',lat:55.6712,lon:12.5575,s:4,sc:'8.5',p:'$165/night',d:'Colorful Vesterbro boutique with free wine & cheese hour, themed floors.',h:'Vesterbro'},
+{n:'Hotel Alexandra',lat:55.6745,lon:12.5688,s:3,sc:'8.0',p:'$155/night',d:'Danish mid-century design hotel. Vintage Wegner & Jacobsen furniture throughout.',h:'Indre By'},
+{n:'Copenhagen Admiral',lat:55.6815,lon:12.5920,s:4,sc:'8.3',p:'$210/night',d:'Waterfront 18th-century warehouse with exposed timber beams & harbor views.',h:'Indre By'},
+{n:'Brøchner Hotels',lat:55.6755,lon:12.5655,s:4,sc:'8.7',p:'$175/night',d:'Design-forward hotel group. Complimentary wine, bikes & curated experiences.',h:'Vesterbro'},
+{n:'Urban House CPH',lat:55.6678,lon:12.5600,s:3,sc:'7.8',p:'$85/night',d:'Hotel-hostel hybrid by Meininger in Vesterbro. Budget-friendly with private rooms.',h:'Vesterbro'}
 ];
 
-// ─── NEIGHBORHOOD POLYGONS ──────────────────────────
-const HOODS=[
-{name:'Indre By',color:'#f87171',coords:[[12.565,55.680],[12.568,55.672],[12.575,55.670],[12.585,55.672],[12.593,55.676],[12.595,55.680],[12.592,55.685],[12.585,55.688],[12.575,55.687],[12.568,55.685]]},
-{name:'Vesterbro',color:'#fb923c',coords:[[12.545,55.672],[12.555,55.665],[12.568,55.664],[12.572,55.668],[12.568,55.672],[12.565,55.676],[12.558,55.676],[12.548,55.675]]},
-{name:'Nørrebro',color:'#4ade80',coords:[[12.535,55.690],[12.545,55.685],[12.558,55.684],[12.568,55.685],[12.572,55.690],[12.572,55.698],[12.565,55.705],[12.548,55.705],[12.538,55.700],[12.535,55.695]]},
-{name:'Christianshavn',color:'#60a5fa',coords:[[12.585,55.668],[12.593,55.668],[12.603,55.672],[12.608,55.678],[12.603,55.682],[12.595,55.680],[12.590,55.676],[12.585,55.672]]},
-{name:'Frederiksberg',color:'#c084fc',coords:[[12.515,55.678],[12.530,55.672],[12.545,55.672],[12.548,55.676],[12.545,55.685],[12.535,55.690],[12.520,55.690],[12.512,55.685]]},
-{name:'Østerbro',color:'#2dd4bf',coords:[[12.565,55.688],[12.575,55.688],[12.585,55.690],[12.598,55.692],[12.605,55.698],[12.598,55.705],[12.580,55.705],[12.568,55.700],[12.565,55.695]]}
+const hostels=[
+{n:'Steel House Copenhagen',lat:55.6710,lon:12.5625,s:3,sc:'8.4',p:'$35/night',d:'NYC-inspired luxury hostel near Tivoli. Pool, gym, cinema room & rooftop.',h:'Vesterbro'},
+{n:'Generator Copenhagen',lat:55.6810,lon:12.5880,s:3,sc:'7.9',p:'$28/night',d:'Design hostel off Kongens Nytorv with ice bar & social events.',h:'Indre By'},
+{n:'Next House Copenhagen',lat:55.6632,lon:12.5510,s:3,sc:'8.6',p:'$30/night',d:'#1 rated specialty hostel. Modern pods, co-working & stunning areas.',h:'Vesterbro'},
+{n:'CPH Downtown Hostel',lat:55.6770,lon:12.5745,s:2,sc:'7.6',p:'$32/night',d:'Central social hostel near Strøget. Daily events, happy hour & lively bar.',h:'Indre By'}
 ];
 
-// ─── HEAT MAP DATA ──────────────────────────────────
-const HEAT_POINTS=[
-// Nyhavn cluster (high)
-{lat:55.6798,lon:12.5894,r:120,a:0.22,clr:'#ff4444'},
-{lat:55.6805,lon:12.5870,r:100,a:0.18,clr:'#ff5533'},
-{lat:55.6790,lon:12.5910,r:80,a:0.15,clr:'#ff6622'},
-// Strøget / City Hall
-{lat:55.6770,lon:12.5755,r:150,a:0.20,clr:'#ff5533'},
-{lat:55.6755,lon:12.5700,r:120,a:0.18,clr:'#ff6622'},
-{lat:55.6760,lon:12.5800,r:100,a:0.15,clr:'#ff7711'},
-// Tivoli
-{lat:55.6737,lon:12.5681,r:140,a:0.20,clr:'#ff4444'},
-{lat:55.6730,lon:12.5660,r:100,a:0.15,clr:'#ff5533'},
-// Vesterbro / Kødbyen
-{lat:55.6660,lon:12.5565,r:130,a:0.20,clr:'#ff5533'},
-{lat:55.6680,lon:12.5540,r:110,a:0.16,clr:'#ff6622'},
-{lat:55.6650,lon:12.5580,r:90,a:0.14,clr:'#ff7711'},
-// Torvehallerne
-{lat:55.6838,lon:12.5715,r:100,a:0.18,clr:'#ff5533'},
-{lat:55.6845,lon:12.5700,r:80,a:0.14,clr:'#ff6622'},
-// Christianshavn
-{lat:55.6735,lon:12.5960,r:110,a:0.14,clr:'#ff8800'},
-{lat:55.6725,lon:12.5940,r:90,a:0.12,clr:'#ff9922'},
-// Latin Quarter
-{lat:55.6790,lon:12.5730,r:110,a:0.16,clr:'#ff6622'},
-// Nørrebro
-{lat:55.6930,lon:12.5560,r:100,a:0.12,clr:'#ffaa33'},
-{lat:55.6940,lon:12.5540,r:80,a:0.10,clr:'#ffbb44'},
-// Outer/cool zones
-{lat:55.6875,lon:12.5730,r:80,a:0.08,clr:'#44aaff'},
-{lat:55.6910,lon:12.5940,r:90,a:0.08,clr:'#44aaff'},
-{lat:55.6929,lon:12.5996,r:70,a:0.06,clr:'#4488ff'},
-{lat:55.6860,lon:12.5905,r:80,a:0.07,clr:'#55bbff'},
-{lat:55.6556,lon:12.5370,r:80,a:0.06,clr:'#4488ff'},
-{lat:55.6830,lon:12.6110,r:80,a:0.06,clr:'#4488ff'},
+const sights=[
+{n:'Nyhavn',lat:55.6797,lon:12.5897,s:5,sc:'4.7',p:'Free',d:'Iconic 17th-century waterfront with colorful townhouses & canal tours.',h:'Indre By'},
+{n:'Tivoli Gardens',lat:55.6737,lon:12.5681,s:5,sc:'4.5',p:'155 DKK',d:'World\'s 2nd-oldest amusement park (1843). Rides, gardens & concerts.',h:'Indre By'},
+{n:'The Little Mermaid',lat:55.6929,lon:12.5998,s:4,sc:'3.9',p:'Free',d:'Bronze statue from 1913, inspired by Hans Christian Andersen\'s fairy tale.',h:'Østerbro'},
+{n:'Rosenborg Castle',lat:55.6858,lon:12.5772,s:5,sc:'4.6',p:'105 DKK',d:'Renaissance castle with crown jewels & 400 years of royal treasures.',h:'Indre By'},
+{n:'Christiansborg Palace',lat:55.6756,lon:12.5802,s:5,sc:'4.6',p:'175 DKK',d:'Seat of Parliament. Royal rooms, ruins & free tower panorama.',h:'Indre By'},
+{n:'Freetown Christiania',lat:55.6735,lon:12.5965,s:4,sc:'4.1',p:'Free',d:'Self-governing commune since 1971. Street art & alternative culture.',h:'Christianshavn'},
+{n:'Amalienborg Palace',lat:55.6842,lon:12.5932,s:4,sc:'4.4',p:'120 DKK',d:'Royal residence with changing of the guard at noon daily.',h:'Indre By'},
+{n:'Rundetårn',lat:55.6816,lon:12.5757,s:4,sc:'4.4',p:'60 DKK',d:'17th-century round tower with Europe\'s oldest observatory.',h:'Indre By'},
+{n:'Strøget',lat:55.6770,lon:12.5740,s:4,sc:'4.3',p:'Free',d:'Europe\'s longest pedestrian shopping street — 1.1km of shops & cafés.',h:'Indre By'},
+{n:'Kastellet',lat:55.6910,lon:12.5940,s:4,sc:'4.6',p:'Free',d:'Star-shaped 17th-century fortress with moats, ramparts & windmill.',h:'Østerbro'},
+{n:'Designmuseum Danmark',lat:55.6855,lon:12.5920,s:4,sc:'4.4',p:'140 DKK',d:'Danish & international design from Middle Ages to present.',h:'Indre By'},
+{n:'Superkilen',lat:55.7005,lon:12.5430,s:4,sc:'4.2',p:'Free',d:'Award-winning urban park celebrating diversity with global objects.',h:'Nørrebro'},
+{n:'Copenhagen Opera',lat:55.6815,lon:12.6015,s:5,sc:'4.5',p:'100-600 DKK',d:'Henning Larsen masterpiece. World-class opera, ballet & concerts.',h:'Christianshavn'},
+{n:'Botanical Garden',lat:55.6878,lon:12.5735,s:4,sc:'4.5',p:'Free',d:'10-hectare garden with 13,000+ species & historic Palm House.',h:'Indre By'},
+{n:'Church of Our Saviour',lat:55.6727,lon:12.5942,s:5,sc:'4.6',p:'69 DKK',d:'Baroque church with golden spiral staircase. 400 steps to panorama.',h:'Christianshavn'},
+{n:'National Museum',lat:55.6745,lon:12.5745,s:4,sc:'4.5',p:'Free',d:'Denmark\'s history from Stone Age to modern. Viking artifacts.',h:'Indre By'},
+{n:'CopenHill',lat:55.6825,lon:12.6120,s:4,sc:'4.3',p:'220 DKK',d:'BIG-designed ski slope atop waste-to-energy plant. Year-round skiing.',h:'Christianshavn'}
 ];
 
-// ─── ENTITY TRACKING ────────────────────────────────
-const entityGroups={hotel:[],hostel:[],sight:[],restaurant:[],neighborhood:[],heatmap:[]};
-const glowEntities=[];
-let minimalMode=true;
-let tileset=null;
+const restaurants=[
+{n:'Absalon',lat:55.6680,lon:12.5530,s:4,sc:'4.6',p:'Free-120 DKK',d:'Community dining hall in converted church. Communal dinners & events.',h:'Vesterbro'},
+{n:'Høst',lat:55.6832,lon:12.5748,s:5,sc:'4.5',p:'350-500 DKK',d:'Rustic-refined Nordic. Seasonal tasting menus in barn-chic setting.',h:'Indre By'},
+{n:'Reffen',lat:55.6920,lon:12.6050,s:4,sc:'4.3',p:'80-150 DKK',d:'Street food market. 40+ stalls — BBQ, sushi, tacos & waterfront.',h:'Christianshavn'},
+{n:'Torvehallerne',lat:55.6838,lon:12.5715,s:4,sc:'4.5',p:'50-200 DKK',d:'Glass food hall. 60+ stalls: smørrebrød, pastries, coffee & tapas.',h:'Indre By'},
+{n:'Poulette',lat:55.6780,lon:12.5815,s:4,sc:'4.4',p:'200-350 DKK',d:'French-inspired bistro. Rotisserie chicken, natural wines & brunch.',h:'Indre By'},
+{n:'Kødbyens Fiskebar',lat:55.6665,lon:12.5555,s:4,sc:'4.4',p:'250-400 DKK',d:'Industrial-chic seafood in Meatpacking District. Oysters & cocktails.',h:'Vesterbro'},
+{n:'Hija de Sanchez',lat:55.6830,lon:12.5720,s:4,sc:'4.6',p:'40-100 DKK',d:'Legendary taquería by ex-Noma chef. Handmade tortillas & salsas.',h:'Indre By'},
+{n:'Tommi\'s Burger Joint',lat:55.6770,lon:12.5680,s:4,sc:'4.3',p:'95-145 DKK',d:'Icelandic no-frills burgers. Juicy patties, fries & milkshakes.',h:'Indre By'},
+{n:'Madglad',lat:55.6705,lon:12.5568,s:4,sc:'4.2',p:'80-140 DKK',d:'Vegetarian buffet in Vesterbro. Organic, seasonal — pay by weight.',h:'Vesterbro'},
+{n:'La Neta',lat:55.6790,lon:12.5730,s:4,sc:'4.3',p:'55-120 DKK',d:'Authentic Mexican street food — burritos, quesadillas & margaritas.',h:'Indre By'},
+{n:'Bottega Barlie',lat:55.6730,lon:12.5685,s:4,sc:'4.4',p:'100-180 DKK',d:'Italian deli & wine bar. Handmade pasta, charcuterie & aperitivo.',h:'Indre By'},
+{n:'Admiralgade 26',lat:55.6785,lon:12.5830,s:4,sc:'4.5',p:'120-250 DKK',d:'Cozy cocktail bar & eatery. Creative small plates & intimate vibe.',h:'Indre By'},
+{n:'RizRaz',lat:55.6768,lon:12.5752,s:3,sc:'4.1',p:'125-175 DKK',d:'Mediterranean vegetarian buffet since 1989. Falafel, hummus & salads.',h:'Indre By'},
+{n:'Gasoline Grill',lat:55.6802,lon:12.5810,s:4,sc:'4.5',p:'80-120 DKK',d:'Famous burgers in converted gas station. Smashed patties & secret sauce.',h:'Indre By'},
+{n:'Paté Paté',lat:55.6670,lon:12.5560,s:4,sc:'4.3',p:'150-280 DKK',d:'Wine bar & tapas in Meatpacking District. French-Spanish small plates.',h:'Vesterbro'},
+{n:'Bæst',lat:55.6920,lon:12.5600,s:5,sc:'4.6',p:'200-350 DKK',d:'Farm-to-table Italian by ex-Noma chef. House-made mozzarella & pizza.',h:'Nørrebro'},
+{n:'Grød',lat:55.6900,lon:12.5650,s:4,sc:'4.3',p:'55-90 DKK',d:'Porridge & grain bowls reinvented. Perfect Scandi breakfast spot.',h:'Nørrebro'},
+{n:'Väkst',lat:55.6788,lon:12.5720,s:4,sc:'4.4',p:'200-350 DKK',d:'Nordic greenhouse restaurant at SP34. Seasonal vegetables & comfort.',h:'Indre By'}
+];
 
-const grayscaleShader=new Cesium.CustomShader({
-  fragmentShaderText:`
-    void fragmentMain(FragmentInput fsInput, inout czm_modelMaterial material) {
-      float gray = dot(material.diffuse, vec3(0.299, 0.587, 0.114));
-      /* High contrast S-curve: crush darks, boost highlights */
-      gray = smoothstep(0.05, 0.85, gray);
-      /* Posterize to ~6 discrete shades for cleaner graphic look */
-      gray = floor(gray * 6.0) / 6.0;
-      /* Dark overall with white highlights: remap 0-1 to 0.06-0.75 */
-      gray = mix(0.06, 0.75, gray);
-      material.diffuse = vec3(gray);
-    }
-  `
-});
+const nbData=[
+{name:'Indre By / City Center',color:'#ef5350',desc:'Historic heart — Strøget, Nyhavn, royal palaces & museums.',coords:[[12.568,55.674],[12.585,55.674],[12.585,55.682],[12.568,55.682]],center:[12.5765,55.678]},
+{name:'Vesterbro / Kødbyen',color:'#ff9800',desc:'Trendy Meatpacking District — craft cocktails, boutiques & nightlife.',coords:[[12.548,55.662],[12.568,55.662],[12.568,55.674],[12.548,55.674]],center:[12.558,55.668]},
+{name:'Nørrebro',color:'#66bb6a',desc:'Diverse & creative — street art, coffee shops & Superkilen.',coords:[[12.540,55.688],[12.570,55.688],[12.570,55.702],[12.540,55.702]],center:[12.555,55.695]},
+{name:'Christianshavn',color:'#42a5f5',desc:'Canal-side charm — Christiania, houseboats & Our Saviour\'s Church.',coords:[[12.585,55.670],[12.602,55.670],[12.602,55.680],[12.585,55.680]],center:[12.5935,55.675]},
+{name:'Frederiksberg',color:'#ab47bc',desc:'Upscale green borough — gardens, Zoo & leafy boulevards.',coords:[[12.518,55.672],[12.548,55.672],[12.548,55.688],[12.518,55.688]],center:[12.533,55.680]},
+{name:'Østerbro',color:'#26a69a',desc:'Residential & classy — Fælledparken, Little Mermaid & Kastellet.',coords:[[12.570,55.688],[12.600,55.688],[12.600,55.700],[12.570,55.700]],center:[12.585,55.694]}
+];
 
-function starsStr(n){ return '★'.repeat(n)+'☆'.repeat(5-n); }
+const heatZones=[
+{lat:55.6797,lon:12.5897,rx:120,ry:80,c:'rgba(255,87,34,0.18)'},
+{lat:55.6790,lon:12.5870,rx:100,ry:90,c:'rgba(255,87,34,0.14)'},
+{lat:55.6770,lon:12.5740,rx:180,ry:100,c:'rgba(255,152,0,0.15)'},
+{lat:55.6760,lon:12.5720,rx:150,ry:80,c:'rgba(255,152,0,0.12)'},
+{lat:55.6665,lon:12.5555,rx:140,ry:100,c:'rgba(255,87,34,0.16)'},
+{lat:55.6680,lon:12.5540,rx:110,ry:80,c:'rgba(255,87,34,0.12)'},
+{lat:55.6737,lon:12.5681,rx:130,ry:90,c:'rgba(255,87,34,0.17)'},
+{lat:55.6740,lon:12.5700,rx:100,ry:70,c:'rgba(255,152,0,0.13)'},
+{lat:55.6838,lon:12.5715,rx:80,ry:60,c:'rgba(255,183,77,0.14)'},
+{lat:55.6845,lon:12.5700,rx:100,ry:70,c:'rgba(255,183,77,0.11)'},
+{lat:55.6900,lon:12.5620,rx:120,ry:90,c:'rgba(255,183,77,0.12)'},
+{lat:55.6910,lon:12.5580,rx:90,ry:70,c:'rgba(255,213,79,0.10)'},
+{lat:55.6850,lon:12.5770,rx:60,ry:50,c:'rgba(255,152,0,0.13)'},
+{lat:55.6730,lon:12.5960,rx:90,ry:70,c:'rgba(255,183,77,0.11)'},
+{lat:55.6920,lon:12.5940,rx:80,ry:60,c:'rgba(255,213,79,0.09)'},
+{lat:55.6929,lon:12.5998,rx:70,ry:50,c:'rgba(255,213,79,0.08)'},
+{lat:55.7005,lon:12.5430,rx:100,ry:80,c:'rgba(144,202,249,0.08)'},
+{lat:55.6632,lon:12.5510,rx:80,ry:60,c:'rgba(144,202,249,0.07)'},
+{lat:55.6825,lon:12.6120,rx:90,ry:70,c:'rgba(144,202,249,0.07)'},
+{lat:55.6878,lon:12.5735,rx:70,ry:50,c:'rgba(255,213,79,0.09)'},
+{lat:55.6810,lon:12.5880,rx:80,ry:60,c:'rgba(255,152,0,0.10)'},
+{lat:55.6755,lon:12.5655,rx:90,ry:70,c:'rgba(255,183,77,0.11)'},
+{lat:55.6815,lon:12.5920,rx:60,ry:50,c:'rgba(255,183,77,0.10)'},
+{lat:55.6680,lon:12.5600,rx:100,ry:80,c:'rgba(255,152,0,0.10)'},
+{lat:55.6710,lon:12.5625,rx:80,ry:60,c:'rgba(255,183,77,0.09)'}
+];
 
-// ─── INIT VIEWER ─────────────────────────────────────
-const viewer=new Cesium.Viewer('cesiumContainer',{
-  baseLayerPicker:false,animation:false,timeline:false,
-  fullscreenButton:false,vrButton:false,geocoder:false,
-  homeButton:false,infoBox:false,selectionIndicator:false,
-  navigationHelpButton:false,sceneModePicker:false,
-  skyAtmosphere:new Cesium.SkyAtmosphere(),
-  orderIndependentTranslucency:true,
-  contextOptions:{requestWebgl2:true},
-  msaaSamples:4,
-});
-viewer.scene.globe.show=false;
-viewer.scene.skyBox.show=false;
-viewer.scene.backgroundColor=Cesium.Color.fromCssColorString('#0a0a0a');
+const LE={hotels:[],hostels:[],sights:[],restaurants:[],neighborhoods:[],heatmap:[]};
+const LS={hotels:true,hostels:true,sights:true,restaurants:true,neighborhoods:false,heatmap:false};
+let viewer,osmB,googleTile,photoOn=false;
 
-// Camera controls — Google Earth style
-const ctrl=viewer.scene.screenSpaceCameraController;
-ctrl.enableTilt=true;
-ctrl.enableLook=false;
-ctrl.minimumZoomDistance=50;
-ctrl.maximumZoomDistance=18000;
-ctrl.inertiaZoom=0.6;
-ctrl.inertiaSpin=0.85;
-ctrl.inertiaTranslate=0.85;
+function starsStr(n){return '★'.repeat(n)+'☆'.repeat(5-n)}
 
-// ─── LOAD 3D TILES ──────────────────────────────────
-(async()=>{
-  try{
-    tileset=await Cesium.createGooglePhotorealistic3DTileset({
-      skipLevelOfDetail:true,
-      baseScreenSpaceError:1024,
-      skipScreenSpaceErrorFactor:16,
-      skipLevels:1,
-      immediatelyLoadDesiredLevelOfDetail:false,
-      loadSiblings:false,
-      dynamicScreenSpaceError:true,
-      dynamicScreenSpaceErrorDensity:2.0e-4,
-      dynamicScreenSpaceErrorFactor:24.0,
-      dynamicScreenSpaceErrorHeightFalloff:0.25,
-      foveatedScreenSpaceError:true,
-      foveatedConeSize:0.1,
-      foveatedMinimumScreenSpaceErrorRelaxation:0.0,
-      maximumScreenSpaceError:8,
-      cacheBytes:1024*1024*1024,
-      maximumCacheOverflowBytes:512*1024*1024,
-      preloadWhenHidden:true,
-      preferLeaves:true,
-      cullRequestsWhileMoving:true,
-      cullRequestsWhileMovingMultiplier:30.0,
-      showCreditsOnScreen:true,
-    });
-    viewer.scene.primitives.add(tileset);
-
-    // Apply grayscale by default
-    if(minimalMode) tileset.customShader=grayscaleShader;
-
-    // Hide loading when tiles loaded
-    const hideLoading=()=>{
-      const el=document.getElementById('loadingOverlay');
-      if(el){el.classList.add('fade');setTimeout(()=>el.remove(),1500);}
-    };
-    if(tileset.ready) hideLoading();
-    else tileset.initialTilesLoaded.addEventListener(hideLoading);
-
-    // Fly to Copenhagen
-    viewer.camera.flyTo({
-      destination:Cesium.Cartesian3.fromDegrees(12.5750,55.6780,1500),
-      orientation:{heading:Cesium.Math.toRadians(0),pitch:Cesium.Math.toRadians(-45),roll:0},
-      duration:2.5,
-      easingFunction:Cesium.EasingFunction.CUBIC_IN_OUT
-    });
-
-    // Create POI entities
-    createPOIs();
-    createNeighborhoods();
-    createHeatmap();
-  }catch(e){
-    console.error('Tileset error:',e);
-    document.getElementById('loadingOverlay').querySelector('.lt').textContent='Error loading tiles';
-  }
-})();
-
-// ─── CREATE POI ENTITIES ─────────────────────────────
-function createPOIs(){
-  const POLE_H=70;
-  POIS.forEach((poi,idx)=>{
-    const cc=CAT[poi.c];
-    const cesColor=Cesium.Color.fromCssColorString(cc.css);
-    const groundPos=Cesium.Cartesian3.fromDegrees(poi.lon,poi.lat,0);
-    const elevPos=Cesium.Cartesian3.fromDegrees(poi.lon,poi.lat,POLE_H);
-
-    // Line text
-    const line1=cc.icon+' '+poi.n;
-    const line2=starsStr(poi.s)+' '+poi.r;
-    const line3=poi.p;
-    const labelText=line1+'\n'+line2+'\n'+line3;
-
-    // Ground dot
-    const dot=viewer.entities.add({
-      position:Cesium.Cartesian3.fromDegrees(poi.lon,poi.lat),
-      point:{
-        pixelSize:7,
-        color:cesColor,
-        outlineColor:cesColor.withAlpha(0.4),
-        outlineWidth:3,
-        heightReference:Cesium.HeightReference.CLAMP_TO_GROUND,
-        disableDepthTestDistance:Number.POSITIVE_INFINITY
-      },
-      properties:{poiIdx:idx}
-    });
-
-    // Label entity with pole line
-    const label=viewer.entities.add({
-      position:elevPos,
-      polyline:{
-        positions:[groundPos,elevPos],
-        width:1.5,
-        material:new Cesium.ColorMaterialProperty(cesColor.withAlpha(0.5)),
-        clampToGround:false,
-      },
-      label:{
-        text:labelText,
-        font:'bold 12px Inter, sans-serif',
-        fillColor:Cesium.Color.WHITE,
-        backgroundColor:Cesium.Color.fromCssColorString('rgba(0,0,0,0.78)'),
-        showBackground:true,
-        backgroundPadding:new Cesium.Cartesian2(10,7),
-        pixelOffset:new Cesium.Cartesian2(0,-8),
-        verticalOrigin:Cesium.VerticalOrigin.BOTTOM,
-        horizontalOrigin:Cesium.HorizontalOrigin.CENTER,
-        disableDepthTestDistance:Number.POSITIVE_INFINITY,
-        scaleByDistance:new Cesium.NearFarScalar(300,1.0,8000,0.35),
-        translucencyByDistance:new Cesium.NearFarScalar(300,1.0,15000,0.5),
-      },
-      properties:{poiIdx:idx}
-    });
-
-    // Ground glow ellipse
-    const glow=viewer.entities.add({
-      position:Cesium.Cartesian3.fromDegrees(poi.lon,poi.lat),
-      ellipse:{
-        semiMajorAxis:30,
-        semiMinorAxis:30,
-        material:cesColor.withAlpha(0.22),
-        heightReference:Cesium.HeightReference.CLAMP_TO_GROUND,
-      }
-    });
-
-    entityGroups[poi.c].push(dot,label,glow);
-    glowEntities.push(glow);
-  });
+function makeLabel(item,cat){
+  const starLine=starsStr(item.s)+' '+item.sc;
+  return starLine+'\n'+item.n+'\n'+item.p;
 }
 
-// ─── NEIGHBORHOODS ───────────────────────────────────
-function createNeighborhoods(){
-  HOODS.forEach(hood=>{
-    const clr=Cesium.Color.fromCssColorString(hood.color);
-    const positions=hood.coords.map(c=>Cesium.Cartesian3.fromDegrees(c[0],c[1]));
-    // Polygon
+function addPOI(item,cat,color){
+  const poleH=80;
+  // Ground dot
+  const glow=viewer.entities.add({
+    position:Cesium.Cartesian3.fromDegrees(item.lon,item.lat,0),
+    ellipse:{semiMajorAxis:35,semiMinorAxis:35,material:color.withAlpha(0.2),height:0,outline:false},
+    show:LS[cat],
+    _cat:cat,_data:item
+  });
+  LE[cat].push(glow);
+
+  // Vertical pole
+  const pole=viewer.entities.add({
+    polyline:{
+      positions:Cesium.Cartesian3.fromDegreesArrayHeights([item.lon,item.lat,2,item.lon,item.lat,poleH]),
+      width:1.5,
+      material:color.withAlpha(0.5),
+      clampToGround:false
+    },
+    show:LS[cat],
+    _cat:cat,_data:item
+  });
+  LE[cat].push(pole);
+
+  // Floating label
+  const lbl=viewer.entities.add({
+    position:Cesium.Cartesian3.fromDegrees(item.lon,item.lat,poleH+2),
+    label:{
+      text:makeLabel(item,cat),
+      font:'12px Inter, sans-serif',
+      fillColor:Cesium.Color.WHITE,
+      outlineColor:Cesium.Color.BLACK,
+      outlineWidth:3,
+      style:Cesium.LabelStyle.FILL_AND_OUTLINE,
+      verticalOrigin:Cesium.VerticalOrigin.BOTTOM,
+      horizontalOrigin:Cesium.HorizontalOrigin.CENTER,
+      pixelOffset:new Cesium.Cartesian2(0,-4),
+      disableDepthTestDistance:Number.POSITIVE_INFINITY,
+      scaleByDistance:new Cesium.NearFarScalar(200,1.0,4000,0.4),
+      translucencyByDistance:new Cesium.NearFarScalar(200,1.0,6000,0.0),
+      showBackground:true,
+      backgroundColor:Cesium.Color.fromCssColorString('rgba(10,10,10,0.85)'),
+      backgroundPadding:new Cesium.Cartesian2(8,5)
+    },
+    show:LS[cat],
+    _cat:cat,_data:item
+  });
+  LE[cat].push(lbl);
+
+  // Building highlight box
+  const box=viewer.entities.add({
+    position:Cesium.Cartesian3.fromDegrees(item.lon,item.lat,25),
+    box:{
+      dimensions:new Cesium.Cartesian3(30,30,50),
+      material:color.withAlpha(0.15),
+      outline:true,
+      outlineColor:color.withAlpha(0.4)
+    },
+    show:LS[cat],
+    _cat:cat,_data:item
+  });
+  LE[cat].push(box);
+}
+
+function addNeighborhoods(){
+  nbData.forEach(nb=>{
+    const c=Cesium.Color.fromCssColorString(nb.color);
+    const positions=[];
+    nb.coords.forEach(p=>positions.push(p[0],p[1]));
     const poly=viewer.entities.add({
       polygon:{
-        hierarchy:new Cesium.PolygonHierarchy(positions),
-        material:clr.withAlpha(0.12),
+        hierarchy:Cesium.Cartesian3.fromDegreesArray(positions),
+        material:c.withAlpha(0.12),
         outline:true,
-        outlineColor:clr.withAlpha(0.4),
-        outlineWidth:2,
-        heightReference:Cesium.HeightReference.CLAMP_TO_GROUND,
+        outlineColor:c.withAlpha(0.6),
+        height:0
       },
-      show:false
+      show:false,
+      _cat:'neighborhoods'
     });
-    // Center label
-    const cx=hood.coords.reduce((s,c)=>s+c[0],0)/hood.coords.length;
-    const cy=hood.coords.reduce((s,c)=>s+c[1],0)/hood.coords.length;
+    LE.neighborhoods.push(poly);
     const lbl=viewer.entities.add({
-      position:Cesium.Cartesian3.fromDegrees(cx,cy,100),
+      position:Cesium.Cartesian3.fromDegrees(nb.center[0],nb.center[1],5),
       label:{
-        text:hood.name,
-        font:'bold 14px Inter, sans-serif',
-        fillColor:Cesium.Color.fromCssColorString(hood.color),
+        text:nb.name,
+        font:'bold 13px Inter, sans-serif',
+        fillColor:Cesium.Color.fromCssColorString(nb.color),
         outlineColor:Cesium.Color.BLACK,
         outlineWidth:3,
         style:Cesium.LabelStyle.FILL_AND_OUTLINE,
+        verticalOrigin:Cesium.VerticalOrigin.CENTER,
+        horizontalOrigin:Cesium.HorizontalOrigin.CENTER,
         disableDepthTestDistance:Number.POSITIVE_INFINITY,
-        scaleByDistance:new Cesium.NearFarScalar(500,1.0,10000,0.4),
-        translucencyByDistance:new Cesium.NearFarScalar(500,1.0,18000,0.5),
+        scaleByDistance:new Cesium.NearFarScalar(500,1.0,5000,0.5),
+        showBackground:true,
+        backgroundColor:Cesium.Color.fromCssColorString('rgba(10,10,10,0.75)'),
+        backgroundPadding:new Cesium.Cartesian2(8,4)
       },
-      show:false
+      show:false,
+      _cat:'neighborhoods'
     });
-    entityGroups.neighborhood.push(poly,lbl);
+    LE.neighborhoods.push(lbl);
   });
 }
 
-// ─── HEATMAP ─────────────────────────────────────────
-function createHeatmap(){
-  HEAT_POINTS.forEach(hp=>{
-    const ent=viewer.entities.add({
-      position:Cesium.Cartesian3.fromDegrees(hp.lon,hp.lat),
+function addHeatMap(){
+  heatZones.forEach(hz=>{
+    const e=viewer.entities.add({
+      position:Cesium.Cartesian3.fromDegrees(hz.lon,hz.lat,1),
       ellipse:{
-        semiMajorAxis:hp.r,
-        semiMinorAxis:hp.r,
-        material:Cesium.Color.fromCssColorString(hp.clr).withAlpha(hp.a),
-        heightReference:Cesium.HeightReference.CLAMP_TO_GROUND,
+        semiMajorAxis:hz.rx,
+        semiMinorAxis:hz.ry,
+        material:Cesium.Color.fromCssColorString(hz.c),
+        height:1,
+        outline:false
       },
-      show:false
+      show:false,
+      _cat:'heatmap'
     });
-    entityGroups.heatmap.push(ent);
+    LE.heatmap.push(e);
   });
 }
 
-// ─── TOGGLE CATEGORIES ──────────────────────────────
-function toggleCat(cat,btn){
-  const isActive=btn.classList.toggle('active');
-  entityGroups[cat].forEach(e=>e.show=isActive);
+function toggleLayer(cat){
+  LS[cat]=!LS[cat];
+  LE[cat].forEach(e=>{e.show=LS[cat]});
+  document.getElementById('dot-'+cat).classList.toggle('on',LS[cat]);
+  document.getElementById('state-'+cat).textContent=LS[cat]?'ON':'OFF';
 }
 
-function toggleMinimal(btn){
-  minimalMode=btn.classList.toggle('active');
-  if(tileset){
-    tileset.customShader=minimalMode?grayscaleShader:undefined;
-    /* Lower LOD in minimal mode = blockier, simpler geometry */
-    tileset.maximumScreenSpaceError=minimalMode?24:8;
-  }
-}
-
-// ─── CLICK HANDLING ──────────────────────────────────
-const handler=new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
-handler.setInputAction(function(click){
-  const picked=viewer.scene.pick(click.position);
-  if(Cesium.defined(picked)&&Cesium.defined(picked.id)&&Cesium.defined(picked.id.properties)){
-    const idx=picked.id.properties.poiIdx;
-    if(Cesium.defined(idx)){
-      const poi=POIS[idx.getValue()];
-      showDetail(poi);
+async function togglePhotoMode(){
+  photoOn=!photoOn;
+  document.getElementById('dot-photo').classList.toggle('on',photoOn);
+  document.getElementById('state-photo').textContent=photoOn?'ON':'OFF';
+  if(photoOn){
+    if(osmB)viewer.scene.primitives.remove(osmB);
+    viewer.scene.globe.show=false;
+    if(!googleTile){
+      try{
+        googleTile=await Cesium.createGooglePhotorealistic3DTileset({
+          skipLevelOfDetail:true,maximumScreenSpaceError:8,
+          cacheBytes:1024*1024*1024,showCreditsOnScreen:true
+        });
+      }catch(e){console.warn('Google tiles failed:',e);photoOn=false;
+        document.getElementById('dot-photo').classList.remove('on');
+        document.getElementById('state-photo').textContent='OFF';
+        viewer.scene.globe.show=true;
+        if(osmB)viewer.scene.primitives.add(osmB);return;
+      }
     }
+    viewer.scene.primitives.add(googleTile);
   }else{
-    closeDetail();
+    if(googleTile)viewer.scene.primitives.remove(googleTile);
+    viewer.scene.globe.show=true;
+    if(osmB)viewer.scene.primitives.add(osmB);
   }
-},Cesium.ScreenSpaceEventType.LEFT_CLICK);
+}
 
-function showDetail(poi){
-  const cc=CAT[poi.c];
-  const card=document.getElementById('detailCard');
-  document.getElementById('dcBadge').textContent=cc.label;
-  document.getElementById('dcBadge').style.background=cc.css;
-  document.getElementById('dcBadge').style.color='#000';
-  document.getElementById('dcName').textContent=poi.n;
-  document.getElementById('dcStars').textContent=starsStr(poi.s)+' '+poi.r;
-  document.getElementById('dcPrice').textContent=poi.p;
-  document.getElementById('dcDesc').textContent=poi.d;
-  document.getElementById('dcHood').textContent='📍 '+poi.h;
-  card.classList.add('show');
+function closeDetail(){document.getElementById('detailCard').classList.remove('show')}
 
-  // Fly to POI
+function showDetail(item,catLabel,color){
+  document.getElementById('dc-cat').textContent=catLabel;
+  document.getElementById('dc-cat').style.color=color;
+  document.getElementById('dc-name').textContent=item.n;
+  document.getElementById('dc-stars').textContent=starsStr(item.s)+' '+item.sc;
+  document.getElementById('dc-price').textContent=item.p;
+  document.getElementById('dc-desc').textContent=item.d;
+  document.getElementById('dc-neighborhood').textContent='📍 '+item.h;
+  document.getElementById('detailCard').classList.add('show');
+}
+
+function flyTo(lon,lat){
   viewer.camera.flyTo({
-    destination:Cesium.Cartesian3.fromDegrees(poi.lon,poi.lat,400),
-    orientation:{
-      heading:Cesium.Math.toRadians(15),
-      pitch:Cesium.Math.toRadians(-40),
-      roll:0
-    },
-    duration:1.5,
-    easingFunction:Cesium.EasingFunction.CUBIC_IN_OUT
+    destination:Cesium.Cartesian3.fromDegrees(lon,lat,400),
+    orientation:{heading:Cesium.Math.toRadians(0),pitch:Cesium.Math.toRadians(-45),roll:0},
+    duration:1.5
   });
 }
 
-function closeDetail(){
-  document.getElementById('detailCard').classList.remove('show');
+function toggleNeighborhoodGuide(){
+  document.getElementById('neighborhoodGuide').classList.toggle('collapsed');
 }
+
+function buildNeighborhoodGuide(){
+  const list=document.getElementById('ngList');
+  nbData.forEach(nb=>{
+    const div=document.createElement('div');
+    div.className='ng-item';
+    div.innerHTML='<div class="ng-color" style="background:'+nb.color+'"></div><div><div class="ng-item-name">'+nb.name+'</div><div class="ng-item-desc">'+nb.desc+'</div></div>';
+    div.onclick=()=>{
+      viewer.camera.flyTo({
+        destination:Cesium.Cartesian3.fromDegrees(nb.center[0],nb.center[1],800),
+        orientation:{heading:0,pitch:Cesium.Math.toRadians(-40),roll:0},
+        duration:1.5
+      });
+    };
+    list.appendChild(div);
+  });
+}
+
+// ── INIT ──
+async function init(){
+  viewer=new Cesium.Viewer('cesiumContainer',{
+    baseLayerPicker:false,timeline:false,animation:false,homeButton:false,
+    sceneModePicker:false,navigationHelpButton:false,fullscreenButton:false,
+    geocoder:true,infoBox:false,selectionIndicator:false,
+    skyBox:false,skyAtmosphere:false,
+    contextOptions:{requestWebgl2:true},
+    msaaSamples:2,
+    baseLayer:false
+  });
+
+  viewer.scene.globe.baseColor=Cesium.Color.fromCssColorString('#0a0a0a');
+  viewer.scene.globe.showGroundAtmosphere=false;
+  viewer.scene.globe.enableLighting=false;
+  viewer.scene.backgroundColor=Cesium.Color.fromCssColorString('#0a0a0a');
+
+  viewer.imageryLayers.addImageryProvider(
+    new Cesium.UrlTemplateImageryProvider({
+      url:'https://basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png',
+      maximumLevel:18,
+      credit:'OpenStreetMap, CARTO'
+    })
+  );
+
+  try{
+    osmB=await Cesium.createOsmBuildingsAsync();
+    viewer.scene.primitives.add(osmB);
+    osmB.style=new Cesium.Cesium3DTileStyle({color:"color('#c8c8cc', 0.88)"});
+  }catch(e){console.warn('OSM buildings failed:',e)}
+
+  const ctrl=viewer.scene.screenSpaceCameraController;
+  ctrl.enableTilt=true;
+  ctrl.enableLook=false;
+  ctrl.minimumZoomDistance=50;
+  ctrl.maximumZoomDistance=12000;
+
+  // Add POIs
+  hotels.forEach(i=>addPOI(i,'hotels',CC.hotels));
+  hostels.forEach(i=>addPOI(i,'hostels',CC.hostels));
+  sights.forEach(i=>addPOI(i,'sights',CC.sights));
+  restaurants.forEach(i=>addPOI(i,'restaurants',CC.restaurants));
+  addNeighborhoods();
+  addHeatMap();
+  buildNeighborhoodGuide();
+
+  // Click handler
+  const handler=new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
+  handler.setInputAction(function(click){
+    const picked=viewer.scene.pick(click.position);
+    if(Cesium.defined(picked)&&Cesium.defined(picked.id)&&picked.id._data){
+      const ent=picked.id;
+      const item=ent._data;
+      const cat=ent._cat;
+      const catLabels={hotels:'Hotel',hostels:'Hostel',sights:'Sight',restaurants:'Restaurant'};
+      const catColors={hotels:'#ef5350',hostels:'#ff9800',sights:'#f5c842',restaurants:'#66bb6a'};
+      showDetail(item,catLabels[cat]||cat,catColors[cat]||'#fff');
+      flyTo(item.lon,item.lat);
+    }
+  },Cesium.ScreenSpaceEventType.LEFT_CLICK);
+
+  // Initial camera
+  viewer.camera.flyTo({
+    destination:Cesium.Cartesian3.fromDegrees(12.5750,55.6780,1200),
+    orientation:{heading:Cesium.Math.toRadians(0),pitch:Cesium.Math.toRadians(-40),roll:0},
+    duration:2.5
+  });
+
+  // Hide loading
+  setTimeout(()=>{document.getElementById('loadingOverlay').classList.add('hidden')},2000);
+}
+
+init().catch(e=>console.error('Init failed:',e));
 </script>
 </body>
 </html>

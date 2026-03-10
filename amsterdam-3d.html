@@ -7,572 +7,380 @@
 <script src="https://cesium.com/downloads/cesiumjs/releases/1.125/Build/Cesium/Cesium.js"></script>
 <link href="https://cesium.com/downloads/cesiumjs/releases/1.125/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{width:100%;height:100%;overflow:hidden;font-family:'Inter',system-ui,sans-serif;background:#0a0a0a;color:#fff}
-#cesiumContainer{width:100%;height:100%}
-.cesium-viewer-toolbar,.cesium-viewer-animationContainer,.cesium-viewer-timelineContainer,
-.cesium-viewer-fullscreenContainer,.cesium-viewer-infoBoxContainer,
-.cesium-viewer-selectionIndicatorContainer,.cesium-viewer-geocoderContainer,
-.cesium-viewer-bottom{display:none!important}
-.cesium-widget-credits{opacity:.4!important;font-size:10px!important}
-
-.glass{
-  background:rgba(10,10,10,.72);
-  backdrop-filter:blur(24px) saturate(1.4);
-  -webkit-backdrop-filter:blur(24px) saturate(1.4);
-  border:1px solid rgba(255,255,255,.08);
-  border-radius:16px;
-  box-shadow:0 8px 32px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.06);
-}
-
-#titleBar{position:absolute;top:20px;left:20px;z-index:100;padding:16px 22px}
-#titleBar h1{font-size:18px;font-weight:700;letter-spacing:-.3px;
-  background:linear-gradient(135deg,#fff,#b0c4de);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-#titleBar .sub{font-size:12px;color:rgba(255,255,255,.5);margin-top:3px}
-
-#tp{position:absolute;top:20px;right:20px;z-index:100;padding:10px;display:flex;flex-direction:column;gap:6px}
-.tb{display:flex;align-items:center;gap:10px;padding:10px 16px;border-radius:12px;
-  border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.04);
-  color:#fff;font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;
-  user-select:none;white-space:nowrap;font-family:'Inter',sans-serif}
-.tb:hover{background:rgba(255,255,255,.1)}
-.tb.on{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.15)}
-.td{width:8px;height:8px;border-radius:50%;transition:box-shadow .2s,opacity .2s;flex-shrink:0}
-.tb.on .td{box-shadow:0 0 8px currentColor}
-.tb:not(.on) .td{opacity:.35}
-.tk{font-size:10px;color:rgba(255,255,255,.25);border:1px solid rgba(255,255,255,.1);
-  border-radius:4px;padding:1px 5px;margin-left:auto}
-
-#np{position:absolute;bottom:24px;left:20px;z-index:100;padding:0;max-width:320px;
-  overflow:hidden;transition:max-height .35s ease;max-height:500px}
-#np.col{max-height:46px}
-#np.hid{display:none}
-.nhr{padding:12px 18px;cursor:pointer;display:flex;align-items:center;
-  justify-content:space-between;font-size:13px;font-weight:600;
-  border-bottom:1px solid rgba(255,255,255,.06)}
-.nhr .ar{transition:transform .3s;font-size:11px;opacity:.5}
-#np.col .nhr .ar{transform:rotate(-90deg)}
-.nb{padding:6px 14px 14px;max-height:300px;overflow-y:auto}
-.ni{padding:10px;border-radius:10px;margin-top:8px;background:rgba(255,255,255,.03);
-  border:1px solid rgba(255,255,255,.04)}
-.nin{font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px}
-.nid{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.nit{font-size:11px;color:rgba(255,255,255,.5);margin-top:4px;line-height:1.45}
-
-#dc{position:absolute;bottom:24px;right:20px;z-index:100;width:340px;padding:0;
-  overflow:hidden;opacity:0;pointer-events:none;transform:translateY(12px);
-  transition:opacity .3s,transform .3s}
-#dc.vis{opacity:1;pointer-events:auto;transform:translateY(0)}
-.dch{padding:16px 20px 12px}
-.dcba{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:6px;
-  font-size:11px;font-weight:600;margin-bottom:10px}
-.dcn{font-size:18px;font-weight:700;line-height:1.25}
-.dcs{font-size:14px;margin-top:4px;color:#fbbf24}
-.dcy{padding:0 20px 18px}
-.dcr{display:flex;align-items:center;gap:8px;font-size:12px;color:rgba(255,255,255,.6);margin-top:6px}
-.dcr .ic{font-size:14px;width:18px;text-align:center}
-.dcd{font-size:12.5px;color:rgba(255,255,255,.7);line-height:1.55;margin-top:12px}
-.dcx{position:absolute;top:12px;right:14px;cursor:pointer;width:28px;height:28px;
-  border-radius:8px;display:flex;align-items:center;justify-content:center;
-  background:rgba(255,255,255,.06);border:none;color:#fff;font-size:14px;transition:background .2s}
-.dcx:hover{background:rgba(255,255,255,.12)}
-
-#lo{position:absolute;inset:0;z-index:9999;background:#0a0a0a;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  transition:opacity 1.2s ease}
-#lo.fo{opacity:0;pointer-events:none}
-.lr{width:48px;height:48px;border-radius:50%;border:3px solid rgba(255,255,255,.08);
-  border-top-color:rgba(255,255,255,.7);animation:sp .9s linear infinite}
-@keyframes sp{to{transform:rotate(360deg)}}
-.lt{margin-top:18px;font-size:14px;font-weight:500;color:rgba(255,255,255,.5);letter-spacing:.5px}
-.ls{margin-top:6px;font-size:11px;color:rgba(255,255,255,.25)}
-.nb::-webkit-scrollbar{width:4px}
-.nb::-webkit-scrollbar-track{background:transparent}
-.nb::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:4px}
+html,body,#cesiumContainer{width:100%;height:100%;overflow:hidden;background:#0a0a0a;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sans-serif}
+.cesium-viewer-bottom,.cesium-viewer-fullscreenContainer{display:none!important}
+.cesium-credit-logoContainer{opacity:.3!important}
+.cesium-credit-textContainer{font-size:9px!important;opacity:.3!important}
+.cesium-viewer-toolbar{display:none!important}
+.cesium-geocoder-input{background:rgba(15,15,15,.85)!important;border:1px solid rgba(255,255,255,.12)!important;color:#fff!important;border-radius:8px!important;backdrop-filter:blur(20px)!important;font-size:13px!important}
+.glass{background:rgba(12,12,14,.72);backdrop-filter:blur(24px) saturate(1.4);-webkit-backdrop-filter:blur(24px) saturate(1.4);border:1px solid rgba(255,255,255,.08);border-radius:16px;color:#e8e8ec}
+#loadingOverlay{position:fixed;inset:0;z-index:9999;background:#0a0a0a;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .8s ease,visibility .8s ease}
+#loadingOverlay.hidden{opacity:0;visibility:hidden;pointer-events:none}
+.spinner{width:48px;height:48px;border:3px solid rgba(255,255,255,.08);border-top-color:#ff6b6b;border-radius:50%;animation:spin .9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{margin-top:20px;font-size:16px;color:rgba(255,255,255,.5);letter-spacing:.5px}
+.loading-sub{margin-top:6px;font-size:12px;color:rgba(255,255,255,.25)}
+#titlePanel{position:fixed;top:16px;left:16px;z-index:100;padding:16px 20px}
+#titlePanel h1{font-size:18px;font-weight:700;letter-spacing:-.3px}
+#titlePanel .sub{font-size:12px;color:rgba(255,255,255,.45);margin-top:4px}
+#togglePanel{position:fixed;top:16px;right:16px;z-index:100;padding:8px;display:flex;flex-direction:column;gap:4px}
+.toggle-btn{display:flex;align-items:center;gap:8px;padding:8px 14px;border:none;border-radius:10px;background:rgba(255,255,255,.04);color:rgba(255,255,255,.55);font-size:12px;font-weight:600;cursor:pointer;transition:all .25s ease;white-space:nowrap;font-family:inherit}
+.toggle-btn:hover{background:rgba(255,255,255,.08)}
+.toggle-btn.active{background:rgba(255,255,255,.1);color:#fff}
+.toggle-btn .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;transition:all .25s ease}
+.toggle-btn.active .dot{box-shadow:0 0 8px currentColor}
+#detailCard{position:fixed;bottom:20px;right:16px;z-index:100;width:320px;padding:20px;transform:translateY(120%);transition:transform .35s cubic-bezier(.16,1,.3,1)}
+#detailCard.visible{transform:translateY(0)}
+#detailCard .close-btn{position:absolute;top:10px;right:14px;background:none;border:none;color:rgba(255,255,255,.4);font-size:18px;cursor:pointer;padding:4px}
+#detailCard .close-btn:hover{color:#fff}
+.dc-cat{font-size:10px;text-transform:uppercase;letter-spacing:1.2px;font-weight:700;margin-bottom:6px}
+.dc-name{font-size:17px;font-weight:700;margin-bottom:4px}
+.dc-stars{font-size:13px;color:#ffd43b;margin-bottom:8px}
+.dc-price{font-size:14px;font-weight:600;color:#69db7c;margin-bottom:6px}
+.dc-desc{font-size:12px;color:rgba(255,255,255,.55);line-height:1.5;margin-bottom:8px}
+.dc-hood{font-size:11px;color:rgba(255,255,255,.35)}
+#hoodGuide{position:fixed;bottom:20px;left:16px;z-index:100;width:260px;padding:0;overflow:hidden;max-height:44px;transition:max-height .4s cubic-bezier(.16,1,.3,1)}
+#hoodGuide.expanded{max-height:420px}
+.hood-header{padding:12px 16px;font-size:12px;font-weight:700;letter-spacing:.5px;cursor:pointer;user-select:none;display:flex;justify-content:space-between;align-items:center;text-transform:uppercase;color:rgba(255,255,255,.5)}
+.hood-header:hover{color:rgba(255,255,255,.8)}
+.hood-list{padding:0 16px 14px}
+.hood-item{padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);cursor:pointer}
+.hood-item:last-child{border:none}
+.hood-item:hover .hood-name{color:#fff}
+.hood-name{font-size:13px;font-weight:600;transition:color .2s;display:flex;align-items:center;gap:6px}
+.hood-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.hood-desc{font-size:11px;color:rgba(255,255,255,.35);margin-top:2px;padding-left:12px}
+.cesium-viewer-geocoderContainer{position:fixed!important;top:18px;left:50%;transform:translateX(-50%);z-index:100!important}
 </style>
 </head>
 <body>
-
-<div id="lo"><div class="lr"></div><div class="lt">Loading Amsterdam</div><div class="ls">Streaming 3D tiles…</div></div>
-
-<div id="titleBar" class="glass">
-  <h1>🇳🇱 Amsterdam — 3D Guide Map</h1>
-  <div class="sub">Mar 22–25, 2026 · 3 people · Spring Break</div>
+<div id="loadingOverlay"><div class="spinner"></div><div class="loading-text">Loading Amsterdam…</div><div class="loading-sub">Dark basemap + 3D buildings</div></div>
+<div id="titlePanel" class="glass"><h1>🇳🇱 Amsterdam — 3D Guide Map</h1><div class="sub">Mar 22–25, 2026 · 3 people · Spring Break</div></div>
+<div id="togglePanel" class="glass">
+<button class="toggle-btn active" data-layer="hotels" onclick="toggleLayer('hotels')"><span class="dot" style="background:#ff6b6b"></span>🏨 Hotels</button>
+<button class="toggle-btn active" data-layer="sights" onclick="toggleLayer('sights')"><span class="dot" style="background:#ffd43b"></span>⭐ Sights</button>
+<button class="toggle-btn active" data-layer="restaurants" onclick="toggleLayer('restaurants')"><span class="dot" style="background:#69db7c"></span>🍽 Food</button>
+<button class="toggle-btn" data-layer="neighborhoods" onclick="toggleLayer('neighborhoods')"><span class="dot" style="background:#74c0fc"></span>🏘 Hoods</button>
+<button class="toggle-btn" data-layer="heatmap" onclick="toggleLayer('heatmap')"><span class="dot" style="background:#ff922b"></span>🔥 Heat</button>
+<button class="toggle-btn" data-layer="photo" onclick="togglePhoto()"><span class="dot" style="background:#e8e8ec"></span>📸 Photo</button>
 </div>
-
-<div id="tp" class="glass">
-  <div class="tb on" data-l="hotels" onclick="tgl('hotels')"><div class="td" style="background:#f87171;color:#f87171"></div><span>🏨 Hotels</span><span class="tk">1</span></div>
-  <div class="tb on" data-l="sights" onclick="tgl('sights')"><div class="td" style="background:#fbbf24;color:#fbbf24"></div><span>⭐ Sights</span><span class="tk">2</span></div>
-  <div class="tb on" data-l="restaurants" onclick="tgl('restaurants')"><div class="td" style="background:#4ade80;color:#4ade80"></div><span>🍽 Restaurants</span><span class="tk">3</span></div>
-  <div class="tb" data-l="neighborhoods" onclick="tgl('neighborhoods')"><div class="td" style="background:#60a5fa;color:#60a5fa"></div><span>🏘 Neighborhoods</span><span class="tk">4</span></div>
-  <div class="tb" data-l="heatmap" onclick="tgl('heatmap')"><div class="td" style="background:#fb923c;color:#fb923c"></div><span>🔥 Heat Map</span><span class="tk">5</span></div>
-  <div class="tb on" data-l="minimal" onclick="tgl('minimal')"><div class="td" style="background:#e0e0e0;color:#e0e0e0"></div><span>🎨 Minimal</span><span class="tk">6</span></div>
+<div id="detailCard" class="glass">
+<button class="close-btn" onclick="closeDetail()">✕</button>
+<div class="dc-cat" id="dcCat"></div><div class="dc-name" id="dcName"></div>
+<div class="dc-stars" id="dcStars"></div><div class="dc-price" id="dcPrice"></div>
+<div class="dc-desc" id="dcDesc"></div><div class="dc-hood" id="dcHood"></div>
 </div>
-
-<div id="np" class="glass hid">
-  <div class="nhr" onclick="document.getElementById('np').classList.toggle('col')">
-    <span>🏘 Neighborhood Guide</span><span class="ar">▼</span>
-  </div>
-  <div class="nb">
-    <div class="ni"><div class="nin"><div class="nid" style="background:#60a5fa"></div>Jordaan</div><div class="nit">Charming canal streets, indie boutiques, cozy brown cafés, art galleries. Noordermarkt Saturdays.</div></div>
-    <div class="ni"><div class="nin"><div class="nid" style="background:#fb923c"></div>De Pijp</div><div class="nit">Bohemian foodie heaven. Albert Cuyp Market is a must. Craft beer, lively atmosphere.</div></div>
-    <div class="ni"><div class="nin"><div class="nid" style="background:#c084fc"></div>Museum Quarter</div><div class="nit">Rijksmuseum, Van Gogh, Stedelijk. P.C. Hooftstraat shops. Vondelpark for picnics.</div></div>
-    <div class="ni"><div class="nin"><div class="nid" style="background:#f87171"></div>Centrum</div><div class="nit">Dam Square, Red Light District, Nine Streets. Touristy but essential.</div></div>
-    <div class="ni"><div class="nin"><div class="nid" style="background:#2dd4bf"></div>Noord</div><div class="nit">Creative frontier. Free ferry. NDSM Wharf street art, A'DAM Lookout views.</div></div>
-    <div class="ni"><div class="nin"><div class="nid" style="background:#4ade80"></div>Oud-West</div><div class="nit">Foodhallen, De Hallen complex. Mid-range dining, craft cocktails.</div></div>
-  </div>
+<div id="hoodGuide" class="glass">
+<div class="hood-header" onclick="document.getElementById('hoodGuide').classList.toggle('expanded')">🏘 Neighborhood Guide <span style="font-size:14px">▾</span></div>
+<div class="hood-list" id="hoodList"></div>
 </div>
-
-<div id="dc" class="glass">
-  <button class="dcx" onclick="closeDC()">✕</button>
-  <div class="dch">
-    <div class="dcba" id="dcBdg"></div>
-    <div class="dcn" id="dcNm"></div>
-    <div class="dcs" id="dcSt"></div>
-  </div>
-  <div class="dcy">
-    <div class="dcr" id="dcPr"><span class="ic">💰</span><span></span></div>
-    <div class="dcr" id="dcRt"><span class="ic">📊</span><span></span></div>
-    <div class="dcr" id="dcNh"><span class="ic">📍</span><span></span></div>
-    <div class="dcd" id="dcDs"></div>
-  </div>
-</div>
-
 <div id="cesiumContainer"></div>
 <script>
-/* ═══════════════════ CESIUM INIT ═══════════════════ */
 Cesium.Ion.defaultAccessToken='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI5Zjk1ODRlMi1hNjlmLTQ0NDktOTU3OS0wMjUxNTYyNWFhZDkiLCJpZCI6NDAxMDM0LCJpYXQiOjE3NzMxMDE0MDB9.JQg2NhsCuLeNn_3wLEdrtEVuvGu6_R445H6wVaSLTks';
+(async function(){
+var viewer=new Cesium.Viewer('cesiumContainer',{baseLayerPicker:false,timeline:false,animation:false,homeButton:false,sceneModePicker:false,navigationHelpButton:false,fullscreenButton:false,geocoder:true,infoBox:false,selectionIndicator:false,skyBox:false,skyAtmosphere:false,contextOptions:{requestWebgl2:true},msaaSamples:2,baseLayer:false});
+var scene=viewer.scene;
+scene.globe.baseColor=Cesium.Color.fromCssColorString('#0a0a0a');
+scene.globe.showGroundAtmosphere=false;
+scene.globe.enableLighting=false;
+scene.backgroundColor=Cesium.Color.fromCssColorString('#0a0a0a');
+viewer.imageryLayers.addImageryProvider(new Cesium.UrlTemplateImageryProvider({url:'https://basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png',maximumLevel:18,credit:'OpenStreetMap contributors, CARTO'}));
 
-var CC={
-  hotels:{css:'#f87171',c:Cesium.Color.fromCssColorString('#f87171'),ic:'\ud83c\udfe8',lb:'Hotel'},
-  sights:{css:'#fbbf24',c:Cesium.Color.fromCssColorString('#fbbf24'),ic:'\u2b50',lb:'Sight'},
-  restaurants:{css:'#4ade80',c:Cesium.Color.fromCssColorString('#4ade80'),ic:'\ud83c\udf7d',lb:'Restaurant'}
+var osmBuildings=await Cesium.createOsmBuildingsAsync();
+scene.primitives.add(osmBuildings);
+osmBuildings.style=new Cesium.Cesium3DTileStyle({color:"color('#c8c8cc',0.88)"});
+
+var ssc=scene.screenSpaceCameraController;
+ssc.enableTilt=true;ssc.enableLook=false;ssc.minimumZoomDistance=50;ssc.maximumZoomDistance=12000;
+ssc.inertiaSpin=0.6;ssc.inertiaTranslate=0.6;ssc.inertiaZoom=0.7;
+
+var CH=Cesium.Color.fromCssColorString('#ff6b6b');
+var CS=Cesium.Color.fromCssColorString('#ffd43b');
+var CR=Cesium.Color.fromCssColorString('#69db7c');
+
+var hotels=[
+{n:'Sir Adam',s:4,p:185,d:'Design hotel in A\'DAM Tower with stunning rooftop views',h:'Noord',lat:52.3843,lon:4.9014},
+{n:'Hotel De Hallen',s:4,p:175,d:'Converted tram depot with industrial-chic rooms',h:'Oud-West',lat:52.3668,lon:4.8695},
+{n:'Volkshotel',s:3,p:120,d:'Creative hub with rooftop sauna, bar & cultural events',h:'Oost',lat:52.3506,lon:4.9225},
+{n:'The Hoxton',s:4,p:210,d:'Canal-house boutique hotel on prestigious Herengracht',h:'Centrum',lat:52.3752,lon:4.8890},
+{n:'Hotel Not Hotel',s:3,p:130,d:'Quirky concept with secret rooms behind bookshelves',h:'De Pijp',lat:52.3548,lon:4.8911},
+{n:'Andaz Amsterdam',s:5,p:320,d:'Hyatt luxury on Prinsengracht, Marcel Wanders design',h:'Canal Ring',lat:52.3660,lon:4.8850},
+{n:"art'otel Amsterdam",s:4,p:195,d:'Contemporary art hotel near Central Station',h:'Centrum',lat:52.3790,lon:4.8980},
+{n:'W Amsterdam',s:5,p:350,d:'Iconic Dam Square address with rooftop pool',h:'Centrum',lat:52.3730,lon:4.8920},
+{n:'Pulitzer Amsterdam',s:5,p:380,d:'25 golden-age canal houses merged, garden courtyard',h:'Jordaan',lat:52.3745,lon:4.8835},
+{n:'citizenM Amstel',s:4,p:145,d:'Smart tech rooms with mood lighting, affordable luxury',h:'Centrum',lat:52.3635,lon:4.9020},
+{n:'Mr. Jordaan',s:4,p:220,d:'Intimate boutique hotel in the heart of Jordaan',h:'Jordaan',lat:52.3760,lon:4.8820},
+{n:'NH Collection Flower Market',s:4,p:230,d:'Overlooking Bloemenmarkt with modern elegance',h:'Centrum',lat:52.3665,lon:4.8910}
+];
+
+var sightsList=[
+{n:'Dam Square',s:4,p:'Free',d:'Historic heart of Amsterdam with Royal Palace',h:'Centrum',lat:52.3731,lon:4.8932},
+{n:'Anne Frank House',s:5,p:'\u20ac16',d:'Moving WWII museum — book weeks ahead',h:'Jordaan',lat:52.3752,lon:4.8840},
+{n:'Rijksmuseum',s:5,p:'\u20ac25',d:'Dutch Golden Age masterpieces & Night Watch',h:'Museum Quarter',lat:52.3600,lon:4.8852},
+{n:'Van Gogh Museum',s:5,p:'\u20ac25',d:'World\'s largest Van Gogh collection, 200+ paintings',h:'Museum Quarter',lat:52.3584,lon:4.8811},
+{n:'Vondelpark',s:4,p:'Free',d:'Beloved 47-hectare urban park, great for picnics',h:'Oud-Zuid',lat:52.3580,lon:4.8686},
+{n:'Red Light District',s:3,p:'Free',d:'Historic neighborhood with neon-lit alleys',h:'Centrum',lat:52.3741,lon:4.8990},
+{n:'Heineken Experience',s:4,p:'\u20ac23',d:'Interactive brewery tour with 2 free beers',h:'De Pijp',lat:52.3577,lon:4.8915},
+{n:"A'DAM Lookout",s:4,p:'\u20ac16.50',d:'360\u00b0 panorama + Europe\'s highest swing',h:'Noord',lat:52.3841,lon:4.9012},
+{n:'Nine Streets',s:4,p:'Free',d:'Charming grid of indie boutiques & cozy caf\u00e9s',h:'Canal Ring',lat:52.3700,lon:4.8850},
+{n:'Leidseplein',s:4,p:'Free',d:'Vibrant nightlife square with street performers',h:'Centrum',lat:52.3640,lon:4.8828},
+{n:'NDSM Wharf',s:4,p:'Free',d:'Post-industrial art village, free ferry from Central',h:'Noord',lat:52.4012,lon:4.8915},
+{n:'Stedelijk Museum',s:5,p:'\u20ac22.50',d:'World-class modern & contemporary art',h:'Museum Quarter',lat:52.3580,lon:4.8799},
+{n:'Begijnhof',s:4,p:'Free',d:'Hidden medieval courtyard from the 14th century',h:'Centrum',lat:52.3694,lon:4.8897},
+{n:'Canal Cruise',s:4,p:'~\u20ac16',d:'1-hour cruise through UNESCO World Heritage canals',h:'Centrum',lat:52.3775,lon:4.8972},
+{n:'NEMO Science Museum',s:4,p:'\u20ac18.50',d:'Interactive science exhibits & rooftop terrace',h:'Centrum',lat:52.3740,lon:4.9123},
+{n:'Bloemenmarkt',s:4,p:'Free',d:'World\'s only floating flower market since 1862',h:'Centrum',lat:52.3664,lon:4.8918},
+{n:'Westerkerk',s:4,p:'Free',d:'Iconic 17th-century church, climb tower for \u20ac9',h:'Jordaan',lat:52.3745,lon:4.8837}
+];
+
+var restsList=[
+{n:'Foodhallen',s:4,p:'\u20ac10\u201325',d:'Indoor food market with 20+ international stalls',h:'Oud-West',c:'Multi-cuisine',lat:52.3664,lon:4.8693},
+{n:'BAK',s:5,p:'\u20ac65\u201395',d:'Exceptional seasonal tasting menus, waterfront',h:'Houthavens',c:'Modern Dutch',lat:52.3912,lon:4.8760},
+{n:'Hoi Tin',s:4,p:'\u20ac12\u201320',d:'Legendary Cantonese restaurant since 1969',h:'Centrum',c:'Chinese',lat:52.3742,lon:4.8990},
+{n:'De Kas',s:5,p:'\u20ac75\u201395',d:'Farm-to-table dining in a stunning greenhouse',h:'Oost',c:'Modern European',lat:52.3520,lon:4.9280},
+{n:'Rijks',s:5,p:'\u20ac55\u201385',d:'Michelin-starred Dutch ingredients focus',h:'Museum Quarter',c:'Fine Dutch',lat:52.3598,lon:4.8860},
+{n:'Koevoet',s:4,p:'\u20ac18\u201330',d:'Cozy Jordaan bistro with natural wines',h:'Jordaan',c:'European Bistro',lat:52.3772,lon:4.8826},
+{n:'Caf\u00e9 Modern',s:4,p:'\u20ac15\u201328',d:'NDSM waterfront with eclectic menu',h:'Noord',c:'Modern European',lat:52.4005,lon:4.8918},
+{n:'Albert Cuyp Market',s:4,p:'\u20ac3\u201315',d:'Street food paradise with 260+ stalls',h:'De Pijp',c:'Street Food',lat:52.3558,lon:4.8940},
+{n:'Bar Lusconi',s:4,p:'\u20ac12\u201322',d:'Italian aperitivo with canal-side setting',h:'Centrum',c:'Italian',lat:52.3750,lon:4.8860},
+{n:'Brasserie van Baerle',s:4,p:'\u20ac25\u201345',d:'Elegant Museum Quarter French-Dutch brasserie',h:'Museum Quarter',c:'French-Dutch',lat:52.3570,lon:4.8770},
+{n:'Kaagman & Kortekaas',s:4,p:'\u20ac15\u201328',d:'Artisan cheese & charcuterie experts',h:'Jordaan',c:'Dutch Deli',lat:52.3765,lon:4.8800},
+{n:'Flore',s:4,p:'\u20ac12\u201325',d:'All-day neighbourhood caf\u00e9, brunch favorite',h:'Oud-West',c:'Caf\u00e9',lat:52.3635,lon:4.8685},
+{n:'Caf\u00e9 de Klos',s:4,p:'\u20ac15\u201328',d:'Famous spare ribs, tiny & always packed',h:'Centrum',c:'BBQ & Ribs',lat:52.3680,lon:4.8828},
+{n:'Pluk',s:4,p:'\u20ac12\u201322',d:'Instagram-worthy healthy bowls & coffee',h:'Nine Streets',c:'Healthy Caf\u00e9',lat:52.3705,lon:4.8855},
+{n:'Moeders',s:4,p:'\u20ac14\u201325',d:'Home-cooked Dutch classics, walls of mom photos',h:'Jordaan',c:'Traditional Dutch',lat:52.3780,lon:4.8805},
+{n:'The Seafood Bar',s:4,p:'\u20ac20\u201340',d:'Premium fresh seafood platters & oysters',h:'Museum Quarter',c:'Seafood',lat:52.3563,lon:4.8830}
+];
+
+var hoods=[
+{name:'Jordaan',color:'#74c0fc',desc:'Charming canals, indie boutiques & cozy brown cafés',poly:[[4.878,52.381],[4.890,52.381],[4.890,52.373],[4.878,52.373]],center:[4.884,52.377]},
+{name:'De Pijp',color:'#ff922b',desc:'Bohemian neighborhood centered on Albert Cuyp Market',poly:[[4.886,52.360],[4.900,52.360],[4.900,52.350],[4.886,52.350]],center:[4.893,52.355]},
+{name:'Museum Quarter',color:'#b197fc',desc:'Home to Rijksmuseum, Van Gogh & Stedelijk',poly:[[4.873,52.365],[4.886,52.365],[4.886,52.355],[4.873,52.355]],center:[4.880,52.360]},
+{name:'Centrum',color:'#ff6b6b',desc:'Dam Square, Red Light District & historic canals',poly:[[4.888,52.378],[4.900,52.378],[4.900,52.368],[4.888,52.368]],center:[4.894,52.373]},
+{name:'Noord',color:'#38d9a9',desc:'Creative hub across the IJ: NDSM & A\'DAM Tower',poly:[[4.895,52.395],[4.915,52.395],[4.915,52.382],[4.895,52.382]],center:[4.905,52.389]},
+{name:'Oud-West',color:'#69db7c',desc:'Foodhallen, De Hallen & wonderful local character',poly:[[4.858,52.372],[4.878,52.372],[4.878,52.360],[4.858,52.360]],center:[4.868,52.366]}
+];
+
+var heatZones=[
+[52.376,4.883,180,220,255,69,58,0.20],[52.378,4.886,140,160,255,100,60,0.18],
+[52.364,4.883,200,140,255,69,58,0.15],[52.373,4.893,160,180,255,80,50,0.22],
+[52.375,4.898,120,130,255,69,58,0.18],[52.356,4.893,200,160,255,100,50,0.17],
+[52.354,4.890,160,120,255,120,40,0.14],[52.370,4.885,130,100,255,200,50,0.10],
+[52.360,4.880,200,180,255,200,60,0.10],[52.371,4.887,100,110,255,180,40,0.12],
+[52.389,4.905,250,200,60,160,220,0.08],[52.395,4.900,200,180,50,180,150,0.07],
+[52.355,4.870,180,150,100,200,120,0.08],[52.368,4.870,220,160,60,180,200,0.07],
+[52.350,4.920,180,160,60,160,200,0.06],[52.380,4.910,120,100,255,150,50,0.12],
+[52.365,4.888,100,80,255,90,50,0.16],[52.358,4.882,140,100,255,180,60,0.10],
+[52.374,4.884,90,100,255,69,58,0.22],[52.377,4.900,110,90,255,120,50,0.14],
+[52.363,4.895,130,110,255,100,50,0.15],[52.373,4.896,80,70,255,69,58,0.25],
+[52.402,4.892,200,160,50,150,200,0.06],[52.367,4.862,200,180,80,200,120,0.07]
+];
+
+var layers={hotels:[],sights:[],restaurants:[],neighborhoods:[],heatmap:[]};
+var layerState={hotels:true,sights:true,restaurants:true,neighborhoods:false,heatmap:false};
+
+function makeStars(n){return '\u2605'.repeat(n)+'\u2606'.repeat(5-n);}
+
+function addPOI(item,catColor,catKey,catLabel){
+  var gp=Cesium.Cartesian3.fromDegrees(item.lon,item.lat,0);
+  var ep=Cesium.Cartesian3.fromDegrees(item.lon,item.lat,80);
+  var priceTxt=typeof item.p==='number'?('\u20ac'+item.p+'/night'):item.p;
+  var starsTxt=makeStars(item.s);
+  var extra=item.c?(item.c+' \u00b7 '):'';
+  var show=layerState[catKey];
+  var props={poiName:item.n,poiStars:starsTxt,poiPrice:priceTxt,poiDesc:item.d,poiHood:item.h,poiCat:catLabel,poiCuisine:item.c||'',poiLat:item.lat,poiLon:item.lon};
+
+  // Ground dot
+  layers[catKey].push(viewer.entities.add({position:gp,show:show,
+    point:{pixelSize:8,color:catColor,outlineColor:Cesium.Color.WHITE,outlineWidth:1.5,
+    heightReference:Cesium.HeightReference.CLAMP_TO_GROUND,
+    disableDepthTestDistance:Number.POSITIVE_INFINITY},
+    properties:props
+  }));
+
+  // Signpost line + label
+  layers[catKey].push(viewer.entities.add({position:ep,show:show,
+    polyline:{positions:[gp,ep],width:1.5,
+    material:new Cesium.ColorMaterialProperty(catColor.withAlpha(0.5))},
+    label:{text:starsTxt+' '+item.n+'\n'+extra+priceTxt,
+      font:'bold 12px -apple-system,sans-serif',
+      fillColor:Cesium.Color.WHITE,outlineColor:Cesium.Color.BLACK,outlineWidth:2,
+      style:Cesium.LabelStyle.FILL_AND_OUTLINE,
+      backgroundColor:Cesium.Color.fromCssColorString('rgba(10,10,10,0.82)'),
+      showBackground:true,backgroundPadding:new Cesium.Cartesian2(10,6),
+      verticalOrigin:Cesium.VerticalOrigin.BOTTOM,
+      pixelOffset:new Cesium.Cartesian2(0,-4),
+      disableDepthTestDistance:Number.POSITIVE_INFINITY,
+      scaleByDistance:new Cesium.NearFarScalar(200,1.1,6000,0.35),
+      translucencyByDistance:new Cesium.NearFarScalar(200,1.0,10000,0.5)},
+    properties:props
+  }));
+
+  // Ground glow
+  layers[catKey].push(viewer.entities.add({position:gp,show:show,
+    ellipse:{semiMajorAxis:35,semiMinorAxis:35,
+    material:catColor.withAlpha(0.2),
+    heightReference:Cesium.HeightReference.CLAMP_TO_GROUND}
+  }));
+
+  // Building highlight box
+  layers[catKey].push(viewer.entities.add({
+    position:Cesium.Cartesian3.fromDegrees(item.lon,item.lat,25),show:show,
+    box:{dimensions:new Cesium.Cartesian3(30,30,50),
+    material:catColor.withAlpha(0.12),
+    outline:true,outlineColor:catColor.withAlpha(0.3)}
+  }));
+}
+
+// Add all POIs
+hotels.forEach(function(h){addPOI(h,CH,'hotels','HOTEL');});
+sightsList.forEach(function(s){addPOI(s,CS,'sights','SIGHT');});
+restsList.forEach(function(r){addPOI(r,CR,'restaurants','RESTAURANT');});
+
+// ===== NEIGHBORHOODS =====
+hoods.forEach(function(hood){
+  var pts=[];
+  hood.poly.forEach(function(c){pts.push(c[0],c[1]);});
+  var hc=Cesium.Color.fromCssColorString(hood.color);
+
+  // Polygon
+  layers.neighborhoods.push(viewer.entities.add({show:false,
+    polygon:{hierarchy:Cesium.Cartesian3.fromDegreesArray(pts),
+    material:hc.withAlpha(0.12),
+    outline:true,outlineColor:hc.withAlpha(0.6),
+    heightReference:Cesium.HeightReference.CLAMP_TO_GROUND}
+  }));
+
+  // Label
+  layers.neighborhoods.push(viewer.entities.add({show:false,
+    position:Cesium.Cartesian3.fromDegrees(hood.center[0],hood.center[1],120),
+    label:{text:hood.name,font:'bold 14px -apple-system,sans-serif',
+      fillColor:Cesium.Color.WHITE,outlineColor:Cesium.Color.BLACK,outlineWidth:2,
+      style:Cesium.LabelStyle.FILL_AND_OUTLINE,
+      backgroundColor:hc.withAlpha(0.7),showBackground:true,
+      backgroundPadding:new Cesium.Cartesian2(12,6),
+      verticalOrigin:Cesium.VerticalOrigin.CENTER,
+      disableDepthTestDistance:Number.POSITIVE_INFINITY,
+      scaleByDistance:new Cesium.NearFarScalar(500,1.0,8000,0.4)}
+  }));
+});
+
+// ===== HEAT MAP =====
+heatZones.forEach(function(z){
+  layers.heatmap.push(viewer.entities.add({show:false,
+    position:Cesium.Cartesian3.fromDegrees(z[1],z[0],0),
+    ellipse:{semiMajorAxis:z[2],semiMinorAxis:z[3],
+    material:new Cesium.Color(z[4]/255,z[5]/255,z[6]/255,z[7]),
+    heightReference:Cesium.HeightReference.CLAMP_TO_GROUND}
+  }));
+});
+
+// ===== NEIGHBORHOOD GUIDE =====
+var hoodListEl=document.getElementById('hoodList');
+hoods.forEach(function(hood){
+  var item=document.createElement('div');
+  item.className='hood-item';
+  item.innerHTML='<div class="hood-name"><span class="hood-dot" style="background:'+hood.color+'"></span>'+hood.name+'</div><div class="hood-desc">'+hood.desc+'</div>';
+  item.onclick=function(){
+    viewer.camera.flyTo({
+      destination:Cesium.Cartesian3.fromDegrees(hood.center[0],hood.center[1],800),
+      orientation:{heading:Cesium.Math.toRadians(10),pitch:Cesium.Math.toRadians(-40),roll:0},
+      duration:1.5
+    });
+  };
+  hoodListEl.appendChild(item);
+});
+
+// ===== TOGGLE LAYERS =====
+window.toggleLayer=function(key){
+  layerState[key]=!layerState[key];
+  var btn=document.querySelector('[data-layer="'+key+'"]');
+  btn.classList.toggle('active');
+  layers[key].forEach(function(e){e.show=layerState[key];});
 };
 
-function starStr(n){var s='';for(var i=0;i<5;i++)s+=i<n?'\u2605':'\u2606';return s;}
-
-/* ═══════════════════ POI DATA ═══════════════════ */
-var PD={
-hotels:[
-{n:"Sir Adam Hotel",lo:4.9013,la:52.3843,s:4,r:"8.5/10",p:"\u20ac180/night",h:"Noord",d:"Design hotel in A\u2019DAM Tower. Panoramic IJ views, turntables & Marshall speakers in rooms. Rooftop Over The Edge swing."},
-{n:"Hotel De Hallen",lo:4.8685,la:52.3628,s:4,r:"8.6/10",p:"\u20ac165/night",h:"Oud-West",d:"Converted 1902 tram depot in De Hallen complex. Steps from Foodhallen. Industrial-chic, high ceilings."},
-{n:"Volkshotel",lo:4.9267,la:52.3505,s:3,r:"8.2/10",p:"\u20ac105/night",h:"Oost",d:"Creative budget hotel, former newspaper HQ. Rooftop hot tub, basement club, co-working spaces."},
-{n:"The Hoxton",lo:4.8843,la:52.3774,s:4,r:"8.8/10",p:"\u20ac210/night",h:"Centrum",d:"Five merged canal houses on Herengracht. Exposed brick, canal views, Lotti\u2019s restaurant, buzzy lobby."},
-{n:"Hotel Not Hotel",lo:4.8771,la:52.3659,s:3,r:"8.4/10",p:"\u20ac110/night",h:"Oud-West",d:"Each room a unique installation \u2014 tram car, bookcase, secret passage. Playful, affordable, near Vondelpark."},
-{n:"Andaz Amsterdam",lo:4.8849,la:52.3622,s:5,r:"9.1/10",p:"\u20ac320/night",h:"Jordaan",d:"Hyatt luxury in a former library on Prinsengracht. Marcel Wanders interiors. Bluespoon restaurant. Free minibar."},
-{n:"art\u2019otel Amsterdam",lo:4.9022,la:52.3786,s:4,r:"8.3/10",p:"\u20ac195/night",h:"Centrum",d:"Art hotel by Centraal Station. Permanent collection throughout. Rooftop pool & bar with skyline views."},
-{n:"W Amsterdam",lo:4.8910,la:52.3724,s:5,r:"8.9/10",p:"\u20ac280/night",h:"Centrum",d:"Former bank on Dam Square. WET deck rooftop pool, AWAY spa, The Duchess restaurant in a stunning banking hall."},
-{n:"Pulitzer Amsterdam",lo:4.8835,la:52.3744,s:5,r:"9.2/10",p:"\u20ac310/night",h:"Jordaan",d:"25 restored canal houses on Prinsengracht & Keizersgracht. Garden courtyard, art gallery, classic boat tours."},
-{n:"CitizenM South",lo:4.8717,la:52.3397,s:4,r:"8.7/10",p:"\u20ac145/night",h:"Zuid",d:"Tech-forward: self-check-in, tablet mood lighting, XL king beds in every compact room. 24/7 canteen lobby."},
-{n:"Mr. Jordaan",lo:4.8810,la:52.3763,s:3,r:"8.8/10",p:"\u20ac220/night",h:"Jordaan",d:"Boutique hotel on a quiet Jordaan street. Canal house charm, curated neighbourhood maps, warm lobby."},
-{n:"Lloyd Hotel",lo:4.9335,la:52.3791,s:3,r:"7.9/10",p:"\u20ac120/night",h:"Oost",d:"1921 heritage building. Rooms from 1-star to 5-star \u2014 pick your adventure. Eclectic art throughout."}
-],
-sights:[
-{n:"Dam Square",lo:4.8936,la:52.3731,s:4,r:"4.3/5",p:"Free",h:"Centrum",d:"Central square since the 13th century. Royal Palace, Nieuwe Kerk, and the National Monument."},
-{n:"Anne Frank House",lo:4.8841,la:52.3752,s:5,r:"4.7/5",p:"\u20ac16",h:"Jordaan",d:"Preserved hiding place where Anne Frank wrote her diary. Book weeks ahead \u2014 tickets release Tuesdays at 10 AM."},
-{n:"Rijksmuseum",lo:4.8852,la:52.3600,s:5,r:"4.8/5",p:"\u20ac25",h:"Museum Quarter",d:"National museum \u2014 Night Watch, Milkmaid, 8,000+ works spanning 800 years. Allow 3\u20134 hours. Free under 18."},
-{n:"Van Gogh Museum",lo:4.8812,la:52.3584,s:5,r:"4.7/5",p:"\u20ac22",h:"Museum Quarter",d:"World\u2019s largest Van Gogh collection \u2014 200 paintings, 500 drawings. Sunflowers & Almond Blossom. Book morning slots."},
-{n:"Vondelpark",lo:4.8745,la:52.3579,s:4,r:"4.6/5",p:"Free",h:"Museum Quarter",d:"47-hectare urban park. Picnics, people-watching, free concerts. Grab stroopwafels from park vendors."},
-{n:"Red Light District",lo:4.8992,la:52.3740,s:3,r:"4.0/5",p:"Free",h:"Centrum",d:"Oldest neighbourhood. Centuries-old architecture, Oude Kerk, cozy bars on narrow alleys."},
-{n:"Heineken Experience",lo:4.8919,la:52.3578,s:4,r:"4.3/5",p:"\u20ac23",h:"De Pijp",d:"Interactive tour in the 1867 brewery. Pour your own pint, two included drinks. Rooftop bar with great views."},
-{n:"A\u2019DAM Lookout",lo:4.9017,la:52.3842,s:4,r:"4.4/5",p:"\u20ac16.50",h:"Noord",d:"360\u00b0 observation deck atop A\u2019DAM Tower. Over The Edge swing 100m above the city. Sunset is magical."},
-{n:"Nine Streets",lo:4.8855,la:52.3707,s:4,r:"4.5/5",p:"Free",h:"Centrum",d:"Nine charming cross-streets. Vintage shops, indie boutiques, specialty coffee, artisan cheese."},
-{n:"Leidseplein",lo:4.8825,la:52.3641,s:4,r:"4.1/5",p:"Free",h:"Centrum",d:"Entertainment hub \u2014 theatres, comedy clubs, live music, packed terraces. Melkweg & Paradiso nearby."},
-{n:"NDSM Wharf",lo:4.8916,la:52.4012,s:4,r:"4.4/5",p:"Free",h:"Noord",d:"Post-industrial shipyard turned art hub. Street art, festivals, IJ-Hallen flea market. Free ferry from Centraal."},
-{n:"Stedelijk Museum",lo:4.8798,la:52.3580,s:4,r:"4.5/5",p:"\u20ac22.50",h:"Museum Quarter",d:"Modern & contemporary art \u2014 Mondrian, Warhol, De Kooning. The \u2018bathtub\u2019 extension is iconic."},
-{n:"Begijnhof",lo:4.8897,la:52.3693,s:4,r:"4.6/5",p:"Free",h:"Centrum",d:"Hidden 14th-century courtyard. Amsterdam\u2019s oldest house (1528). Peaceful oasis near Kalverstraat."},
-{n:"Canal Cruise",lo:4.8895,la:52.3765,s:4,r:"4.5/5",p:"\u20ac16\u201338",h:"Centrum",d:"Quintessential Amsterdam. Glide past canal houses, bridges, houseboats. Candlelight cruises unforgettable."},
-{n:"NEMO Science Museum",lo:4.9123,la:52.3738,s:4,r:"4.4/5",p:"\u20ac17.50",h:"Centrum",d:"Renzo Piano\u2019s ship-shaped museum. Hands-on exhibits across 5 floors. Free rooftop with a great panorama."}
-],
-restaurants:[
-{n:"Foodhallen",lo:4.8685,la:52.3625,s:4,r:"4.4/5",p:"\u20ac8\u201315/dish",h:"Oud-West",d:"Indoor food market, 20+ vendors. Vietnamese bao, pizza, ceviche. Perfect when your group can\u2019t agree."},
-{n:"BAK Restaurant",lo:4.9146,la:52.3760,s:5,r:"4.8/5",p:"\u20ac65\u201385/pp",h:"Centrum",d:"Fine dining on the waterfront. Daily 4\u20135 course seasonal Dutch menu. Michelin Bib Gourmand."},
-{n:"Hoi Tin",lo:4.8948,la:52.3700,s:4,r:"4.2/5",p:"\u20ac12\u201320/pp",h:"Centrum",d:"No-frills Cantonese since 1981. Legendary roast duck and dim sum. Cash preferred."},
-{n:"De Kas",lo:4.9329,la:52.3529,s:5,r:"4.7/5",p:"\u20ac55\u201375/pp",h:"Oost",d:"Michelin star in a 1926 greenhouse growing its own herbs. Daily set menu, garden-to-table."},
-{n:"Rijks",lo:4.8850,la:52.3596,s:5,r:"4.6/5",p:"\u20ac45\u201365/pp",h:"Museum Quarter",d:"Michelin star inside the Rijksmuseum. Dutch cuisine. 3-course lunch is great value."},
-{n:"Koevoet",lo:4.8799,la:52.3817,s:4,r:"4.5/5",p:"\u20ac18\u201328/pp",h:"Jordaan",d:"Cozy Jordaan spot with seasonal blackboard menu. Dutch comfort food + French technique."},
-{n:"Caf\u00e9 Modern",lo:4.9000,la:52.3838,s:4,r:"4.3/5",p:"\u20ac15\u201325/pp",h:"Noord",d:"Waterfront caf\u00e9 in Noord with IJ views. Modern European plates. Weekend brunch popular."},
-{n:"Albert Cuyp Market",lo:4.8945,la:52.3555,s:4,r:"4.5/5",p:"\u20ac3\u201310",h:"De Pijp",d:"Largest street market since 1905. 250+ stalls. Stroopwafels, herring, Surinamese roti. Mon\u2013Sat."},
-{n:"Bar Lusconi",lo:4.8901,la:52.3678,s:4,r:"4.3/5",p:"\u20ac15\u201325/pp",h:"Centrum",d:"Canal-side Italian bar. Sun-drenched terrace. Perfect aperitivo. Pasta & cicchetti standouts."},
-{n:"Brasserie van Baerle",lo:4.8782,la:52.3563,s:4,r:"4.4/5",p:"\u20ac25\u201340/pp",h:"Museum Quarter",d:"Elegant brasserie near Vondelpark. Classic French-Dutch dishes. Legendary steak tartare."},
-{n:"Kaagman & Kortekaas",lo:4.8862,la:52.3642,s:4,r:"4.5/5",p:"\u20ac20\u201335/pp",h:"Centrum",d:"Farm-to-table bistro, open kitchen. Weekly changing 3-course dinner. Well-curated wines."},
-{n:"Flore",lo:4.8675,la:52.3643,s:4,r:"4.3/5",p:"\u20ac18\u201330/pp",h:"Oud-West",d:"All-day restaurant, leafy terrace. Mediterranean-Dutch seasonal produce. Weekend brunch."},
-{n:"Caf\u00e9 de Klos",lo:4.8833,la:52.3658,s:4,r:"4.5/5",p:"\u20ac15\u201325/pp",h:"Centrum",d:"Legendary spare ribs since the 1980s. No reservations \u2014 queue outside and it\u2019s worth it."},
-{n:"Pluk Amsterdam",lo:4.8856,la:52.3722,s:4,r:"4.1/5",p:"\u20ac12\u201320/pp",h:"Centrum",d:"Instagrammable Nine Streets caf\u00e9. Beautiful acai bowls, fresh juices. Cute but small \u2014 arrive early."},
-{n:"Moeders",lo:4.8789,la:52.3689,s:4,r:"4.3/5",p:"\u20ac15\u201325/pp",h:"Jordaan",d:"\u2018Mothers\u2019 restaurant: traditional Dutch home cooking. Walls of framed mom photos. Stamppot & apple pie."},
-{n:"The Seafood Bar",lo:4.8800,la:52.3572,s:4,r:"4.6/5",p:"\u20ac30\u201350/pp",h:"Museum Quarter",d:"Fresh platters, lobster rolls, best fish & chips in Amsterdam. Buzzy, near Museumplein. No reservations."}
-]};
-/* ═══════════════════ NEIGHBORHOODS ═══════════════════ */
-var NH=[
-{nm:"Jordaan",fc:[96,165,250],pts:[[4.8748,52.3688],[4.8748,52.3810],[4.8870,52.3810],[4.8870,52.3688]],ct:[4.8809,52.3749]},
-{nm:"De Pijp",fc:[251,146,60],pts:[[4.8860,52.3500],[4.8860,52.3590],[4.9030,52.3590],[4.9030,52.3500]],ct:[4.8945,52.3545]},
-{nm:"Museum Quarter",fc:[192,132,252],pts:[[4.8700,52.3540],[4.8700,52.3610],[4.8880,52.3610],[4.8880,52.3540]],ct:[4.8790,52.3575]},
-{nm:"Centrum",fc:[248,113,113],pts:[[4.8830,52.3680],[4.8830,52.3790],[4.9050,52.3790],[4.9050,52.3680]],ct:[4.8940,52.3735]},
-{nm:"Noord",fc:[45,212,191],pts:[[4.8850,52.3830],[4.8850,52.4050],[4.9200,52.4050],[4.9200,52.3830]],ct:[4.9025,52.3940]},
-{nm:"Oud-West",fc:[74,222,128],pts:[[4.8580,52.3590],[4.8580,52.3680],[4.8770,52.3680],[4.8770,52.3590]],ct:[4.8675,52.3635]}
-];
-
-/* ═══════════════════ HEATMAP POINTS ═══════════════════ */
-var HM=[
-{lo:4.8940,la:52.3730,i:1.0},{lo:4.8860,la:52.3710,i:0.9},{lo:4.8830,la:52.3750,i:0.85},
-{lo:4.8835,la:52.3660,i:0.8},{lo:4.8825,la:52.3640,i:0.85},{lo:4.8850,la:52.3600,i:0.7},
-{lo:4.8945,la:52.3555,i:0.75},{lo:4.8900,la:52.3578,i:0.65},{lo:4.8685,la:52.3630,i:0.6},
-{lo:4.8992,la:52.3740,i:0.7},{lo:4.8810,la:52.3763,i:0.75},{lo:4.8895,la:52.3765,i:0.8},
-{lo:4.8897,la:52.3693,i:0.65},{lo:4.9013,la:52.3843,i:0.5},{lo:4.8916,la:52.4012,i:0.35},
-{lo:4.8841,la:52.3752,i:0.8},{lo:4.8852,la:52.3600,i:0.7},{lo:4.8812,la:52.3584,i:0.7},
-{lo:4.9017,la:52.3842,i:0.5},{lo:4.8919,la:52.3578,i:0.65},{lo:4.8910,la:52.3724,i:0.9},
-{lo:4.8855,la:52.3707,i:0.8},{lo:4.8799,la:52.3817,i:0.55},{lo:4.9000,la:52.3838,i:0.4},
-{lo:4.8901,la:52.3678,i:0.7},{lo:4.8789,la:52.3689,i:0.65}
-];
-
-function hmColor(intensity){
-  if(intensity>0.7) return Cesium.Color.fromCssColorString('rgba(239,68,68,'+(.18*intensity)+')');
-  if(intensity>0.5) return Cesium.Color.fromCssColorString('rgba(251,146,60,'+(.16*intensity)+')');
-  if(intensity>0.3) return Cesium.Color.fromCssColorString('rgba(250,204,21,'+(.14*intensity)+')');
-  return Cesium.Color.fromCssColorString('rgba(96,165,250,'+(.12*intensity)+')');
-}
-
-/* ═══════════════════ LAYER STATE ═══════════════════ */
-var layers={hotels:true,sights:true,restaurants:true,neighborhoods:false,heatmap:false,minimal:true};
-var entities={hotels:[],sights:[],restaurants:[],neighborhoods:[],heatmap:[]};
-var glowEntities={hotels:[],sights:[],restaurants:[]};
-var viewer, tileset, grayscaleShader;
-
-/* ═══════════════════ INIT ═══════════════════ */
-(async function(){
-  viewer = new Cesium.Viewer('cesiumContainer',{
-    terrainProvider: undefined,
-    baseLayerPicker:false,animation:false,timeline:false,geocoder:false,
-    homeButton:false,sceneModePicker:false,navigationHelpButton:false,
-    fullscreenButton:false,infoBox:false,selectionIndicator:false,
-    shadows:false,shouldAnimate:false,
-    scene3DOnly:true,
-    requestRenderMode:false,
-    maximumRenderTimeChange:Infinity
-  });
-
-  viewer.scene.globe.show = false;
-  viewer.scene.skyBox.show = false;
-  viewer.scene.sun.show = false;
-  viewer.scene.moon.show = false;
-  viewer.scene.skyAtmosphere.show = false;
-  viewer.scene.backgroundColor = Cesium.Color.fromCssColorString('#0a0a0a');
-  viewer.scene.fog.enabled = false;
-
-  /* Camera controls - Google Earth style */
-  var ctrl = viewer.scene.screenSpaceCameraController;
-  ctrl.enableTilt = true;
-  ctrl.enableLook = false;
-  ctrl.minimumZoomDistance = 50;
-  ctrl.maximumZoomDistance = 20000;
-  ctrl.inertiaSpin = 0.6;
-  ctrl.inertiaTranslate = 0.6;
-  ctrl.inertiaZoom = 0.7;
-
-  /* Dark minimal shader — dark base, white highlights, posterized */
-  grayscaleShader = new Cesium.CustomShader({
-    fragmentShaderText: '\
-      void fragmentMain(FragmentInput fsInput, inout czm_modelMaterial material) {\
-        float gray = dot(material.diffuse, vec3(0.299, 0.587, 0.114));\
-        /* High contrast S-curve: crush darks, boost highlights */\
-        gray = smoothstep(0.05, 0.85, gray);\
-        /* Posterize to ~6 discrete shades for a cleaner graphic look */\
-        gray = floor(gray * 6.0) / 6.0;\
-        /* Dark overall with white highlights: remap 0-1 to 0.06-0.75 */\
-        gray = mix(0.06, 0.75, gray);\
-        material.diffuse = vec3(gray);\
-      }\
-    '
-  });
-
-  /* Load Google 3D Tiles */
-  try {
-    tileset = await Cesium.createGooglePhotorealistic3DTileset({
-      skipLevelOfDetail: true,
-      baseScreenSpaceError: 1024,
-      skipScreenSpaceErrorFactor: 16,
-      skipLevels: 1,
-      immediatelyLoadDesiredLevelOfDetail: false,
-      loadSiblings: false,
-      dynamicScreenSpaceError: true,
-      dynamicScreenSpaceErrorDensity: 2.0e-4,
-      dynamicScreenSpaceErrorFactor: 24.0,
-      dynamicScreenSpaceErrorHeightFalloff: 0.25,
-      foveatedScreenSpaceError: true,
-      foveatedConeSize: 0.1,
-      foveatedMinimumScreenSpaceErrorRelaxation: 0.0,
-      maximumScreenSpaceError: 8,
-      cacheBytes: 1024*1024*1024,
-      maximumCacheOverflowBytes: 512*1024*1024,
-      preloadWhenHidden: true,
-      preferLeaves: true,
-      cullRequestsWhileMoving: true,
-      cullRequestsWhileMovingMultiplier: 30.0,
-      showCreditsOnScreen: true,
-    });
-    viewer.scene.primitives.add(tileset);
-
-    /* Apply grayscale by default */
-    if(layers.minimal) tileset.customShader = grayscaleShader;
-
-    /* Loading overlay */
-    tileset.initialTilesLoaded.addEventListener(function(){
-      setTimeout(function(){ document.getElementById('lo').classList.add('fo'); },400);
-      setTimeout(function(){ document.getElementById('lo').style.display='none'; },1800);
-    });
-  } catch(e){
-    console.error('Tileset error:',e);
-    document.getElementById('lo').classList.add('fo');
-  }
-
-  /* Fly to Amsterdam */
-  viewer.camera.flyTo({
-    destination: Cesium.Cartesian3.fromDegrees(4.8952, 52.3702, 1500),
-    orientation: {
-      heading: Cesium.Math.toRadians(10),
-      pitch: Cesium.Math.toRadians(-45),
-      roll: 0
-    },
-    duration: 2.5,
-    easingFunction: Cesium.EasingFunction.CUBIC_IN_OUT
-  });
-
-  /* Build all layers */
-  buildPOIs();
-  buildNeighborhoods();
-  buildHeatmap();
-
-  /* Click handler */
-  var handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
-  handler.setInputAction(function(click){
-    var picked = viewer.scene.pick(click.position);
-    if(Cesium.defined(picked) && Cesium.defined(picked.id) && picked.id._poi){
-      showDetail(picked.id._poi, picked.id._cat);
+// ===== PHOTO MODE =====
+var photoMode=false;
+var googleTileset=null;
+window.togglePhoto=async function(){
+  photoMode=!photoMode;
+  var btn=document.querySelector('[data-layer="photo"]');
+  btn.classList.toggle('active');
+  if(photoMode){
+    scene.primitives.remove(osmBuildings);
+    scene.globe.show=false;
+    if(!googleTileset){
+      try{
+        googleTileset=await Cesium.createGooglePhotorealistic3DTileset({
+          skipLevelOfDetail:true,maximumScreenSpaceError:8,
+          cacheBytes:1024*1024*1024,showCreditsOnScreen:true
+        });
+      }catch(e){console.warn('Google tiles unavailable:',e);scene.globe.show=true;return;}
     }
-  }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+    scene.primitives.add(googleTileset);
+  }else{
+    if(googleTileset)scene.primitives.remove(googleTileset);
+    scene.globe.show=true;
+    osmBuildings=await Cesium.createOsmBuildingsAsync();
+    scene.primitives.add(osmBuildings);
+    osmBuildings.style=new Cesium.Cesium3DTileStyle({color:"color('#c8c8cc',0.88)"});
+  }
+};
 
-  /* Keyboard shortcuts */
-  document.addEventListener('keydown',function(e){
-    var k=e.key;
-    if(k==='1')tgl('hotels');
-    else if(k==='2')tgl('sights');
-    else if(k==='3')tgl('restaurants');
-    else if(k==='4')tgl('neighborhoods');
-    else if(k==='5')tgl('heatmap');
-    else if(k==='6')tgl('minimal');
-    else if(k==='Escape')closeDC();
-  });
+// ===== DETAIL CARD =====
+window.closeDetail=function(){document.getElementById('detailCard').classList.remove('visible');};
+
+var handler=new Cesium.ScreenSpaceEventHandler(scene.canvas);
+handler.setInputAction(function(click){
+  var picked=scene.pick(click.position);
+  if(Cesium.defined(picked)&&Cesium.defined(picked.id)&&Cesium.defined(picked.id.properties)){
+    var props=picked.id.properties;
+    var name=props.poiName;
+    if(!name)return;
+    name=name.getValue();
+    var cat=props.poiCat?props.poiCat.getValue():'';
+    var stars=props.poiStars?props.poiStars.getValue():'';
+    var price=props.poiPrice?props.poiPrice.getValue():'';
+    var desc=props.poiDesc?props.poiDesc.getValue():'';
+    var hood=props.poiHood?props.poiHood.getValue():'';
+    var cuisine=props.poiCuisine?props.poiCuisine.getValue():'';
+    var lat=props.poiLat?props.poiLat.getValue():52.37;
+    var lon=props.poiLon?props.poiLon.getValue():4.89;
+
+    var catColors={HOTEL:'#ff6b6b',SIGHT:'#ffd43b',RESTAURANT:'#69db7c'};
+    document.getElementById('dcCat').textContent=cat;
+    document.getElementById('dcCat').style.color=catColors[cat]||'#fff';
+    document.getElementById('dcName').textContent=name;
+    document.getElementById('dcStars').textContent=stars;
+    document.getElementById('dcPrice').textContent=price;
+    document.getElementById('dcDesc').textContent=(cuisine?cuisine+' — ':'')+desc;
+    document.getElementById('dcHood').textContent='\ud83d\udccd '+hood;
+    document.getElementById('detailCard').classList.add('visible');
+
+    viewer.camera.flyTo({
+      destination:Cesium.Cartesian3.fromDegrees(lon,lat,400),
+      orientation:{heading:Cesium.Math.toRadians(10),pitch:Cesium.Math.toRadians(-35),roll:0},
+      duration:1.5
+    });
+  }
+},Cesium.ScreenSpaceEventType.LEFT_CLICK);
+
+// ===== INITIAL CAMERA =====
+viewer.camera.flyTo({
+  destination:Cesium.Cartesian3.fromDegrees(4.8952,52.3702,1200),
+  orientation:{heading:Cesium.Math.toRadians(10),pitch:Cesium.Math.toRadians(-40),roll:0},
+  duration:2.5,
+  easingFunction:Cesium.EasingFunction.CUBIC_IN_OUT
+});
+
+// ===== LOADING OVERLAY =====
+setTimeout(function(){document.getElementById('loadingOverlay').classList.add('hidden');},3500);
+osmBuildings.allTilesLoaded.addEventListener(function(){
+  setTimeout(function(){document.getElementById('loadingOverlay').classList.add('hidden');},500);
+});
+
 })();
-/* ═══════════════════ BUILD POIs ═══════════════════ */
-function buildPOIs(){
-  ['hotels','sights','restaurants'].forEach(function(cat){
-    var catConf = CC[cat];
-    PD[cat].forEach(function(poi){
-      var elevH = 70;
-      var groundPos = Cesium.Cartesian3.fromDegrees(poi.lo, poi.la, 0);
-      var elevPos = Cesium.Cartesian3.fromDegrees(poi.lo, poi.la, elevH);
-
-      /* Ground dot */
-      var dot = viewer.entities.add({
-        position: Cesium.Cartesian3.fromDegrees(poi.lo, poi.la),
-        point:{
-          pixelSize:8,
-          color:catConf.c,
-          outlineColor:catConf.c.withAlpha(0.4),
-          outlineWidth:3,
-          heightReference:Cesium.HeightReference.CLAMP_TO_GROUND,
-          disableDepthTestDistance:Number.POSITIVE_INFINITY
-        }
-      });
-      dot._poi = poi;
-      dot._cat = cat;
-
-      /* Label line text */
-      var labelText = starStr(poi.s)+' '+poi.n+'\n'+poi.p;
-      if(cat==='sights') labelText = catConf.ic+' '+poi.n+'\n'+poi.p;
-
-      /* Elevated label with line */
-      var label = viewer.entities.add({
-        position: elevPos,
-        polyline:{
-          positions:[groundPos, elevPos],
-          width:1.5,
-          material: new Cesium.ColorMaterialProperty(catConf.c.withAlpha(0.5)),
-          clampToGround:false
-        },
-        label:{
-          text: labelText,
-          font:'bold 13px Inter, sans-serif',
-          fillColor:Cesium.Color.WHITE,
-          style:Cesium.LabelStyle.FILL,
-          backgroundColor:Cesium.Color.fromCssColorString('rgba(0,0,0,0.78)'),
-          showBackground:true,
-          backgroundPadding:new Cesium.Cartesian2(10,6),
-          pixelOffset:new Cesium.Cartesian2(0,-8),
-          verticalOrigin:Cesium.VerticalOrigin.BOTTOM,
-          horizontalOrigin:Cesium.HorizontalOrigin.CENTER,
-          disableDepthTestDistance:Number.POSITIVE_INFINITY,
-          scaleByDistance:new Cesium.NearFarScalar(300,1.0,8000,0.4),
-          translucencyByDistance:new Cesium.NearFarScalar(300,1.0,15000,0.6)
-        }
-      });
-      label._poi = poi;
-      label._cat = cat;
-
-      entities[cat].push(dot);
-      entities[cat].push(label);
-
-      /* Ground glow ellipse */
-      var glow = viewer.entities.add({
-        position: Cesium.Cartesian3.fromDegrees(poi.lo, poi.la),
-        ellipse:{
-          semiMajorAxis:30,
-          semiMinorAxis:30,
-          material:catConf.c.withAlpha(0.22),
-          heightReference:Cesium.HeightReference.CLAMP_TO_GROUND
-        }
-      });
-      glowEntities[cat].push(glow);
-    });
-  });
-}
-
-/* ═══════════════════ BUILD NEIGHBORHOODS ═══════════════════ */
-function buildNeighborhoods(){
-  NH.forEach(function(nh){
-    var positions=[];
-    nh.pts.forEach(function(p){positions.push(p[0],p[1]);});
-    var fc=nh.fc;
-
-    var poly = viewer.entities.add({
-      polygon:{
-        hierarchy:Cesium.Cartesian3.fromDegreesArray(positions),
-        material:new Cesium.Color(fc[0]/255,fc[1]/255,fc[2]/255,0.15),
-        heightReference:Cesium.HeightReference.CLAMP_TO_GROUND,
-        outline:true,
-        outlineColor:new Cesium.Color(fc[0]/255,fc[1]/255,fc[2]/255,0.5),
-        outlineWidth:2
-      }
-    });
-    poly.show = false;
-
-    var lbl = viewer.entities.add({
-      position:Cesium.Cartesian3.fromDegrees(nh.ct[0],nh.ct[1],40),
-      label:{
-        text:nh.nm,
-        font:'bold 15px Inter, sans-serif',
-        fillColor:new Cesium.Color(fc[0]/255,fc[1]/255,fc[2]/255,0.9),
-        style:Cesium.LabelStyle.FILL_AND_OUTLINE,
-        outlineColor:Cesium.Color.BLACK,
-        outlineWidth:3,
-        disableDepthTestDistance:Number.POSITIVE_INFINITY,
-        scaleByDistance:new Cesium.NearFarScalar(500,1.2,10000,0.5)
-      }
-    });
-    lbl.show = false;
-
-    entities.neighborhoods.push(poly);
-    entities.neighborhoods.push(lbl);
-  });
-}
-
-/* ═══════════════════ BUILD HEATMAP ═══════════════════ */
-function buildHeatmap(){
-  HM.forEach(function(h){
-    var rad = 80 + h.i*120;
-    var ent = viewer.entities.add({
-      position:Cesium.Cartesian3.fromDegrees(h.lo,h.la),
-      ellipse:{
-        semiMajorAxis:rad,
-        semiMinorAxis:rad,
-        material:hmColor(h.i),
-        heightReference:Cesium.HeightReference.CLAMP_TO_GROUND
-      }
-    });
-    ent.show = false;
-    entities.heatmap.push(ent);
-  });
-}
-
-/* ═══════════════════ TOGGLE LAYERS ═══════════════════ */
-function tgl(layer){
-  layers[layer] = !layers[layer];
-  var btn = document.querySelector('[data-l="'+layer+'"]');
-  if(btn) btn.classList.toggle('on', layers[layer]);
-
-  if(layer==='minimal'){
-    if(tileset){
-      tileset.customShader = layers.minimal ? grayscaleShader : undefined;
-      /* Lower LOD in minimal mode = blockier, simpler geometry */
-      tileset.maximumScreenSpaceError = layers.minimal ? 24 : 8;
-    }
-    /* Toggle glow visibility based on minimal mode */
-    ['hotels','sights','restaurants'].forEach(function(cat){
-      if(layers[cat]){
-        glowEntities[cat].forEach(function(e){e.show = layers.minimal;});
-      }
-    });
-    return;
-  }
-
-  if(layer==='neighborhoods'){
-    entities.neighborhoods.forEach(function(e){e.show=layers.neighborhoods;});
-    var np=document.getElementById('np');
-    if(layers.neighborhoods) np.classList.remove('hid');
-    else np.classList.add('hid');
-    return;
-  }
-
-  if(layer==='heatmap'){
-    entities.heatmap.forEach(function(e){e.show=layers.heatmap;});
-    return;
-  }
-
-  /* POI categories */
-  if(entities[layer]){
-    entities[layer].forEach(function(e){e.show=layers[layer];});
-    if(glowEntities[layer]){
-      glowEntities[layer].forEach(function(e){e.show=layers[layer]&&layers.minimal;});
-    }
-  }
-}
-
-/* ═══════════════════ DETAIL CARD ═══════════════════ */
-function showDetail(poi, cat){
-  var catConf = CC[cat];
-  var card = document.getElementById('dc');
-  var bdg = document.getElementById('dcBdg');
-  bdg.innerHTML = catConf.ic+' '+catConf.lb;
-  bdg.style.background = catConf.css+'22';
-  bdg.style.color = catConf.css;
-
-  document.getElementById('dcNm').textContent = poi.n;
-  document.getElementById('dcSt').textContent = starStr(poi.s);
-  document.getElementById('dcPr').querySelector('span:last-child').textContent = poi.p;
-  document.getElementById('dcRt').querySelector('span:last-child').textContent = 'Rating: '+poi.r;
-  document.getElementById('dcNh').querySelector('span:last-child').textContent = poi.h;
-  document.getElementById('dcDs').textContent = poi.d;
-
-  card.classList.add('vis');
-
-  /* Fly to POI */
-  viewer.camera.flyTo({
-    destination:Cesium.Cartesian3.fromDegrees(poi.lo, poi.la, 400),
-    orientation:{
-      heading:Cesium.Math.toRadians(0),
-      pitch:Cesium.Math.toRadians(-40),
-      roll:0
-    },
-    duration:1.5,
-    easingFunction:Cesium.EasingFunction.CUBIC_IN_OUT
-  });
-}
-
-function closeDC(){
-  document.getElementById('dc').classList.remove('vis');
-}
 </script>
 </body>
 </html>
