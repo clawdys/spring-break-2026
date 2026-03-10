@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🇩🇰 Copenhagen — 3D Guide Map</title>
+<script src="https://cesium.com/downloads/cesiumjs/releases/1.125/Build/Cesium/Cesium.js"></script>
+<link href="https://cesium.com/downloads/cesiumjs/releases/1.125/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: #0a0a0a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #e0e0e0; }
+  #cesiumContainer { width: 100%; height: 100%; }
+
+  /* Dark theme overrides for Cesium */
+  .cesium-viewer { background: #0a0a0a !important; }
+  .cesium-viewer-bottom { background: transparent !important; }
+  .cesium-widget-credits { background: rgba(10,10,10,0.7) !important; font-size: 10px !important; }
+  .cesium-geocoder-input { background: rgba(30,30,30,0.9) !important; color: #e0e0e0 !important; border: 1px solid #333 !important; }
+  .cesium-button { background: rgba(30,30,30,0.9) !important; color: #e0e0e0 !important; border: 1px solid #333 !important; }
+  .cesium-infoBox { background: rgba(17,17,17,0.95) !important; color: #e0e0e0 !important; border: 1px solid #333 !important; }
+  .cesium-infoBox-title { background: rgba(20,20,20,0.95) !important; color: #fff !important; }
+  .cesium-infoBox-iframe { background: #111 !important; }
+
+  /* Title bar */
+  #titleBar {
+    position: absolute; top: 0; left: 0; right: 0; z-index: 10;
+    background: linear-gradient(180deg, rgba(10,10,10,0.95) 0%, rgba(10,10,10,0.7) 80%, transparent 100%);
+    padding: 16px 20px 28px; display: flex; align-items: center; justify-content: space-between;
+    pointer-events: none;
+  }
+  #titleBar h1 { font-size: 18px; font-weight: 700; letter-spacing: -0.3px; pointer-events: auto; }
+  #titleBar .subtitle { font-size: 13px; color: #999; margin-top: 2px; }
+  #titleBar .right { text-align: right; pointer-events: auto; }
+
+  /* Toggle buttons */
+  #togglePanel {
+    position: absolute; top: 72px; right: 16px; z-index: 10;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .toggle-btn {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 14px; border-radius: 8px;
+    background: rgba(20,20,20,0.88); border: 1px solid #333;
+    color: #e0e0e0; font-size: 13px; font-weight: 500;
+    cursor: pointer; transition: all 0.2s; backdrop-filter: blur(12px);
+    user-select: none; white-space: nowrap;
+  }
+  .toggle-btn:hover { background: rgba(40,40,40,0.95); border-color: #555; }
+  .toggle-btn.off { opacity: 0.45; }
+  .toggle-btn .dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; border: 1.5px solid rgba(255,255,255,0.3); }
+
+  /* Neighborhood panel */
+  #neighborhoodPanel {
+    position: absolute; bottom: 36px; left: 16px; z-index: 10;
+    background: rgba(15,15,15,0.9); border: 1px solid #2a2a2a; border-radius: 12px;
+    padding: 14px 16px; max-width: 300px; backdrop-filter: blur(14px);
+  }
+  #neighborhoodPanel h3 { font-size: 13px; font-weight: 700; margin-bottom: 10px; color: #ccc; letter-spacing: 0.5px; text-transform: uppercase; }
+  .hood { margin-bottom: 8px; }
+  .hood:last-child { margin-bottom: 0; }
+  .hood .name { font-size: 13px; font-weight: 600; color: #fff; }
+  .hood .tip { font-size: 11.5px; color: #888; margin-top: 1px; line-height: 1.4; }
+  #nhToggle {
+    position: absolute; bottom: 36px; left: 16px; z-index: 9;
+    background: rgba(15,15,15,0.9); border: 1px solid #2a2a2a; border-radius: 8px;
+    padding: 8px 12px; font-size: 12px; color: #999; cursor: pointer; display: none;
+    backdrop-filter: blur(14px);
+  }
+
+  /* Info popup */
+  #infoPopup {
+    display: none; position: absolute; z-index: 20;
+    background: rgba(17,17,17,0.96); border: 1px solid #333; border-radius: 12px;
+    padding: 16px 18px; min-width: 220px; max-width: 300px;
+    backdrop-filter: blur(16px); box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+    pointer-events: auto;
+  }
+  #infoPopup .close-btn {
+    position: absolute; top: 8px; right: 10px; background: none; border: none;
+    color: #666; font-size: 18px; cursor: pointer; line-height: 1;
+  }
+  #infoPopup .close-btn:hover { color: #fff; }
+  #infoPopup .cat-badge {
+    display: inline-block; font-size: 10px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.8px; padding: 2px 8px; border-radius: 4px; margin-bottom: 8px;
+  }
+  #infoPopup h4 { font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+  #infoPopup .desc { font-size: 12.5px; color: #aaa; line-height: 1.5; }
+
+  /* Mobile adjustments */
+  @media (max-width: 600px) {
+    #titleBar h1 { font-size: 15px; }
+    #titleBar .subtitle { font-size: 11px; }
+    #togglePanel { top: 64px; right: 10px; }
+    .toggle-btn { padding: 6px 10px; font-size: 12px; }
+    #neighborhoodPanel { max-width: 260px; padding: 12px 14px; bottom: 28px; left: 10px; }
+    #infoPopup { min-width: 180px; max-width: 260px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Title Bar -->
+<div id="titleBar">
+  <div>
+    <h1>🇩🇰 Copenhagen — 3D Guide Map</h1>
+    <div class="subtitle">Mar 25–28 · 4 travelers</div>
+  </div>
+  <div class="right">
+    <div style="font-size:12px;color:#666;">Spring Break 2026</div>
+  </div>
+</div>
+
+<!-- Toggle Buttons -->
+<div id="togglePanel">
+  <div class="toggle-btn" data-cat="hotel" onclick="toggleCategory('hotel')">
+    <span class="dot" style="background:#ff6b6b;"></span> Hotels <span style="color:#666;font-size:11px;">(3)</span>
+  </div>
+  <div class="toggle-btn" data-cat="hostel" onclick="toggleCategory('hostel')">
+    <span class="dot" style="background:#ff9800;"></span> Hostels <span style="color:#666;font-size:11px;">(4)</span>
+  </div>
+  <div class="toggle-btn" data-cat="sight" onclick="toggleCategory('sight')">
+    <span class="dot" style="background:#ffd93d;"></span> Sights <span style="color:#666;font-size:11px;">(12)</span>
+  </div>
+  <div class="toggle-btn" data-cat="restaurant" onclick="toggleCategory('restaurant')">
+    <span class="dot" style="background:#6bcb77;"></span> Restaurants <span style="color:#666;font-size:11px;">(14)</span>
+  </div>
+</div>
+
+<!-- Neighborhood Tips -->
+<div id="neighborhoodPanel">
+  <h3>📍 Neighborhoods</h3>
+  <div class="hood">
+    <div class="name">Vesterbro / Kødbyen</div>
+    <div class="tip">Meatpacking District — trendy bars, street food, budget eats. Our hostel hub.</div>
+  </div>
+  <div class="hood">
+    <div class="name">Nørrebro</div>
+    <div class="tip">Multicultural & artsy — Superkilen park, craft coffee, local vibes.</div>
+  </div>
+  <div class="hood">
+    <div class="name">Indre By (City Center)</div>
+    <div class="tip">Strøget shopping, Rundetårn, Tivoli — walkable core of Copenhagen.</div>
+  </div>
+  <div class="hood">
+    <div class="name">Christianshavn</div>
+    <div class="tip">Canals, Christiania freetown, Reffen street food market on the harbor.</div>
+  </div>
+</div>
+<div id="nhToggle" onclick="document.getElementById('neighborhoodPanel').style.display='block';this.style.display='none';">📍 Neighborhoods</div>
+
+<!-- Info Popup -->
+<div id="infoPopup">
+  <button class="close-btn" onclick="closeInfo()">×</button>
+  <div id="infoBadge" class="cat-badge"></div>
+  <h4 id="infoName"></h4>
+  <div id="infoDesc" class="desc"></div>
+</div>
+
+<!-- Cesium Container -->
+<div id="cesiumContainer"></div>
+
+<script>
+// Token support: URL param or placeholder
+const params = new URLSearchParams(window.location.search);
+const TOKEN = params.get('token') || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI5Zjk1ODRlMi1hNjlmLTQ0NDktOTU3OS0wMjUxNTYyNWFhZDkiLCJpZCI6NDAxMDM0LCJpYXQiOjE3NzMxMDE0MDB9.JQg2NhsCuLeNn_3wLEdrtEVuvGu6_R445H6wVaSLTks';
+Cesium.Ion.defaultAccessToken = TOKEN;
+
+// ── Data ──────────────────────────────────────────────
+const PIN_DATA = {
+  hotel: {
+    label: 'Boutique Hotel',
+    color: '#ff6b6b',
+    items: [
+      { name: 'Coco Hotel', lat: 55.6724, lon: 12.5566, desc: '~$350/pp · Vesterbro · Parisian-chic' },
+      { name: 'Hotel SP34', lat: 55.6788, lon: 12.5672, desc: '~$380/pp · Latin Quarter · Rooftop' },
+      { name: 'Manon Les Suites', lat: 55.6804, lon: 12.5612, desc: '~$450/pp · Tropical atrium + pool' },
+    ]
+  },
+  hostel: {
+    label: 'Hostel',
+    color: '#ff9800',
+    items: [
+      { name: 'Steel House ⭐', lat: 55.6763, lon: 12.5601, desc: '~$120/pp · Pool, gym, cinema' },
+      { name: 'Generator', lat: 55.6827, lon: 12.5823, desc: '~$150/pp · Near Kongens Nytorv' },
+      { name: 'Next House', lat: 55.6714, lon: 12.5626, desc: '~$130/pp · Vesterbro · Events' },
+      { name: 'Downtown Hostel', lat: 55.6759, lon: 12.5743, desc: '~$140/pp · Canal center' },
+    ]
+  },
+  sight: {
+    label: 'Sight',
+    color: '#ffd93d',
+    items: [
+      { name: 'Nyhavn', lat: 55.6797, lon: 12.5909, desc: 'Iconic colorful harbor — must-see photo spot' },
+      { name: 'Tivoli Gardens', lat: 55.6747, lon: 12.5657, desc: 'Historic amusement park — open late Mar' },
+      { name: 'Little Mermaid', lat: 55.6929, lon: 12.5993, desc: 'Bronze statue on the waterfront since 1913' },
+      { name: 'Rosenborg Castle', lat: 55.6862, lon: 12.5765, desc: 'Renaissance castle — crown jewels inside' },
+      { name: 'Christiansborg', lat: 55.6768, lon: 12.5799, desc: 'Parliament — free tower with panoramic views' },
+      { name: 'Christiania', lat: 55.6739, lon: 12.5968, desc: 'Self-governing freetown — street art & culture' },
+      { name: 'Amalienborg', lat: 55.6845, lon: 12.5936, desc: 'Royal residence — guard change at noon' },
+      { name: 'Rundetårn', lat: 55.6813, lon: 12.5758, desc: '17th-century tower — spiral ramp to the top' },
+      { name: 'Strøget', lat: 55.6800, lon: 12.5834, desc: 'Europe\'s longest pedestrian street — shops & buskers' },
+      { name: 'Kastellet', lat: 55.6914, lon: 12.5937, desc: 'Star-shaped fortress — beautiful park walk' },
+      { name: 'Designmuseum', lat: 55.6866, lon: 12.5928, desc: 'Danish design & craft — stunning Rococo building' },
+      { name: 'Superkilen', lat: 55.6997, lon: 12.5424, desc: 'Urban park in Nørrebro — global art installations' },
+    ]
+  },
+  restaurant: {
+    label: 'Restaurant',
+    color: '#6bcb77',
+    items: [
+      { name: 'Absalon', lat: 55.6654, lon: 12.5503, desc: 'Community dinner · DKK 60–100' },
+      { name: 'Høst', lat: 55.6834, lon: 12.5662, desc: 'New Nordic · DKK 395' },
+      { name: 'Reffen', lat: 55.6931, lon: 12.6099, desc: 'Street Food Market · DKK 60–120' },
+      { name: 'Torvehallerne', lat: 55.6843, lon: 12.5695, desc: 'Food Market · DKK 50–120' },
+      { name: 'Poulette', lat: 55.6889, lon: 12.5549, desc: 'Fried Chicken · DKK 95' },
+      { name: 'Kødbyens Fiskebar', lat: 55.6679, lon: 12.5593, desc: 'Seafood · DKK 200–400' },
+      { name: 'Hija de Sanchez', lat: 55.6689, lon: 12.5585, desc: 'Ex-Noma Tacos · DKK 45–65' },
+      { name: "Tommi's Burger", lat: 55.6683, lon: 12.5580, desc: 'Burgers · DKK 99–119' },
+      { name: 'Madglad', lat: 55.6707, lon: 12.5557, desc: 'Community · DKK 50–85' },
+      { name: 'La Neta', lat: 55.6879, lon: 12.5603, desc: 'Mexican · DKK 120' },
+      { name: 'Bottega Barlie', lat: 55.6872, lon: 12.5855, desc: 'Mediterranean · DKK 85–200' },
+      { name: 'Admiralgade 26', lat: 55.6776, lon: 12.5821, desc: 'Fusion · DKK 600' },
+      { name: 'RizRaz', lat: 55.6800, lon: 12.5740, desc: 'Vegetarian Buffet · DKK 145–185' },
+      { name: 'Gasoline Grill', lat: 55.6832, lon: 12.5851, desc: 'Burgers · DKK 100–150' },
+    ]
+  }
+};
+
+// Category visibility state
+const catVisible = { hotel: true, hostel: true, sight: true, restaurant: true };
+const catEntities = { hotel: [], hostel: [], sight: [], restaurant: [] };
+
+// ── Viewer ─────────────────────────────────────────────
+const viewer = new Cesium.Viewer('cesiumContainer', {
+  globe: false,
+  baseLayerPicker: false,
+  timeline: false,
+  animation: false,
+  homeButton: false,
+  sceneModePicker: false,
+  navigationHelpButton: false,
+  fullscreenButton: false,
+  geocoder: true,
+  infoBox: false,
+  selectionIndicator: false,
+  showCreditsOnScreen: true,
+  skyBox: false,
+  skyAtmosphere: false,
+  orderIndependentTranslucency: true,
+  contextOptions: { requestWebgl2: true },
+  msaaSamples: 2,
+});
+
+// Dark background
+viewer.scene.backgroundColor = Cesium.Color.fromCssColorString('#0a0a0a');
+
+// Load Google Photorealistic 3D Tiles
+async function init() {
+  try {
+    const tileset = await Cesium.createGooglePhotorealistic3DTileset();
+    viewer.scene.primitives.add(tileset);
+  } catch (e) {
+    console.error('Failed to load Google 3D Tiles:', e);
+  }
+
+  // Add all pins
+  for (const [cat, data] of Object.entries(PIN_DATA)) {
+    const cesiumColor = Cesium.Color.fromCssColorString(data.color);
+    for (const item of data.items) {
+      const entity = viewer.entities.add({
+        name: item.name,
+        position: Cesium.Cartesian3.fromDegrees(item.lon, item.lat),
+        point: {
+          pixelSize: 12,
+          color: cesiumColor,
+          outlineColor: Cesium.Color.WHITE,
+          outlineWidth: 2,
+          heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
+          disableDepthTestDistance: Number.POSITIVE_INFINITY,
+        },
+        label: {
+          text: item.name,
+          font: '12px sans-serif',
+          fillColor: cesiumColor,
+          outlineColor: Cesium.Color.fromCssColorString('rgba(0,0,0,0.85)'),
+          outlineWidth: 3,
+          style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+          verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+          pixelOffset: new Cesium.Cartesian2(0, -14),
+          heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
+          disableDepthTestDistance: Number.POSITIVE_INFINITY,
+          scaleByDistance: new Cesium.NearFarScalar(200, 1.2, 6000, 0.5),
+          translucencyByDistance: new Cesium.NearFarScalar(200, 1.0, 12000, 0.3),
+        },
+        properties: {
+          category: cat,
+          categoryLabel: data.label,
+          color: data.color,
+          description: item.desc,
+        },
+      });
+      catEntities[cat].push(entity);
+    }
+  }
+
+  // Set camera to Copenhagen center, ~1500m, tilted 45°
+  viewer.camera.flyTo({
+    destination: Cesium.Cartesian3.fromDegrees(12.5750, 55.6780, 1500),
+    orientation: {
+      heading: Cesium.Math.toRadians(0),
+      pitch: Cesium.Math.toRadians(-45),
+      roll: 0,
+    },
+    duration: 0,
+  });
+}
+
+init();
+
+// ── Click handler for info popup ──────────────────────
+const infoPopup = document.getElementById('infoPopup');
+const infoName = document.getElementById('infoName');
+const infoDesc = document.getElementById('infoDesc');
+const infoBadge = document.getElementById('infoBadge');
+
+const handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
+handler.setInputAction(function(click) {
+  const picked = viewer.scene.pick(click.position);
+  if (Cesium.defined(picked) && picked.id && picked.id.properties) {
+    const props = picked.id.properties;
+    const cat = props.category.getValue();
+    const color = props.color.getValue();
+    const name = picked.id.name;
+    const desc = props.description.getValue();
+    const catLabel = props.categoryLabel.getValue();
+
+    infoBadge.textContent = catLabel;
+    infoBadge.style.background = color + '22';
+    infoBadge.style.color = color;
+    infoName.textContent = name;
+    infoDesc.textContent = desc;
+
+    // Position popup near click
+    const x = Math.min(click.position.x, window.innerWidth - 320);
+    const y = Math.min(click.position.y, window.innerHeight - 160);
+    infoPopup.style.left = Math.max(8, x) + 'px';
+    infoPopup.style.top = Math.max(8, y - 120) + 'px';
+    infoPopup.style.display = 'block';
+  } else {
+    closeInfo();
+  }
+}, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+
+function closeInfo() {
+  infoPopup.style.display = 'none';
+}
+
+// ── Toggle categories ──────────────────────────────────
+function toggleCategory(cat) {
+  catVisible[cat] = !catVisible[cat];
+  const show = catVisible[cat];
+  catEntities[cat].forEach(e => { e.show = show; });
+  const btn = document.querySelector(`.toggle-btn[data-cat="${cat}"]`);
+  if (btn) btn.classList.toggle('off', !show);
+}
+
+// ── Neighborhood panel toggle on mobile ────────────────
+function checkMobile() {
+  const panel = document.getElementById('neighborhoodPanel');
+  const toggle = document.getElementById('nhToggle');
+  if (window.innerWidth < 600) {
+    panel.style.display = 'none';
+    toggle.style.display = 'block';
+  } else {
+    panel.style.display = 'block';
+    toggle.style.display = 'none';
+  }
+}
+window.addEventListener('resize', checkMobile);
+checkMobile();
+</script>
+</body>
+</html>
