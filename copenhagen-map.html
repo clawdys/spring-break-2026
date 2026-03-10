@@ -3,283 +3,205 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Copenhagen — Hotels, Sights & Transit</title>
+<title>Copenhagen — Full Guide Map</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0a0a0a; color: #e0e0e0; }
-  #map { width: 100%; height: 72vh; min-height: 420px; }
-  .title-bar { background: #111; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #222; flex-wrap: wrap; gap: 6px; }
-  .title-bar h1 { font-size: 15px; font-weight: 600; letter-spacing: 0.3px; }
-  .title-bar span { font-size: 11px; color: #666; }
-  .map-legend { background: #111; padding: 12px 16px; display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; border-top: 1px solid #222; font-size: 11px; color: #999; }
-  .map-legend .item { display: flex; align-items: center; gap: 5px; }
-  .map-legend .line { width: 20px; height: 3px; border-radius: 2px; }
-
-  .leaflet-popup-content-wrapper { background: #1a1a1a; color: #e0e0e0; border-radius: 10px; box-shadow: 0 4px 24px rgba(0,0,0,0.6); }
-  .leaflet-popup-tip { background: #1a1a1a; }
-  .leaflet-popup-content { margin: 10px 14px; font-size: 12.5px; line-height: 1.5; min-width: 180px; }
-  .leaflet-popup-content b { color: #fff; font-size: 13.5px; }
-  .leaflet-popup-content a { color: #5dade2; text-decoration: none; }
-  .leaflet-popup-content a:hover { text-decoration: underline; }
-  .popup-hotel { border-left: 3px solid #ff6b6b; padding-left: 10px; }
-  .popup-hostel { border-left: 3px solid #ff9800; padding-left: 10px; }
-  .popup-sight { border-left: 3px solid #ffd93d; padding-left: 10px; }
-  .popup-transit { border-left: 3px solid #6bcb77; padding-left: 10px; }
-  .tag { display: inline-block; font-size: 10px; padding: 1px 6px; border-radius: 3px; margin-top: 4px; }
-  .tag-price { background: #2d2d2d; color: #ff6b6b; }
-  .tag-budget { background: #2d2d2d; color: #ff9800; }
-  .tag-area { background: #2d2d2d; color: #aaa; }
-
-  .cards { padding: 12px 16px; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px; }
-  .card { background: #141414; border: 1px solid #222; border-radius: 8px; padding: 12px 14px; }
-  .card h3 { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #666; margin-bottom: 8px; }
-  .card-item { font-size: 12px; padding: 3px 0; display: flex; justify-content: space-between; align-items: center; }
-  .card-item .name { color: #ccc; }
-  .card-item .price { color: #ff6b6b; font-weight: 600; font-size: 11px; }
-  .card-item .budget { color: #ff9800; font-weight: 600; font-size: 11px; }
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0a0a0a;color:#e0e0e0}
+#map{width:100%;height:70vh;min-height:400px}
+.title-bar{background:#111;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #222;flex-wrap:wrap;gap:6px}
+.title-bar h1{font-size:15px;font-weight:600}
+.title-bar span{font-size:11px;color:#666}
+.controls{background:#111;padding:8px 16px;display:flex;flex-wrap:wrap;gap:8px;justify-content:center;border-bottom:1px solid #222}
+.tog{font-size:11px;padding:5px 12px;border-radius:20px;border:1px solid #333;background:#1a1a1a;color:#999;cursor:pointer;transition:all .2s;user-select:none}
+.tog.on{background:#333;color:#fff;border-color:#555}
+.tog:hover{border-color:#555}
+.legend{background:#111;padding:10px 16px;display:flex;flex-wrap:wrap;gap:12px;justify-content:center;border-top:1px solid #222;font-size:10px;color:#999}
+.legend .i{display:flex;align-items:center;gap:4px}
+.legend .ln{width:18px;height:3px;border-radius:2px}
+.leaflet-popup-content-wrapper{background:#1a1a1a;color:#e0e0e0;border-radius:10px;box-shadow:0 4px 24px rgba(0,0,0,.6)}
+.leaflet-popup-tip{background:#1a1a1a}
+.leaflet-popup-content{margin:10px 14px;font-size:12px;line-height:1.5;min-width:170px}
+.leaflet-popup-content b{color:#fff;font-size:13px}
+.leaflet-popup-content a{color:#5dade2;text-decoration:none}
+.ph{border-left:3px solid #ff6b6b;padding-left:10px}
+.po{border-left:3px solid #ff9800;padding-left:10px}
+.ps{border-left:3px solid #ffd93d;padding-left:10px}
+.pf{border-left:3px solid #6bcb77;padding-left:10px}
+.pt{border-left:3px solid #64b5f6;padding-left:10px}
+.tg{display:inline-block;font-size:10px;padding:1px 6px;border-radius:3px;margin:3px 3px 0 0;background:#2d2d2d}
+.tp{color:#ff6b6b}.tb{color:#ff9800}.tc{color:#6bcb77}.ta{color:#aaa}
+.cards{padding:10px 16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px}
+.card{background:#141414;border:1px solid #222;border-radius:8px;padding:10px 12px}
+.card h3{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#666;margin-bottom:6px}
+.ci{font-size:11.5px;padding:2px 0;color:#ccc}
 </style>
 </head>
 <body>
 <div class="title-bar">
-  <h1>🇩🇰 Copenhagen — Hotels, Sights & Transit</h1>
-  <span>Spring Break · Mar 25–28 · 4 travelers</span>
+  <h1>🇩🇰 Copenhagen — Hotels · Food · Sights · Transit</h1>
+  <span>Mar 25–28 · 4 travelers</span>
+</div>
+<div class="controls">
+  <div class="tog on" onclick="tgl('hotels',this)">🏨 Hotels</div>
+  <div class="tog on" onclick="tgl('hostels',this)">🛏️ Hostels</div>
+  <div class="tog on" onclick="tgl('sights',this)">📍 Sights</div>
+  <div class="tog on" onclick="tgl('food',this)">🍽️ Restaurants</div>
+  <div class="tog on" onclick="tgl('transit',this)">🚇 Transit</div>
+  <div class="tog on" onclick="tgl('heat',this)">🔥 Heat Map</div>
+  <div class="tog on" onclick="tgl('zones',this)">🗺️ Zones</div>
 </div>
 <div id="map"></div>
-<div class="map-legend">
-  <div class="item"><div style="width:12px;height:12px;background:#ff6b6b;border-radius:50%;border:2px solid #fff;"></div> Boutique Hotels</div>
-  <div class="item"><div style="width:12px;height:12px;background:#ff9800;border-radius:50%;border:2px solid #fff;"></div> Hostels</div>
-  <div class="item"><div style="width:12px;height:12px;background:#ffd93d;border-radius:50%;border:2px solid #fff;"></div> Sights</div>
-  <div class="item"><div class="line" style="background:#F44336;"></div> M3 Cityringen</div>
-  <div class="item"><div class="line" style="background:#4CAF50;"></div> M1/M2</div>
-  <div class="item"><div class="line" style="background:#2196F3;"></div> M4 Nordhavn</div>
+<div class="legend">
+  <div class="i"><div style="width:10px;height:10px;background:#ff6b6b;border-radius:50%;border:2px solid #fff"></div> Hotels</div>
+  <div class="i"><div style="width:10px;height:10px;background:#ff9800;border-radius:50%;border:2px solid #fff"></div> Hostels</div>
+  <div class="i"><div style="width:10px;height:10px;background:#ffd93d;border-radius:50%;border:2px solid #fff"></div> Sights</div>
+  <div class="i"><div style="width:10px;height:10px;background:#6bcb77;border-radius:50%;border:2px solid #fff"></div> Food</div>
+  <div class="i"><div class="ln" style="background:#F44336"></div> M3 Cityringen</div>
+  <div class="i"><div class="ln" style="background:#4CAF50"></div> M1/M2</div>
+  <div class="i"><div class="ln" style="background:#2196F3"></div> M4</div>
+  <div class="i"><div style="width:18px;height:10px;background:linear-gradient(90deg,#adff2f44,#ffff0066,#ff660088,#ff0000aa);border-radius:3px"></div> Food + nightlife density</div>
 </div>
 <div class="cards">
   <div class="card">
-    <h3>🏨 Boutique Hotels (per person, 3 nights)</h3>
-    <div class="card-item"><span class="name">Coco Hotel</span><span class="price">~$350/pp</span></div>
-    <div class="card-item"><span class="name">Hotel SP34</span><span class="price">~$380/pp</span></div>
-    <div class="card-item"><span class="name">Manon Les Suites</span><span class="price">~$450/pp</span></div>
+    <h3>🔥 Hottest Neighborhoods</h3>
+    <div class="ci"><b style="color:#E91E63">Vesterbro / Kødbyen</b> — Meatpacking District. Best nightlife + food. Coolest area.</div>
+    <div class="ci"><b style="color:#ff9800">Nørrebro</b> — Multicultural hub. Cheap eats, hipster cafés, ethnic food.</div>
+    <div class="ci"><b style="color:#4CAF50">Indre By (Center)</b> — Strøget, fine dining, Nyhavn, historic.</div>
+    <div class="ci"><b style="color:#2196F3">Christianshavn</b> — Canals, Christiania, waterfront vibes.</div>
+    <div class="ci"><b style="color:#ffd93d">Refshaleøen</b> — Reffen street food, industrial creative district.</div>
   </div>
   <div class="card">
-    <h3>🛏️ Hostels (per person, 3 nights)</h3>
-    <div class="card-item"><span class="name">Steel House ⭐</span><span class="budget">~$120/pp</span></div>
-    <div class="card-item"><span class="name">Next House</span><span class="budget">~$130/pp</span></div>
-    <div class="card-item"><span class="name">Downtown Hostel</span><span class="budget">~$140/pp</span></div>
-    <div class="card-item"><span class="name">Generator</span><span class="budget">~$150/pp</span></div>
+    <h3>🍽️ Top Restaurant Picks</h3>
+    <div class="ci">Absalon — communal dinner €8! <b style="color:#6bcb77">DKK 60</b></div>
+    <div class="ci">Høst — New Nordic, affordable <b style="color:#6bcb77">DKK 395</b></div>
+    <div class="ci">Reffen — 50+ street food stalls <b style="color:#6bcb77">DKK 60-120</b></div>
+    <div class="ci">Poulette — fried chicken (from The Bear!) <b style="color:#6bcb77">DKK 95</b></div>
+    <div class="ci">Kødbyens Fiskebar — seafood in Meatpacking <b style="color:#6bcb77">DKK 200+</b></div>
+    <div class="ci">Hija de Sanchez — tacos by ex-Noma chef <b style="color:#6bcb77">DKK 50</b></div>
   </div>
-  <div class="card" style="grid-column: 1 / -1;">
-    <h3>🚇 Transit Tips</h3>
-    <div class="card-item"><span class="name">Copenhagen Card: 80+ attractions FREE + unlimited transit · 48h = ~$95 · Pays for itself in 2 museums</span></div>
-    <div class="card-item"><span class="name">M3 Cityringen (red circle): Hits everything — Nyhavn, Tivoli, Vesterbro, Nørrebro. Runs 24/7.</span></div>
-    <div class="card-item"><span class="name">M1/M2 (green): Central → Frederiksberg → Vanløse · M2 goes to Airport</span></div>
-    <div class="card-item"><span class="name">M4 (blue): Central → Kongens Nytorv → Nordhavn. Good for harbor area.</span></div>
-    <div class="card-item"><span class="name">City is very bikeable — rent from hotel or Donkey Republic app (~$12/day)</span></div>
+  <div class="card">
+    <h3>💡 Food Tips</h3>
+    <div class="ci">💰 Copenhagen Card (48h ~$95) = 80+ attractions FREE + transit</div>
+    <div class="ci">🥪 Try smørrebrød (open sandwiches) at Torvehallerne</div>
+    <div class="ci">🍺 Mikkeller brewery bars are everywhere — try one</div>
+    <div class="ci">🍽️ Absalon community dinner tickets sell out — book by 4pm</div>
+    <div class="ci">🚲 Rent bikes (~$12/day) — fastest way around the city</div>
+    <div class="ci">⚠️ CPH is expensive — budget DKK 200-400/day for food</div>
   </div>
 </div>
 <script>
-const map = L.map('map', { zoomControl: true }).setView([55.6790, 12.5770], 14);
-L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-  attribution: '© OpenStreetMap © CARTO',
-  maxZoom: 19
-}).addTo(map);
+const map=L.map('map',{zoomControl:true}).setView([55.6790,12.577],14);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{attribution:'© OSM © CARTO',maxZoom:19}).addTo(map);
 
-// --- TRANSIT LINES ---
+const ly={hotels:L.layerGroup(),hostels:L.layerGroup(),sights:L.layerGroup(),food:L.layerGroup(),transit:L.layerGroup(),heat:L.layerGroup(),zones:L.layerGroup()};
+Object.values(ly).forEach(l=>l.addTo(map));
+function tgl(n,el){if(map.hasLayer(ly[n])){map.removeLayer(ly[n]);el.classList.remove('on')}else{map.addLayer(ly[n]);el.classList.add('on')}}
 
-// M3 Cityringen (circular) — Red
-const m3 = [
-  [55.6735, 12.5645], // København H
-  [55.6750, 12.5590], // Enghave Plads
-  [55.6752, 12.5510], // Frederiksberg Allé
-  [55.6770, 12.5460], // Frederiksberg
-  [55.6800, 12.5440], // Aksel Møllers Have
-  [55.6830, 12.5480], // Nuuks Plads
-  [55.6855, 12.5510], // Nørrebros Runddel
-  [55.6870, 12.5580], // Nørrebro
-  [55.6875, 12.5660], // Skjolds Plads
-  [55.6870, 12.5740], // Vibenshus Runddel
-  [55.6860, 12.5810], // Poul Henningsens Pl
-  [55.6840, 12.5860], // Trianglen
-  [55.6820, 12.5900], // Østerport
-  [55.6830, 12.5930], // Marmorkirken
-  [55.6810, 12.5900], // Kongens Nytorv
-  [55.6785, 12.5830], // Gammel Strand
-  [55.6768, 12.5760], // Rådhuspladsen
-  [55.6735, 12.5645], // back to København H
-];
-L.polyline(m3, { color: '#F44336', weight: 4, opacity: 0.65 }).addTo(map);
+function mk(c,s){return L.divIcon({className:'',html:'<div style="width:'+s+'px;height:'+s+'px;background:'+c+';border:2px solid rgba(255,255,255,.85);border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,.5),0 0 10px '+c+'33"></div>',iconSize:[s,s],iconAnchor:[s/2,s/2]})}
+function lb(t,y){return L.divIcon({className:'',html:'<div style="white-space:nowrap;font-size:10px;font-weight:600;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.9),0 0 6px rgba(0,0,0,.7);pointer-events:none">'+t+'</div>',iconSize:[0,0],iconAnchor:[-12,y||4]})}
 
-// M1/M2 shared segment — Green
-const m1m2 = [
-  [55.6810, 12.5900], // Kongens Nytorv
-  [55.6770, 12.5460], // Frederiksberg (shared stretch simplified)
-];
-// More accurate M1/M2 path
-const m1m2full = [
-  [55.6810, 12.5900], // Kongens Nytorv
-  [55.6785, 12.5830], // Gammel Strand
-  [55.6768, 12.5760], // Rådhuspladsen
-  [55.6735, 12.5645], // København H
-  [55.6720, 12.5570], // Vesterbro area
-  [55.6730, 12.5500], // Frederiksberg Allé
-  [55.6770, 12.5460], // Frederiksberg
-  [55.6790, 12.5370], // Fasanvej
-  [55.6830, 12.5300], // Lindevang
-  [55.6850, 12.5250], // Vanløse
-];
-L.polyline(m1m2full, { color: '#4CAF50', weight: 3.5, opacity: 0.5, dashArray: '10,6' }).addTo(map);
+// ZONES
+var zs={weight:1.5,fillOpacity:0.08,opacity:0.4};
+L.polygon([[55.674,12.545],[55.674,12.562],[55.666,12.562],[55.666,12.545]],{...zs,color:'#E91E63',fillColor:'#E91E63'}).bindPopup('<b>Vesterbro / Kødbyen</b><br>Meatpacking District. Best nightlife, craft cocktails, restaurants. Copenhagen\'s coolest neighborhood. Absalon, Tommi\'s, Kødbyens Fiskebar.').addTo(ly.zones);
+L.polygon([[55.692,12.545],[55.692,12.575],[55.682,12.575],[55.682,12.545]],{...zs,color:'#ff9800',fillColor:'#ff9800'}).bindPopup('<b>Nørrebro</b><br>Multicultural hub. Street food, Superkilen park, Poulette, La Neta, budget eats. Creative scene.').addTo(ly.zones);
+L.polygon([[55.682,12.570],[55.682,12.595],[55.672,12.595],[55.672,12.570]],{...zs,color:'#4CAF50',fillColor:'#4CAF50'}).bindPopup('<b>Indre By (City Center)</b><br>Strøget shopping, Tivoli, fine dining. Admiralgade 26, Høst. Historic district.').addTo(ly.zones);
+L.polygon([[55.680,12.590],[55.680,12.602],[55.668,12.602],[55.668,12.590]],{...zs,color:'#2196F3',fillColor:'#2196F3'}).bindPopup('<b>Christianshavn</b><br>Canal district. Freetown Christiania, houseboats, waterfront restaurants. Relaxed vibe.').addTo(ly.zones);
+L.polygon([[55.698,12.598],[55.698,12.615],[55.688,12.615],[55.688,12.598]],{...zs,color:'#ffd93d',fillColor:'#ffd93d'}).bindPopup('<b>Refshaleøen</b><br>Former shipyard. Reffen street food, Alchemist restaurant, industrial creative district.').addTo(ly.zones);
+L.polygon([[55.690,12.575],[55.690,12.598],[55.682,12.598],[55.682,12.575]],{...zs,color:'#00BCD4',fillColor:'#00BCD4'}).bindPopup('<b>Østerbro</b><br>Upscale residential. Kastellet, Little Mermaid, Bottega Barlie. Quieter, leafy.').addTo(ly.zones);
 
-// M2 to Airport branch
-const m2airport = [
-  [55.6810, 12.5900], // Kongens Nytorv
-  [55.6770, 12.5950], // Christianshavn
-  [55.6700, 12.5990], // Islands Brygge
-  [55.6630, 12.5960], // DR Byen
-  [55.6280, 12.6520], // Airport (way south-east, won't show)
-];
-// Just show the first few stops
-L.polyline(m2airport.slice(0,4), { color: '#4CAF50', weight: 3, opacity: 0.4, dashArray: '6,8' }).addTo(map);
+// HEAT MAP
+L.heatLayer([
+// Vesterbro/Kødbyen — hottest
+[55.670,12.550,.9],[55.671,12.553,.8],[55.669,12.548,.7],[55.672,12.555,.7],[55.670,12.545,.6],[55.668,12.552,.6],[55.671,12.558,.5],[55.673,12.550,.5],
+// Nørrebro
+[55.688,12.555,.7],[55.686,12.560,.6],[55.689,12.550,.6],[55.687,12.558,.5],[55.690,12.553,.5],[55.685,12.562,.4],
+// Center/Strøget
+[55.678,12.576,.6],[55.679,12.580,.5],[55.677,12.573,.5],[55.680,12.583,.5],[55.676,12.578,.4],[55.681,12.577,.4],
+// Nyhavn
+[55.680,12.590,.7],[55.681,12.592,.6],[55.679,12.588,.5],[55.682,12.591,.4],
+// Torvehallerne
+[55.684,12.571,.7],[55.683,12.573,.6],[55.685,12.569,.5],
+// Christianshavn
+[55.674,12.597,.5],[55.673,12.595,.4],[55.675,12.599,.4],
+// Reffen
+[55.691,12.606,.6],[55.692,12.608,.5],[55.690,12.604,.4],
+// Tivoli area
+[55.674,12.568,.5],[55.673,12.565,.4],[55.675,12.570,.4],
+],{radius:35,blur:25,maxZoom:16,max:1,gradient:{0.2:'#00ff0033',0.4:'#adff2f55',0.6:'#ffff0077',0.8:'#ff990099',1:'#ff0000aa'}}).addTo(ly.heat);
 
-// M4 — Blue (København H → Kongens Nytorv → Nordhavn)
-const m4 = [
-  [55.6735, 12.5645], // København H
-  [55.6768, 12.5760], // Rådhuspladsen
-  [55.6785, 12.5830], // Gammel Strand
-  [55.6810, 12.5900], // Kongens Nytorv
-  [55.6830, 12.5930], // Marmorkirken
-  [55.6820, 12.5900], // Østerport
-  [55.6870, 12.5960], // Nordhavn
-  [55.6900, 12.5980], // Orientkaj
-];
-L.polyline(m4, { color: '#2196F3', weight: 3.5, opacity: 0.55 }).addTo(map);
+// TRANSIT
+// M3 Cityringen
+L.polyline([[55.6735,12.5645],[55.675,12.559],[55.6752,12.551],[55.677,12.546],[55.68,12.544],[55.683,12.548],[55.6855,12.551],[55.687,12.558],[55.6875,12.566],[55.687,12.574],[55.686,12.581],[55.684,12.586],[55.682,12.590],[55.683,12.593],[55.681,12.590],[55.6785,12.583],[55.6768,12.576],[55.6735,12.5645]],{color:'#F44336',weight:4,opacity:.6}).addTo(ly.transit);
+// M1/M2
+L.polyline([[55.681,12.590],[55.6785,12.583],[55.6768,12.576],[55.6735,12.5645],[55.672,12.557],[55.673,12.550],[55.677,12.546],[55.679,12.537],[55.683,12.530],[55.685,12.525]],{color:'#4CAF50',weight:3,opacity:.45,dashArray:'10,6'}).addTo(ly.transit);
+// M2 to Christianshavn
+L.polyline([[55.681,12.590],[55.677,12.595],[55.670,12.599],[55.663,12.596]],{color:'#4CAF50',weight:2.5,opacity:.35,dashArray:'6,8'}).addTo(ly.transit);
+// M4
+L.polyline([[55.6735,12.5645],[55.6768,12.576],[55.6785,12.583],[55.681,12.590],[55.683,12.593],[55.682,12.590],[55.687,12.596],[55.690,12.598]],{color:'#2196F3',weight:3,opacity:.5}).addTo(ly.transit);
+// Metro stations
+[[55.6735,12.5645,'København H'],[55.681,12.590,'Kongens Nytorv'],[55.6768,12.576,'Rådhuspladsen'],[55.6785,12.583,'Gammel Strand'],[55.684,12.586,'Trianglen'],[55.682,12.590,'Østerport'],[55.677,12.546,'Frederiksberg'],[55.675,12.559,'Enghave Plads'],[55.677,12.595,'Christianshavn'],[55.6835,12.571,'Nørreport']].forEach(s=>L.circleMarker([s[0],s[1]],{radius:3.5,fillColor:'#fff',color:'#555',weight:1.5,fillOpacity:.9}).bindPopup('<div class="pt"><b>🚇 '+s[2]+'</b></div>').addTo(ly.transit));
 
-// --- METRO STATION DOTS ---
-const metroStations = [
-  { name: "København H (Central)", lat: 55.6735, lng: 12.5645, line: "M3/M4" },
-  { name: "Kongens Nytorv", lat: 55.6810, lng: 12.5900, line: "M1/M2/M3/M4" },
-  { name: "Nørreport", lat: 55.6835, lng: 12.5710, line: "S-train + nearby M3" },
-  { name: "Rådhuspladsen", lat: 55.6768, lng: 12.5760, line: "M3/M4" },
-  { name: "Gammel Strand", lat: 55.6785, lng: 12.5830, line: "M3/M4" },
-  { name: "Trianglen", lat: 55.6840, lng: 12.5860, line: "M3" },
-  { name: "Østerport", lat: 55.6820, lng: 12.5900, line: "M3/M4" },
-  { name: "Frederiksberg", lat: 55.6770, lng: 12.5460, line: "M1/M2/M3" },
-  { name: "Christianshavn", lat: 55.6770, lng: 12.5950, line: "M1/M2" },
-  { name: "Enghave Plads", lat: 55.6750, lng: 12.5590, line: "M3" },
-];
-
-metroStations.forEach(s => {
-  L.circleMarker([s.lat, s.lng], {
-    radius: 4, fillColor: '#fff', color: '#666', weight: 1.5, fillOpacity: 0.9
-  }).bindPopup(`<div class="popup-transit"><b>🚇 ${s.name}</b><br>Lines: ${s.line}</div>`).addTo(map);
+// HOTELS
+[{n:"Coco Hotel",la:55.6718,lo:12.5555,p:"~$350/pp",a:"Vesterbro",d:"Parisian-chic. Locals hang at café. Leafy courtyard.",u:"https://coco-hotel.com/"},
+{n:"Hotel SP34",la:55.6785,lo:12.57,p:"~$380/pp",a:"Latin Quarter",d:"Scandi-minimal. Rooftop terrace, wine bar. Steps from Strøget.",u:"https://www.brochner-hotels.com/hotel-sp34/"},
+{n:"Manon Les Suites",la:55.6798,lo:12.562,p:"~$450/pp",a:"Center",d:"Bali-jungle vibe. Indoor pool, tropical atrium. Wildest interiors in CPH.",u:"https://guldsmedenhotels.com/manon-les-suites/"}
+].forEach(h=>{
+  L.marker([h.la,h.lo],{icon:mk('#ff6b6b',20),zIndexOffset:1000}).bindPopup('<div class="ph"><b>🏨 '+h.n+'</b><br>'+h.d+'<br><span class="tg tp">'+h.p+' · 3 nights</span><span class="tg ta">'+h.a+'</span><br><a href="'+h.u+'" target="_blank">Book →</a></div>').addTo(ly.hotels);
+  L.marker([h.la,h.lo],{icon:lb(h.n),interactive:false}).addTo(ly.hotels);
 });
 
-// --- MARKER HELPERS ---
-function makeMarker(color, size) {
-  return L.divIcon({
-    className: '',
-    html: `<div style="
-      width:${size}px; height:${size}px;
-      background:${color};
-      border: 2.5px solid rgba(255,255,255,0.9);
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.5), 0 0 12px ${color}44;
-    "></div>`,
-    iconSize: [size, size],
-    iconAnchor: [size/2, size/2]
-  });
-}
-
-function labelMarker(text, offsetY) {
-  return L.divIcon({
-    className: '',
-    html: `<div style="
-      white-space: nowrap;
-      font-size: 10.5px;
-      font-weight: 600;
-      color: #fff;
-      text-shadow: 0 1px 4px rgba(0,0,0,0.9), 0 0 8px rgba(0,0,0,0.7);
-      letter-spacing: 0.3px;
-      pointer-events: none;
-    ">${text}</div>`,
-    iconSize: [0, 0],
-    iconAnchor: [-14, offsetY || 4]
-  });
-}
-
-// --- BOUTIQUE HOTELS (Red) ---
-const hotels = [
-  { name: "Coco Hotel", lat: 55.6718, lng: 12.5555, price: "~$350/pp", area: "Vesterbro", desc: "Parisian-chic meets Copenhagen cool. Locals hang at the lobby café. Leafy courtyard. 88 rooms.", url: "https://coco-hotel.com/" },
-  { name: "Hotel SP34", lat: 55.6785, lng: 12.5700, price: "~$380/pp", area: "Latin Quarter", desc: "Scandi-minimalist design. Rooftop terrace, wine bar. Steps from Strøget shopping street.", url: "https://www.brochner-hotels.com/hotel-sp34/" },
-  { name: "Manon Les Suites", lat: 55.6798, lng: 12.5620, price: "~$450/pp", area: "City Center", desc: "Bali-jungle vibe. Indoor pool, tropical atrium, rooftop dining. Organic everything. Wildest interiors in CPH.", url: "https://guldsmedenhotels.com/manon-les-suites/" },
-];
-
-// --- HOSTELS (Orange) ---
-const hostels = [
-  { name: "Steel House ⭐", lat: 55.6722, lng: 12.5655, price: "~$120/pp", area: "Central", desc: "Industrial-chic hostel in old steel factory. Pool, gym, cinema room, rooftop. Best hostel in CPH. Near Tivoli & Central Station.", url: "https://www.steelhousecopenhagen.com/" },
-  { name: "Generator", lat: 55.6835, lng: 12.5905, price: "~$150/pp", area: "Adelgade", desc: "Design-led hostel chain. Near Nyhavn + Kongens Nytorv. Bar, café, co-working. Great location.", url: "https://staygenerator.com/hostels/copenhagen" },
-  { name: "Next House", lat: 55.6685, lng: 12.5600, price: "~$130/pp", area: "Vesterbro", desc: "Modern, clean, social. Near Central Station. Bar + events every night.", url: "https://www.nexthousecopenhagen.com/" },
-  { name: "Downtown Hostel", lat: 55.6760, lng: 12.5733, price: "~$140/pp", area: "City Center", desc: "Right on a canal in the absolute center. Can't beat the location. Basic but solid.", url: "https://www.copenhagendowntown.com/" },
-];
-
-// --- SIGHTS (Yellow) ---
-const sights = [
-  { name: "Nyhavn", lat: 55.6800, lng: 12.5900, desc: "Iconic colorful harbor — the postcard shot. Bars, restaurants, canal boats." },
-  { name: "Tivoli Gardens", lat: 55.6735, lng: 12.5680, desc: "World's 2nd oldest amusement park (1843). Rides, gardens, live music. Opens late March!" },
-  { name: "The Little Mermaid", lat: 55.6929, lng: 12.5998, desc: "Iconic 1913 bronze statue on the waterfront. Quick visit — combine with Kastellet." },
-  { name: "Rosenborg Castle", lat: 55.6859, lng: 12.5773, desc: "Renaissance castle + King's Garden. Crown jewels inside." },
-  { name: "Christiansborg Palace", lat: 55.6760, lng: 12.5790, desc: "Danish Parliament. Free tower with best panoramic view in the city." },
-  { name: "Freetown Christiania", lat: 55.6735, lng: 12.5970, desc: "Self-governing commune since 1971. Street art, DIY architecture, unique vibe. No photos on Pusher Street." },
-  { name: "Amalienborg Palace", lat: 55.6840, lng: 12.5930, desc: "Royal residence. Guard changing at noon daily. Free to watch." },
-  { name: "Rundetårn", lat: 55.6812, lng: 12.5757, desc: "Round Tower (1642). Spiral ramp to the top. City views. €5 entry." },
-  { name: "Strøget", lat: 55.6780, lng: 12.5760, desc: "Europe's longest pedestrian shopping street. 1.1 km of shops." },
-  { name: "Torvehallerne", lat: 55.6835, lng: 12.5715, desc: "Glass food market halls. Danish smørrebrød, pastries, coffee. Must-visit for lunch." },
-  { name: "Designmuseum Danmark", lat: 55.6860, lng: 12.5920, desc: "Danish design history — furniture, fashion, posters. Beautiful building + garden." },
-  { name: "Reffen Street Food", lat: 55.6910, lng: 12.6060, desc: "Huge open-air street food market on the waterfront. 50+ stalls. Sunsets." },
-  { name: "Kastellet", lat: 55.6910, lng: 12.5950, desc: "Star-shaped 17th-century fortress. Beautiful grounds. Near Little Mermaid." },
-  { name: "Vesterbro", lat: 55.6700, lng: 12.5530, desc: "Meatpacking District. Best nightlife, craft cocktails, restaurants. Copenhagen's coolest neighborhood." },
-];
-
-// Draw boutique hotels
-hotels.forEach(h => {
-  L.marker([h.lat, h.lng], { icon: makeMarker('#ff6b6b', 22), zIndexOffset: 1000 })
-    .bindPopup(`<div class="popup-hotel">
-      <b>🏨 ${h.name}</b><br>
-      ${h.desc}<br>
-      <span class="tag tag-price">${h.price} · 3 nights</span>
-      <span class="tag tag-area">${h.area}</span><br>
-      <a href="${h.url}" target="_blank">Book →</a>
-    </div>`)
-    .addTo(map);
-  L.marker([h.lat, h.lng], { icon: labelMarker(h.name, 4), interactive: false }).addTo(map);
+// HOSTELS
+[{n:"Steel House ⭐",la:55.6722,lo:12.5655,p:"~$120/pp",a:"Central",d:"Pool, gym, cinema. Best hostel in CPH. Near Tivoli.",u:"https://www.steelhousecopenhagen.com/"},
+{n:"Generator",la:55.6835,lo:12.5905,p:"~$150/pp",a:"Adelgade",d:"Design hostel near Nyhavn. Bar, café, co-working.",u:"https://staygenerator.com/hostels/copenhagen"},
+{n:"Next House",la:55.6685,lo:12.56,p:"~$130/pp",a:"Vesterbro",d:"Modern, clean. Near Central Station. Bar + events.",u:"https://www.nexthousecopenhagen.com/"},
+{n:"Downtown Hostel",la:55.676,lo:12.5733,p:"~$140/pp",a:"Center",d:"Right on a canal in the absolute center.",u:"https://www.copenhagendowntown.com/"}
+].forEach(h=>{
+  L.marker([h.la,h.lo],{icon:mk('#ff9800',18),zIndexOffset:900}).bindPopup('<div class="po"><b>🛏️ '+h.n+'</b><br>'+h.d+'<br><span class="tg tb">'+h.p+' · 3 nights</span><span class="tg ta">'+h.a+'</span><br><a href="'+h.u+'" target="_blank">Book →</a></div>').addTo(ly.hostels);
+  L.marker([h.la,h.lo],{icon:lb(h.n),interactive:false}).addTo(ly.hostels);
 });
 
-// Draw hostels
-hostels.forEach(h => {
-  L.marker([h.lat, h.lng], { icon: makeMarker('#ff9800', 20), zIndexOffset: 900 })
-    .bindPopup(`<div class="popup-hostel">
-      <b>🛏️ ${h.name}</b><br>
-      ${h.desc}<br>
-      <span class="tag tag-budget">${h.price} · 3 nights</span>
-      <span class="tag tag-area">${h.area}</span><br>
-      <a href="${h.url}" target="_blank">Book →</a>
-    </div>`)
-    .addTo(map);
-  L.marker([h.lat, h.lng], { icon: labelMarker(h.name, 4), interactive: false }).addTo(map);
+// SIGHTS
+[{n:"Nyhavn",la:55.68,lo:12.59,d:"Iconic colorful harbor. Bars, canal boats."},
+{n:"Tivoli Gardens",la:55.6735,lo:12.568,d:"1843 amusement park. Opens late March!"},
+{n:"The Little Mermaid",la:55.6929,lo:12.5998,d:"1913 bronze statue. Combine with Kastellet."},
+{n:"Rosenborg Castle",la:55.6859,lo:12.5773,d:"Renaissance castle + crown jewels."},
+{n:"Christiansborg",la:55.676,lo:12.579,d:"Parliament. Free tower — best city view."},
+{n:"Freetown Christiania",la:55.6735,lo:12.597,d:"Self-governing commune. Street art, unique vibe."},
+{n:"Amalienborg",la:55.684,lo:12.593,d:"Royal residence. Guard change at noon."},
+{n:"Rundetårn",la:55.6812,lo:12.5757,d:"Round Tower (1642). Spiral ramp. City views."},
+{n:"Strøget",la:55.678,lo:12.576,d:"Europe's longest pedestrian shopping street."},
+{n:"Kastellet",la:55.691,lo:12.595,d:"Star-shaped 17th-century fortress. Beautiful."},
+{n:"Designmuseum",la:55.686,lo:12.592,d:"Danish design history. Furniture, fashion."},
+{n:"Superkilen",la:55.6905,lo:12.5465,d:"Urban park in Nørrebro. Wild art + design."}
+].forEach(s=>{
+  L.marker([s.la,s.lo],{icon:mk('#ffd93d',16),zIndexOffset:500}).bindPopup('<div class="ps"><b>📍 '+s.n+'</b><br>'+s.d+'</div>').addTo(ly.sights);
+  L.marker([s.la,s.lo],{icon:lb(s.n),interactive:false}).addTo(ly.sights);
 });
 
-// Draw sights
-sights.forEach(s => {
-  L.marker([s.lat, s.lng], { icon: makeMarker('#ffd93d', 18), zIndexOffset: 500 })
-    .bindPopup(`<div class="popup-sight"><b>📍 ${s.name}</b><br>${s.desc}</div>`)
-    .addTo(map);
-  L.marker([s.lat, s.lng], { icon: labelMarker(s.name, 3), interactive: false }).addTo(map);
+// RESTAURANTS
+[{n:"Absalon",la:55.668,lo:12.551,d:"Communal dinner in old church. 180 strangers, long tables. DKK 60 (€8). Book by 4pm.",c:"Community",p:"DKK 60-100"},
+{n:"Høst",la:55.684,lo:12.568,d:"New Nordic by Cofoco. Affordable tasting menu. Beautiful Norm Architects interior.",c:"New Nordic",p:"DKK 395"},
+{n:"Reffen Street Food",la:55.691,lo:12.606,d:"Huge open-air market. 50+ stalls. Waterfront sunsets. Best cheap eats.",c:"Street Food",p:"DKK 60-120"},
+{n:"Torvehallerne",la:55.6835,lo:12.5715,d:"Glass food halls. Smørrebrød, pastries, coffee. Essential lunch stop.",c:"Market",p:"DKK 50-120"},
+{n:"Poulette",la:55.688,lo:12.555,d:"Fried chicken from The Bear! Two sandwiches: spicy chicken or mapo tofu. Queue-worthy.",c:"Fried Chicken",p:"DKK 95"},
+{n:"Kødbyens Fiskebar",la:55.67,lo:12.551,d:"Seafood in the Meatpacking District. Raw bar, oysters, catch of the day. Industrial chic.",c:"Seafood",p:"DKK 200-400"},
+{n:"Hija de Sanchez",la:55.671,lo:12.552,d:"Tacos by ex-Noma pastry chef Rosio Sanchez. Small, legendary, Vesterbro.",c:"Mexican",p:"DKK 45-65"},
+{n:"Tommi's Burger",la:55.67,lo:12.55,d:"Icelandic burgers in Meatpacking. Quality fast food. Craft beers.",c:"Burgers",p:"DKK 99-119"},
+{n:"Madglad",la:55.671,lo:12.556,d:"Community dining in Vesterbro. All-you-can-eat DKK 85. Cozy, colorful.",c:"Community",p:"DKK 50-85"},
+{n:"La Neta",la:55.686,lo:12.56,d:"Good tacos in Nørrebro. 5 pieces DKK 120. Casual, tasty.",c:"Mexican",p:"DKK 120"},
+{n:"Bottega Barlie",la:55.685,lo:12.592,d:"Natural wine + Med plates. Sunny terrace. Creative crowd. Breakfast to late.",c:"Mediterranean",p:"DKK 85-200"},
+{n:"Admiralgade 26",la:55.678,lo:12.583,d:"Scandi-Japanese fusion. 5-course daily menu. Canal-side. Community dinners Wed.",c:"Fusion",p:"DKK 600"},
+{n:"RizRaz",la:55.6785,lo:12.574,d:"All-you-can-eat vegetarian buffet. Two locations. Great value for CPH.",c:"Vegetarian",p:"DKK 145-185"},
+{n:"Gasoline Grill",la:55.679,lo:12.580,d:"Cult burger spot. Former gas station. Short menu, long queues, worth it.",c:"Burgers",p:"DKK 100-150"}
+].forEach(r=>{
+  L.marker([r.la,r.lo],{icon:mk('#6bcb77',16),zIndexOffset:800}).bindPopup('<div class="pf"><b>🍽️ '+r.n+'</b><br>'+r.d+'<br><span class="tg tc">'+r.c+'</span><span class="tg tp">'+r.p+'</span></div>').addTo(ly.food);
+  L.marker([r.la,r.lo],{icon:lb(r.n),interactive:false}).addTo(ly.food);
 });
 
-// Fit bounds
-const allCoords = [...hotels, ...hostels, ...sights].map(x => [x.lat, x.lng]);
-map.fitBounds(allCoords, { padding: [30, 30] });
+map.fitBounds([[55.662,12.540],[55.695,12.610]],{padding:[20,20]});
 </script>
 </body>
 </html>
