@@ -67,29 +67,29 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <div class="cards">
   <div class="card">
     <h3>🔥 Hottest Neighborhoods</h3>
-    <div class="ci"><b style="color:#E91E63">Vesterbro / Kødbyen</b> — Meatpacking District. Best nightlife + food. Coolest area.</div>
-    <div class="ci"><b style="color:#ff9800">Nørrebro</b> — Multicultural hub. Cheap eats, hipster cafés, ethnic food.</div>
+    <div class="ci"><b style="color:#E91E63">Vesterbro / Kødbyen</b> — Meatpacking District. Best nightlife + food.</div>
+    <div class="ci"><b style="color:#ff9800">Nørrebro</b> — Multicultural hub. Cheap eats, hipster cafés.</div>
     <div class="ci"><b style="color:#4CAF50">Indre By (Center)</b> — Strøget, fine dining, Nyhavn, historic.</div>
-    <div class="ci"><b style="color:#2196F3">Christianshavn</b> — Canals, Christiania, waterfront vibes.</div>
-    <div class="ci"><b style="color:#ffd93d">Refshaleøen</b> — Reffen street food, industrial creative district.</div>
+    <div class="ci"><b style="color:#2196F3">Christianshavn</b> — Canals, Christiania, waterfront.</div>
+    <div class="ci"><b style="color:#ffd93d">Refshaleøen</b> — Reffen street food, industrial creative.</div>
   </div>
   <div class="card">
     <h3>🍽️ Top Restaurant Picks</h3>
     <div class="ci">Absalon — communal dinner €8! <b style="color:#6bcb77">DKK 60</b></div>
     <div class="ci">Høst — New Nordic, affordable <b style="color:#6bcb77">DKK 395</b></div>
     <div class="ci">Reffen — 50+ street food stalls <b style="color:#6bcb77">DKK 60-120</b></div>
-    <div class="ci">Poulette — fried chicken (from The Bear!) <b style="color:#6bcb77">DKK 95</b></div>
-    <div class="ci">Kødbyens Fiskebar — seafood in Meatpacking <b style="color:#6bcb77">DKK 200+</b></div>
-    <div class="ci">Hija de Sanchez — tacos by ex-Noma chef <b style="color:#6bcb77">DKK 50</b></div>
+    <div class="ci">Poulette — fried chicken (The Bear!) <b style="color:#6bcb77">DKK 95</b></div>
+    <div class="ci">Kødbyens Fiskebar — seafood <b style="color:#6bcb77">DKK 200+</b></div>
+    <div class="ci">Hija de Sanchez — ex-Noma tacos <b style="color:#6bcb77">DKK 50</b></div>
   </div>
   <div class="card">
     <h3>💡 Food Tips</h3>
-    <div class="ci">💰 Copenhagen Card (48h ~$95) = 80+ attractions FREE + transit</div>
-    <div class="ci">🥪 Try smørrebrød (open sandwiches) at Torvehallerne</div>
-    <div class="ci">🍺 Mikkeller brewery bars are everywhere — try one</div>
-    <div class="ci">🍽️ Absalon community dinner tickets sell out — book by 4pm</div>
-    <div class="ci">🚲 Rent bikes (~$12/day) — fastest way around the city</div>
-    <div class="ci">⚠️ CPH is expensive — budget DKK 200-400/day for food</div>
+    <div class="ci">💰 Copenhagen Card (48h ~$95) = 80+ attractions + transit</div>
+    <div class="ci">🥪 Try smørrebrød at Torvehallerne</div>
+    <div class="ci">🍺 Mikkeller brewery bars are everywhere</div>
+    <div class="ci">🍽️ Absalon dinner tickets sell out — book by 4pm</div>
+    <div class="ci">🚲 Rent bikes (~$12/day) — fastest way around</div>
+    <div class="ci">⚠️ Budget DKK 200-400/day for food</div>
   </div>
 </div>
 <script>
@@ -105,103 +105,93 @@ function lb(t,y){return L.divIcon({className:'',html:'<div style="white-space:no
 
 // ZONES
 var zs={weight:1.5,fillOpacity:0.08,opacity:0.4};
-L.polygon([[55.674,12.545],[55.674,12.562],[55.666,12.562],[55.666,12.545]],{...zs,color:'#E91E63',fillColor:'#E91E63'}).bindPopup('<b>Vesterbro / Kødbyen</b><br>Meatpacking District. Best nightlife, craft cocktails, restaurants. Copenhagen\'s coolest neighborhood. Absalon, Tommi\'s, Kødbyens Fiskebar.').addTo(ly.zones);
-L.polygon([[55.692,12.545],[55.692,12.575],[55.682,12.575],[55.682,12.545]],{...zs,color:'#ff9800',fillColor:'#ff9800'}).bindPopup('<b>Nørrebro</b><br>Multicultural hub. Street food, Superkilen park, Poulette, La Neta, budget eats. Creative scene.').addTo(ly.zones);
-L.polygon([[55.682,12.570],[55.682,12.595],[55.672,12.595],[55.672,12.570]],{...zs,color:'#4CAF50',fillColor:'#4CAF50'}).bindPopup('<b>Indre By (City Center)</b><br>Strøget shopping, Tivoli, fine dining. Admiralgade 26, Høst. Historic district.').addTo(ly.zones);
-L.polygon([[55.680,12.590],[55.680,12.602],[55.668,12.602],[55.668,12.590]],{...zs,color:'#2196F3',fillColor:'#2196F3'}).bindPopup('<b>Christianshavn</b><br>Canal district. Freetown Christiania, houseboats, waterfront restaurants. Relaxed vibe.').addTo(ly.zones);
-L.polygon([[55.698,12.598],[55.698,12.615],[55.688,12.615],[55.688,12.598]],{...zs,color:'#ffd93d',fillColor:'#ffd93d'}).bindPopup('<b>Refshaleøen</b><br>Former shipyard. Reffen street food, Alchemist restaurant, industrial creative district.').addTo(ly.zones);
-L.polygon([[55.690,12.575],[55.690,12.598],[55.682,12.598],[55.682,12.575]],{...zs,color:'#00BCD4',fillColor:'#00BCD4'}).bindPopup('<b>Østerbro</b><br>Upscale residential. Kastellet, Little Mermaid, Bottega Barlie. Quieter, leafy.').addTo(ly.zones);
+L.polygon([[55.674,12.545],[55.674,12.565],[55.664,12.565],[55.664,12.545]],{...zs,color:'#E91E63',fillColor:'#E91E63'}).bindPopup('<b>Vesterbro / Kødbyen</b><br>Meatpacking District. Best nightlife, cocktails, restaurants. Absalon, Tommi\'s, Fiskebar, Hija de Sanchez.').addTo(ly.zones);
+L.polygon([[55.695,12.545],[55.695,12.575],[55.683,12.575],[55.683,12.545]],{...zs,color:'#ff9800',fillColor:'#ff9800'}).bindPopup('<b>Nørrebro</b><br>Multicultural hub. Street food, Superkilen park, Poulette, La Neta, budget eats.').addTo(ly.zones);
+L.polygon([[55.684,12.565],[55.684,12.595],[55.673,12.595],[55.673,12.565]],{...zs,color:'#4CAF50',fillColor:'#4CAF50'}).bindPopup('<b>Indre By (Center)</b><br>Strøget shopping, Tivoli, fine dining. Admiralgade 26, Høst, RizRaz.').addTo(ly.zones);
+L.polygon([[55.680,12.590],[55.680,12.605],[55.668,12.605],[55.668,12.590]],{...zs,color:'#2196F3',fillColor:'#2196F3'}).bindPopup('<b>Christianshavn</b><br>Canal district. Christiania, houseboats, waterfront restaurants.').addTo(ly.zones);
+L.polygon([[55.700,12.600],[55.700,12.618],[55.688,12.618],[55.688,12.600]],{...zs,color:'#ffd93d',fillColor:'#ffd93d'}).bindPopup('<b>Refshaleøen</b><br>Former shipyard. Reffen street food, industrial creative district.').addTo(ly.zones);
+L.polygon([[55.692,12.575],[55.692,12.598],[55.683,12.598],[55.683,12.575]],{...zs,color:'#00BCD4',fillColor:'#00BCD4'}).bindPopup('<b>Østerbro</b><br>Upscale residential. Kastellet, Little Mermaid, Bottega Barlie.').addTo(ly.zones);
 
 // HEAT MAP
 L.heatLayer([
-// Vesterbro/Kødbyen — hottest
-[55.670,12.550,.9],[55.671,12.553,.8],[55.669,12.548,.7],[55.672,12.555,.7],[55.670,12.545,.6],[55.668,12.552,.6],[55.671,12.558,.5],[55.673,12.550,.5],
-// Nørrebro
-[55.688,12.555,.7],[55.686,12.560,.6],[55.689,12.550,.6],[55.687,12.558,.5],[55.690,12.553,.5],[55.685,12.562,.4],
-// Center/Strøget
-[55.678,12.576,.6],[55.679,12.580,.5],[55.677,12.573,.5],[55.680,12.583,.5],[55.676,12.578,.4],[55.681,12.577,.4],
-// Nyhavn
-[55.680,12.590,.7],[55.681,12.592,.6],[55.679,12.588,.5],[55.682,12.591,.4],
-// Torvehallerne
-[55.684,12.571,.7],[55.683,12.573,.6],[55.685,12.569,.5],
-// Christianshavn
-[55.674,12.597,.5],[55.673,12.595,.4],[55.675,12.599,.4],
-// Reffen
-[55.691,12.606,.6],[55.692,12.608,.5],[55.690,12.604,.4],
-// Tivoli area
-[55.674,12.568,.5],[55.673,12.565,.4],[55.675,12.570,.4],
+[55.6679,12.5593,.9],[55.6689,12.5585,.8],[55.6683,12.5580,.7],[55.6707,12.5557,.6],[55.6654,12.5503,.7],[55.6700,12.5550,.6],[55.6710,12.5530,.5],[55.6724,12.5566,.5],
+[55.6889,12.5549,.7],[55.6879,12.5603,.6],[55.6870,12.5580,.5],[55.6860,12.5600,.5],[55.6850,12.5560,.4],
+[55.6800,12.5740,.6],[55.6788,12.5672,.5],[55.6776,12.5821,.5],[55.6832,12.5851,.5],[55.6834,12.5662,.4],[55.6797,12.5909,.6],
+[55.6843,12.5695,.7],[55.6850,12.5700,.5],[55.6835,12.5690,.5],
+[55.6739,12.5968,.5],[55.6740,12.5960,.4],[55.6750,12.5970,.3],
+[55.6931,12.6099,.6],[55.6940,12.6100,.5],[55.6920,12.6080,.4],
+[55.6747,12.5657,.5],[55.6750,12.5650,.4],[55.6740,12.5660,.4],
 ],{radius:35,blur:25,maxZoom:16,max:1,gradient:{0.2:'#00ff0033',0.4:'#adff2f55',0.6:'#ffff0077',0.8:'#ff990099',1:'#ff0000aa'}}).addTo(ly.heat);
 
-// TRANSIT
-// M3 Cityringen
+// TRANSIT — M3 Cityringen
 L.polyline([[55.6735,12.5645],[55.675,12.559],[55.6752,12.551],[55.677,12.546],[55.68,12.544],[55.683,12.548],[55.6855,12.551],[55.687,12.558],[55.6875,12.566],[55.687,12.574],[55.686,12.581],[55.684,12.586],[55.682,12.590],[55.683,12.593],[55.681,12.590],[55.6785,12.583],[55.6768,12.576],[55.6735,12.5645]],{color:'#F44336',weight:4,opacity:.6}).addTo(ly.transit);
 // M1/M2
 L.polyline([[55.681,12.590],[55.6785,12.583],[55.6768,12.576],[55.6735,12.5645],[55.672,12.557],[55.673,12.550],[55.677,12.546],[55.679,12.537],[55.683,12.530],[55.685,12.525]],{color:'#4CAF50',weight:3,opacity:.45,dashArray:'10,6'}).addTo(ly.transit);
 // M2 to Christianshavn
 L.polyline([[55.681,12.590],[55.677,12.595],[55.670,12.599],[55.663,12.596]],{color:'#4CAF50',weight:2.5,opacity:.35,dashArray:'6,8'}).addTo(ly.transit);
 // M4
-L.polyline([[55.6735,12.5645],[55.6768,12.576],[55.6785,12.583],[55.681,12.590],[55.683,12.593],[55.682,12.590],[55.687,12.596],[55.690,12.598]],{color:'#2196F3',weight:3,opacity:.5}).addTo(ly.transit);
+L.polyline([[55.6735,12.5645],[55.6768,12.576],[55.6785,12.583],[55.681,12.590],[55.683,12.593],[55.687,12.596],[55.690,12.598]],{color:'#2196F3',weight:3,opacity:.5}).addTo(ly.transit);
 // Metro stations
-[[55.6735,12.5645,'København H'],[55.681,12.590,'Kongens Nytorv'],[55.6768,12.576,'Rådhuspladsen'],[55.6785,12.583,'Gammel Strand'],[55.684,12.586,'Trianglen'],[55.682,12.590,'Østerport'],[55.677,12.546,'Frederiksberg'],[55.675,12.559,'Enghave Plads'],[55.677,12.595,'Christianshavn'],[55.6835,12.571,'Nørreport']].forEach(s=>L.circleMarker([s[0],s[1]],{radius:3.5,fillColor:'#fff',color:'#555',weight:1.5,fillOpacity:.9}).bindPopup('<div class="pt"><b>🚇 '+s[2]+'</b></div>').addTo(ly.transit));
+[[55.6735,12.5645,'København H'],[55.681,12.590,'Kongens Nytorv'],[55.6768,12.576,'Rådhuspladsen'],[55.6785,12.583,'Gammel Strand'],[55.684,12.586,'Trianglen'],[55.682,12.590,'Østerport'],[55.677,12.546,'Frederiksberg'],[55.675,12.559,'Enghave Plads'],[55.677,12.595,'Christianshavn'],[55.6843,12.5695,'Nørreport']].forEach(s=>L.circleMarker([s[0],s[1]],{radius:3.5,fillColor:'#fff',color:'#555',weight:1.5,fillOpacity:.9}).bindPopup('<div class="pt"><b>🚇 '+s[2]+'</b></div>').addTo(ly.transit));
 
-// HOTELS
-[{n:"Coco Hotel",la:55.6718,lo:12.5555,p:"~$350/pp",a:"Vesterbro",d:"Parisian-chic. Locals hang at café. Leafy courtyard.",u:"https://coco-hotel.com/"},
-{n:"Hotel SP34",la:55.6785,lo:12.57,p:"~$380/pp",a:"Latin Quarter",d:"Scandi-minimal. Rooftop terrace, wine bar. Steps from Strøget.",u:"https://www.brochner-hotels.com/hotel-sp34/"},
-{n:"Manon Les Suites",la:55.6798,lo:12.562,p:"~$450/pp",a:"Center",d:"Bali-jungle vibe. Indoor pool, tropical atrium. Wildest interiors in CPH.",u:"https://guldsmedenhotels.com/manon-les-suites/"}
+// HOTELS — exact geocoded
+[{n:"Coco Hotel",la:55.6724,lo:12.5566,p:"~$350/pp",a:"Vesterbro",d:"Parisian-chic. Locals hang at café. Leafy courtyard.",u:"https://coco-hotel.com/"},
+{n:"Hotel SP34",la:55.6788,lo:12.5672,p:"~$380/pp",a:"Latin Quarter",d:"Scandi-minimal. Rooftop terrace, wine bar. Steps from Strøget.",u:"https://www.brochner-hotels.com/hotel-sp34/"},
+{n:"Manon Les Suites",la:55.6804,lo:12.5612,p:"~$450/pp",a:"Center",d:"Bali-jungle vibe. Indoor pool, tropical atrium. Wildest interiors.",u:"https://guldsmedenhotels.com/manon-les-suites/"}
 ].forEach(h=>{
   L.marker([h.la,h.lo],{icon:mk('#ff6b6b',20),zIndexOffset:1000}).bindPopup('<div class="ph"><b>🏨 '+h.n+'</b><br>'+h.d+'<br><span class="tg tp">'+h.p+' · 3 nights</span><span class="tg ta">'+h.a+'</span><br><a href="'+h.u+'" target="_blank">Book →</a></div>').addTo(ly.hotels);
   L.marker([h.la,h.lo],{icon:lb(h.n),interactive:false}).addTo(ly.hotels);
 });
 
-// HOSTELS
-[{n:"Steel House ⭐",la:55.6722,lo:12.5655,p:"~$120/pp",a:"Central",d:"Pool, gym, cinema. Best hostel in CPH. Near Tivoli.",u:"https://www.steelhousecopenhagen.com/"},
-{n:"Generator",la:55.6835,lo:12.5905,p:"~$150/pp",a:"Adelgade",d:"Design hostel near Nyhavn. Bar, café, co-working.",u:"https://staygenerator.com/hostels/copenhagen"},
-{n:"Next House",la:55.6685,lo:12.56,p:"~$130/pp",a:"Vesterbro",d:"Modern, clean. Near Central Station. Bar + events.",u:"https://www.nexthousecopenhagen.com/"},
-{n:"Downtown Hostel",la:55.676,lo:12.5733,p:"~$140/pp",a:"Center",d:"Right on a canal in the absolute center.",u:"https://www.copenhagendowntown.com/"}
+// HOSTELS — exact geocoded
+[{n:"Steel House ⭐",la:55.6763,lo:12.5601,p:"~$120/pp",a:"Central",d:"Pool, gym, cinema. Best hostel in CPH. Near Tivoli.",u:"https://www.steelhousecopenhagen.com/"},
+{n:"Generator",la:55.6827,lo:12.5823,p:"~$150/pp",a:"Adelgade",d:"Design hostel near Kongens Nytorv. Bar, café.",u:"https://staygenerator.com/hostels/copenhagen"},
+{n:"Next House",la:55.6714,lo:12.5626,p:"~$130/pp",a:"Vesterbro",d:"Modern, clean. Near Central Station. Bar + events.",u:"https://www.nexthousecopenhagen.com/"},
+{n:"Downtown Hostel",la:55.6759,lo:12.5743,p:"~$140/pp",a:"Center",d:"Right on a canal in the absolute center.",u:"https://www.copenhagendowntown.com/"}
 ].forEach(h=>{
   L.marker([h.la,h.lo],{icon:mk('#ff9800',18),zIndexOffset:900}).bindPopup('<div class="po"><b>🛏️ '+h.n+'</b><br>'+h.d+'<br><span class="tg tb">'+h.p+' · 3 nights</span><span class="tg ta">'+h.a+'</span><br><a href="'+h.u+'" target="_blank">Book →</a></div>').addTo(ly.hostels);
   L.marker([h.la,h.lo],{icon:lb(h.n),interactive:false}).addTo(ly.hostels);
 });
 
-// SIGHTS
-[{n:"Nyhavn",la:55.68,lo:12.59,d:"Iconic colorful harbor. Bars, canal boats."},
-{n:"Tivoli Gardens",la:55.6735,lo:12.568,d:"1843 amusement park. Opens late March!"},
-{n:"The Little Mermaid",la:55.6929,lo:12.5998,d:"1913 bronze statue. Combine with Kastellet."},
-{n:"Rosenborg Castle",la:55.6859,lo:12.5773,d:"Renaissance castle + crown jewels."},
-{n:"Christiansborg",la:55.676,lo:12.579,d:"Parliament. Free tower — best city view."},
-{n:"Freetown Christiania",la:55.6735,lo:12.597,d:"Self-governing commune. Street art, unique vibe."},
-{n:"Amalienborg",la:55.684,lo:12.593,d:"Royal residence. Guard change at noon."},
-{n:"Rundetårn",la:55.6812,lo:12.5757,d:"Round Tower (1642). Spiral ramp. City views."},
-{n:"Strøget",la:55.678,lo:12.576,d:"Europe's longest pedestrian shopping street."},
-{n:"Kastellet",la:55.691,lo:12.595,d:"Star-shaped 17th-century fortress. Beautiful."},
-{n:"Designmuseum",la:55.686,lo:12.592,d:"Danish design history. Furniture, fashion."},
-{n:"Superkilen",la:55.6905,lo:12.5465,d:"Urban park in Nørrebro. Wild art + design."}
+// SIGHTS — exact geocoded
+[{n:"Nyhavn",la:55.6797,lo:12.5909,d:"Iconic colorful harbor. Bars, canal boats."},
+{n:"Tivoli Gardens",la:55.6747,lo:12.5657,d:"1843 amusement park. Opens late March!"},
+{n:"Little Mermaid",la:55.6929,lo:12.5993,d:"1913 bronze statue. Combine with Kastellet."},
+{n:"Rosenborg Castle",la:55.6862,lo:12.5765,d:"Renaissance castle + crown jewels."},
+{n:"Christiansborg",la:55.6768,lo:12.5799,d:"Parliament. Free tower — best city view."},
+{n:"Christiania",la:55.6739,lo:12.5968,d:"Self-governing commune. Street art, unique vibe."},
+{n:"Amalienborg",la:55.6845,lo:12.5936,d:"Royal residence. Guard change at noon."},
+{n:"Rundetårn",la:55.6813,lo:12.5758,d:"Round Tower (1642). Spiral ramp. City views."},
+{n:"Strøget",la:55.6800,lo:12.5834,d:"Europe's longest pedestrian shopping street."},
+{n:"Kastellet",la:55.6914,lo:12.5937,d:"Star-shaped 17th-century fortress. Beautiful."},
+{n:"Designmuseum",la:55.6866,lo:12.5928,d:"Danish design history. Furniture, fashion."},
+{n:"Superkilen",la:55.6997,lo:12.5424,d:"Urban park in Nørrebro. Wild art + design."}
 ].forEach(s=>{
   L.marker([s.la,s.lo],{icon:mk('#ffd93d',16),zIndexOffset:500}).bindPopup('<div class="ps"><b>📍 '+s.n+'</b><br>'+s.d+'</div>').addTo(ly.sights);
   L.marker([s.la,s.lo],{icon:lb(s.n),interactive:false}).addTo(ly.sights);
 });
 
-// RESTAURANTS
-[{n:"Absalon",la:55.668,lo:12.551,d:"Communal dinner in old church. 180 strangers, long tables. DKK 60 (€8). Book by 4pm.",c:"Community",p:"DKK 60-100"},
-{n:"Høst",la:55.684,lo:12.568,d:"New Nordic by Cofoco. Affordable tasting menu. Beautiful Norm Architects interior.",c:"New Nordic",p:"DKK 395"},
-{n:"Reffen Street Food",la:55.691,lo:12.606,d:"Huge open-air market. 50+ stalls. Waterfront sunsets. Best cheap eats.",c:"Street Food",p:"DKK 60-120"},
-{n:"Torvehallerne",la:55.6835,lo:12.5715,d:"Glass food halls. Smørrebrød, pastries, coffee. Essential lunch stop.",c:"Market",p:"DKK 50-120"},
-{n:"Poulette",la:55.688,lo:12.555,d:"Fried chicken from The Bear! Two sandwiches: spicy chicken or mapo tofu. Queue-worthy.",c:"Fried Chicken",p:"DKK 95"},
-{n:"Kødbyens Fiskebar",la:55.67,lo:12.551,d:"Seafood in the Meatpacking District. Raw bar, oysters, catch of the day. Industrial chic.",c:"Seafood",p:"DKK 200-400"},
-{n:"Hija de Sanchez",la:55.671,lo:12.552,d:"Tacos by ex-Noma pastry chef Rosio Sanchez. Small, legendary, Vesterbro.",c:"Mexican",p:"DKK 45-65"},
-{n:"Tommi's Burger",la:55.67,lo:12.55,d:"Icelandic burgers in Meatpacking. Quality fast food. Craft beers.",c:"Burgers",p:"DKK 99-119"},
-{n:"Madglad",la:55.671,lo:12.556,d:"Community dining in Vesterbro. All-you-can-eat DKK 85. Cozy, colorful.",c:"Community",p:"DKK 50-85"},
-{n:"La Neta",la:55.686,lo:12.56,d:"Good tacos in Nørrebro. 5 pieces DKK 120. Casual, tasty.",c:"Mexican",p:"DKK 120"},
-{n:"Bottega Barlie",la:55.685,lo:12.592,d:"Natural wine + Med plates. Sunny terrace. Creative crowd. Breakfast to late.",c:"Mediterranean",p:"DKK 85-200"},
-{n:"Admiralgade 26",la:55.678,lo:12.583,d:"Scandi-Japanese fusion. 5-course daily menu. Canal-side. Community dinners Wed.",c:"Fusion",p:"DKK 600"},
-{n:"RizRaz",la:55.6785,lo:12.574,d:"All-you-can-eat vegetarian buffet. Two locations. Great value for CPH.",c:"Vegetarian",p:"DKK 145-185"},
-{n:"Gasoline Grill",la:55.679,lo:12.580,d:"Cult burger spot. Former gas station. Short menu, long queues, worth it.",c:"Burgers",p:"DKK 100-150"}
+// RESTAURANTS — exact geocoded
+[{n:"Absalon",la:55.6654,lo:12.5503,d:"Communal dinner in old church. 180 strangers. DKK 60. Book by 4pm.",c:"Community",p:"DKK 60-100"},
+{n:"Høst",la:55.6834,lo:12.5662,d:"New Nordic. Affordable tasting menu. Norm Architects interior.",c:"New Nordic",p:"DKK 395"},
+{n:"Reffen",la:55.6931,lo:12.6099,d:"Huge open-air market. 50+ stalls. Waterfront sunsets.",c:"Street Food",p:"DKK 60-120"},
+{n:"Torvehallerne",la:55.6843,lo:12.5695,d:"Glass food halls. Smørrebrød, pastries, coffee. Essential.",c:"Market",p:"DKK 50-120"},
+{n:"Poulette",la:55.6889,lo:12.5549,d:"Fried chicken from The Bear! Spicy chicken or mapo tofu.",c:"Fried Chicken",p:"DKK 95"},
+{n:"Kødbyens Fiskebar",la:55.6679,lo:12.5593,d:"Seafood in Meatpacking. Raw bar, oysters, catch of day.",c:"Seafood",p:"DKK 200-400"},
+{n:"Hija de Sanchez",la:55.6689,lo:12.5585,d:"Tacos by ex-Noma pastry chef Rosio Sanchez. Legendary.",c:"Mexican",p:"DKK 45-65"},
+{n:"Tommi's Burger",la:55.6683,lo:12.5580,d:"Icelandic burgers in Meatpacking. Craft beers.",c:"Burgers",p:"DKK 99-119"},
+{n:"Madglad",la:55.6707,lo:12.5557,d:"Community dining in Vesterbro. All-you-can-eat DKK 85.",c:"Community",p:"DKK 50-85"},
+{n:"La Neta",la:55.6879,lo:12.5603,d:"Good tacos in Nørrebro. 5 pieces DKK 120.",c:"Mexican",p:"DKK 120"},
+{n:"Bottega Barlie",la:55.6872,lo:12.5855,d:"Natural wine + Med plates. Sunny terrace. Creative crowd.",c:"Mediterranean",p:"DKK 85-200"},
+{n:"Admiralgade 26",la:55.6776,lo:12.5821,d:"Scandi-Japanese fusion. 5-course daily menu. Canal-side.",c:"Fusion",p:"DKK 600"},
+{n:"RizRaz",la:55.6800,lo:12.5740,d:"All-you-can-eat vegetarian buffet. Great value.",c:"Vegetarian",p:"DKK 145-185"},
+{n:"Gasoline Grill",la:55.6832,lo:12.5851,d:"Cult burger spot. Former gas station. Worth the queue.",c:"Burgers",p:"DKK 100-150"}
 ].forEach(r=>{
   L.marker([r.la,r.lo],{icon:mk('#6bcb77',16),zIndexOffset:800}).bindPopup('<div class="pf"><b>🍽️ '+r.n+'</b><br>'+r.d+'<br><span class="tg tc">'+r.c+'</span><span class="tg tp">'+r.p+'</span></div>').addTo(ly.food);
   L.marker([r.la,r.lo],{icon:lb(r.n),interactive:false}).addTo(ly.food);
 });
 
-map.fitBounds([[55.662,12.540],[55.695,12.610]],{padding:[20,20]});
+map.fitBounds([[55.660,12.540],[55.700,12.615]],{padding:[20,20]});
 </script>
 </body>
 </html>

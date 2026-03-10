@@ -90,7 +90,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   </div>
 </div>
 <script>
-const map=L.map('map',{zoomControl:true}).setView([52.3680,4.8870],14);
+const map=L.map('map',{zoomControl:true}).setView([52.3700,4.8900],14);
 L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{attribution:'© OSM © CARTO',maxZoom:19}).addTo(map);
 
 const ly={hotels:L.layerGroup(),sights:L.layerGroup(),food:L.layerGroup(),transit:L.layerGroup(),heat:L.layerGroup(),zones:L.layerGroup()};
@@ -106,79 +106,79 @@ L.polygon([[52.3810,4.8770],[52.3810,4.8870],[52.3740,4.8870],[52.3730,4.8790],[
 L.polygon([[52.3600,4.8870],[52.3600,4.8970],[52.3520,4.8970],[52.3520,4.8870]],{...zs,color:'#ff9800',fillColor:'#ff9800'}).bindPopup('<b>De Pijp</b><br>Trendy, multicultural. Albert Cuyp Market, great restaurants, nightlife.').addTo(ly.zones);
 L.polygon([[52.3700,4.8600],[52.3700,4.8720],[52.3630,4.8720],[52.3630,4.8600]],{...zs,color:'#ffd93d',fillColor:'#ffd93d'}).bindPopup('<b>Oud-West / De Hallen</b><br>Foodhallen, new restaurants, creative studios.').addTo(ly.zones);
 L.polygon([[52.3740,4.8830],[52.3740,4.8890],[52.3690,4.8890],[52.3690,4.8830]],{...zs,color:'#4CAF50',fillColor:'#4CAF50'}).bindPopup('<b>Nine Streets</b><br>Boutique shopping, vintage, canal-side cafés.').addTo(ly.zones);
-L.polygon([[52.3890,4.8920],[52.3890,4.9080],[52.3810,4.9080],[52.3810,4.8920]],{...zs,color:'#2196F3',fillColor:'#2196F3'}).bindPopup('<b>Noord</b><br>Across the IJ. Free ferry. BAK restaurant, NDSM wharf, A\'DAM Tower.').addTo(ly.zones);
-L.polygon([[52.3760,4.8920],[52.3760,4.9030],[52.3700,4.9030],[52.3700,4.8920]],{...zs,color:'#9C27B0',fillColor:'#9C27B0'}).bindPopup('<b>Red Light / Chinatown</b><br>Oldest Chinatown in Europe. Hoi Tin, Nam Kee. Lively at night.').addTo(ly.zones);
+L.polygon([[52.3910,4.8850],[52.3910,4.9120],[52.3810,4.9120],[52.3810,4.8850]],{...zs,color:'#2196F3',fillColor:'#2196F3'}).bindPopup('<b>Noord</b><br>Across the IJ. Free ferry. BAK, Café Modern, A\'DAM Tower.').addTo(ly.zones);
+L.polygon([[52.3760,4.8920],[52.3760,4.9030],[52.3700,4.9030],[52.3700,4.8920]],{...zs,color:'#9C27B0',fillColor:'#9C27B0'}).bindPopup('<b>Red Light / Chinatown</b><br>Oldest Chinatown in Europe. Hoi Tin. Lively at night.').addTo(ly.zones);
 
 // HEAT MAP
 L.heatLayer([
-[52.3780,4.8810,.8],[52.3770,4.8830,.7],[52.3760,4.8820,.6],[52.3790,4.8800,.5],[52.3775,4.8790,.6],[52.3765,4.8840,.5],[52.3785,4.8825,.7],
-[52.3558,4.8924,.9],[52.3550,4.8910,.7],[52.3565,4.8940,.6],[52.3545,4.8930,.5],[52.3560,4.8900,.6],[52.3570,4.8920,.5],[52.3540,4.8915,.4],
-[52.3666,4.8678,.8],[52.3670,4.8690,.6],[52.3660,4.8670,.5],[52.3675,4.8665,.5],[52.3665,4.8700,.4],[52.3655,4.8680,.5],
+[52.3800,4.8870,.8],[52.3780,4.8830,.7],[52.3760,4.8820,.6],[52.3790,4.8800,.5],[52.3775,4.8790,.6],[52.3765,4.8840,.5],[52.3785,4.8825,.7],
+[52.3556,4.8942,.9],[52.3550,4.8910,.7],[52.3565,4.8940,.6],[52.3545,4.8930,.5],[52.3560,4.8900,.6],[52.3570,4.8920,.5],[52.3540,4.8915,.4],
+[52.3665,4.8686,.8],[52.3670,4.8690,.6],[52.3660,4.8670,.5],[52.3675,4.8665,.5],[52.3665,4.8700,.4],[52.3655,4.8680,.5],
 [52.3710,4.8840,.6],[52.3720,4.8850,.5],[52.3700,4.8830,.5],[52.3730,4.8860,.4],[52.3715,4.8870,.5],
-[52.3643,4.8828,.7],[52.3650,4.8840,.5],[52.3640,4.8815,.4],
-[52.3600,4.8852,.5],[52.3590,4.8840,.4],[52.3585,4.8860,.4],
-[52.3731,4.8932,.5],[52.3740,4.8940,.4],[52.3725,4.8920,.4],
-[52.3735,4.8970,.6],[52.3740,4.8960,.5],[52.3730,4.8980,.4],
-[52.3855,4.8950,.5],[52.3860,4.8970,.4],[52.3850,4.9010,.5],
+[52.3640,4.8828,.7],[52.3650,4.8840,.5],[52.3640,4.8815,.4],
+[52.3596,4.8843,.5],[52.3590,4.8840,.4],[52.3580,4.8813,.4],
+[52.3731,4.8924,.5],[52.3740,4.8940,.4],[52.3725,4.8920,.4],
+[52.3755,4.9011,.6],[52.3740,4.8960,.5],[52.3730,4.8980,.4],
+[52.3865,4.9090,.5],[52.3906,4.8852,.4],[52.3838,4.9021,.5],
 ],{radius:35,blur:25,maxZoom:16,max:1,gradient:{0.2:'#00ff0033',0.4:'#adff2f55',0.6:'#ffff0077',0.8:'#ff990099',1:'#ff0000aa'}}).addTo(ly.heat);
 
 // TRANSIT
 [[[[52.3917,4.903],[52.3893,4.9218],[52.3791,4.9003],[52.3706,4.8937],[52.3627,4.8896],[52.3554,4.892]],'#2196F3',4,.6,null],
-[[[52.3791,4.9003],[52.3755,4.9],[52.3701,4.902],[52.364,4.906],[52.351,4.907],[52.345,4.9185]],'#E91E63',3,.5,null],
-[[[52.3791,4.9003],[52.3773,4.893],[52.374,4.887],[52.37,4.881],[52.3643,4.8828],[52.36,4.8852],[52.3584,4.8811],[52.358,4.875],[52.3575,4.8686]],'#4CAF50',2.5,.45,'8,6'],
-[[[52.3791,4.9003],[52.3773,4.893],[52.3755,4.886],[52.3752,4.884],[52.374,4.879],[52.37,4.87],[52.3668,4.868],[52.3656,4.8637]],'#FF9800',2.5,.45,'8,6'],
-[[[52.381,4.9003],[52.3844,4.9013]],'#00BCD4',2.5,.6,'6,8']
+[[[52.3791,4.9003],[52.3755,4.9],[52.3701,4.902],[52.364,4.906],[52.3538,4.9118],[52.345,4.9185]],'#E91E63',3,.5,null],
+[[[52.3791,4.9003],[52.3773,4.893],[52.374,4.887],[52.37,4.881],[52.3640,4.8828],[52.3597,4.8843],[52.3579,4.8813],[52.3572,4.8641]],'#4CAF50',2.5,.45,'8,6'],
+[[[52.3791,4.9003],[52.3773,4.893],[52.3753,4.8842],[52.374,4.879],[52.37,4.87],[52.3675,4.8683],[52.3663,4.8598]],'#FF9800',2.5,.45,'8,6'],
+[[[52.3810,4.9003],[52.3838,4.9023]],'#00BCD4',2.5,.6,'6,8']
 ].forEach(t=>L.polyline(t[0],{color:t[1],weight:t[2],opacity:t[3],dashArray:t[4]}).addTo(ly.transit));
-[[52.3917,4.903,'Noord'],[52.3791,4.9003,'Centraal'],[52.3706,4.8937,'Rokin'],[52.3627,4.8896,'Vijzelgracht'],[52.3554,4.892,'De Pijp'],[52.3701,4.902,'Waterlooplein'],[52.351,4.907,'Wibautstraat']].forEach(s=>L.circleMarker([s[0],s[1]],{radius:3.5,fillColor:'#fff',color:'#555',weight:1.5,fillOpacity:.9}).bindPopup('<div class="pt"><b>🚇 '+s[2]+'</b></div>').addTo(ly.transit));
+[[52.3917,4.903,'Noord'],[52.3791,4.9003,'Centraal'],[52.3706,4.8937,'Rokin'],[52.3627,4.8896,'Vijzelgracht'],[52.3554,4.892,'De Pijp'],[52.3701,4.902,'Waterlooplein'],[52.3538,4.9118,'Wibautstraat']].forEach(s=>L.circleMarker([s[0],s[1]],{radius:3.5,fillColor:'#fff',color:'#555',weight:1.5,fillOpacity:.9}).bindPopup('<div class="pt"><b>🚇 '+s[2]+'</b></div>').addTo(ly.transit));
 
-// HOTELS
-[{n:"Sir Adam",la:52.3844,lo:4.9013,p:"~$530/pp",a:"Noord",d:"A'DAM Tower. Free ferry from Central.",u:"https://www.sirhotels.com/en/adam/"},
-{n:"Hotel De Hallen",la:52.3668,lo:4.868,p:"~$490/pp",a:"Oud-West",d:"1902 tram depot. Foodhallen in building.",u:"https://www.hoteldehallen.com/en"},
-{n:"Volkshotel",la:52.351,lo:4.907,p:"~$330/pp",a:"East",d:"Rooftop hot tubs, nightclubs. Metro outside.",u:"https://www.volkshotel.nl/en"},
-{n:"The Hoxton",la:52.375,lo:4.885,p:"~$425/pp",a:"Center",d:"Canal houses on Herengracht. Walk everywhere.",u:"https://thehoxton.com/amsterdam/"},
-{n:"Hotel Not Hotel",la:52.3656,lo:4.8637,p:"~$290/pp",a:"West",d:"Tram carriage beds, secret bookcases.",u:"https://www.hotelnothotel.com"},
-{n:"Andaz",la:52.3653,lo:4.883,p:"~$670/pp",a:"Center",d:"Marcel Wanders design. Hyatt.",u:"https://www.hyatt.com/andaz/amsaz-andaz-amsterdam-prinsengracht"},
-{n:"art'otel",la:52.3785,lo:4.9022,p:"~$390/pp",a:"Center",d:"Across from Central. Pool + sauna.",u:"https://artotel.com/en/hotels/amsterdam/central-amsterdam/"}
+// HOTELS — exact geocoded coordinates
+[{n:"Sir Adam",la:52.3838,lo:4.9023,p:"~$530/pp",a:"Noord",d:"A'DAM Tower. Free ferry from Central.",u:"https://www.sirhotels.com/en/adam/"},
+{n:"Hotel De Hallen",la:52.3675,lo:4.8683,p:"~$490/pp",a:"Oud-West",d:"1902 tram depot. Foodhallen in building.",u:"https://www.hoteldehallen.com/en"},
+{n:"Volkshotel",la:52.3538,lo:4.9118,p:"~$330/pp",a:"East",d:"Rooftop hot tubs, nightclubs. Metro outside.",u:"https://www.volkshotel.nl/en"},
+{n:"The Hoxton",la:52.3718,lo:4.8874,p:"~$425/pp",a:"Center",d:"Canal houses on Herengracht. Walk everywhere.",u:"https://thehoxton.com/amsterdam/"},
+{n:"Hotel Not Hotel",la:52.3663,lo:4.8598,p:"~$290/pp",a:"West",d:"Tram carriage beds, secret bookcases.",u:"https://www.hotelnothotel.com"},
+{n:"Andaz",la:52.3679,lo:4.8829,p:"~$670/pp",a:"Center",d:"Marcel Wanders design. Hyatt.",u:"https://www.hyatt.com/andaz/amsaz-andaz-amsterdam-prinsengracht"},
+{n:"art'otel",la:52.3776,lo:4.8972,p:"~$390/pp",a:"Center",d:"Near Central. Art-filled. Pool + sauna.",u:"https://artotel.com/en/hotels/amsterdam/central-amsterdam/"}
 ].forEach(h=>{
   L.marker([h.la,h.lo],{icon:mk('#ff6b6b',20),zIndexOffset:1000}).bindPopup('<div class="ph"><b>🏨 '+h.n+'</b><br>'+h.d+'<br><span class="tg tp">'+h.p+'</span><span class="tg ta">'+h.a+'</span><br><a href="'+h.u+'" target="_blank">Book →</a></div>').addTo(ly.hotels);
   L.marker([h.la,h.lo],{icon:lb(h.n),interactive:false}).addTo(ly.hotels);
 });
 
-// SIGHTS
-[{n:"Dam Square",la:52.3731,lo:4.8932,d:"City center · Royal Palace"},
-{n:"Anne Frank House",la:52.3752,lo:4.884,d:"Book tickets weeks ahead"},
-{n:"Rijksmuseum",la:52.36,lo:4.8852,d:"Rembrandt's Night Watch"},
-{n:"Van Gogh Museum",la:52.3584,lo:4.8811,d:"Largest Van Gogh collection"},
-{n:"Vondelpark",la:52.358,lo:4.8686,d:"Amsterdam's chill park"},
-{n:"Red Light District",la:52.3724,lo:4.8981,d:"De Wallen — iconic at night"},
-{n:"Heineken Experience",la:52.3579,lo:4.8919,d:"Brewery tour · book online"},
-{n:"A'DAM Lookout",la:52.3843,lo:4.9,d:"Swing over the edge"},
-{n:"Nine Streets",la:52.371,lo:4.884,d:"Boutique shopping + vintage"},
-{n:"Leidseplein",la:52.3643,lo:4.8828,d:"Nightlife hub"}
+// SIGHTS — exact geocoded coordinates
+[{n:"Dam Square",la:52.3731,lo:4.8924,d:"City center · Royal Palace"},
+{n:"Anne Frank House",la:52.3753,lo:4.8842,d:"Book tickets weeks ahead"},
+{n:"Rijksmuseum",la:52.3597,lo:4.8843,d:"Rembrandt's Night Watch"},
+{n:"Van Gogh Museum",la:52.3579,lo:4.8813,d:"Largest Van Gogh collection"},
+{n:"Vondelpark",la:52.3572,lo:4.8641,d:"Amsterdam's chill park"},
+{n:"Red Light District",la:52.3703,lo:4.8958,d:"De Wallen — iconic at night"},
+{n:"Heineken Experience",la:52.3578,lo:4.8918,d:"Brewery tour · book online"},
+{n:"A'DAM Lookout",la:52.3838,lo:4.9021,d:"Swing over the edge"},
+{n:"Nine Streets",la:52.3703,lo:4.8858,d:"Boutique shopping + vintage"},
+{n:"Leidseplein",la:52.3640,lo:4.8828,d:"Nightlife hub"}
 ].forEach(s=>{
   L.marker([s.la,s.lo],{icon:mk('#ffd93d',16),zIndexOffset:500}).bindPopup('<div class="ps"><b>📍 '+s.n+'</b><br>'+s.d+'</div>').addTo(ly.sights);
   L.marker([s.la,s.lo],{icon:lb(s.n),interactive:false}).addTo(ly.sights);
 });
 
-// RESTAURANTS
-[{n:"Foodhallen",la:52.3666,lo:4.8678,d:"Indoor food market — 20+ vendors. Everything from bánh mì to burgers.",c:"Market",p:"€8-15"},
-{n:"BAK",la:52.3858,lo:4.892,d:"Minimalist warehouse on the IJ. Veg-forward set menus, great wine. TimeOut #1.",c:"Fine Dining",p:"€65-95"},
-{n:"Hoi Tin",la:52.3735,lo:4.897,d:"Best Cantonese in Amsterdam. Chinatown institution. Locals' pick.",c:"Cantonese",p:"€20-30"},
-{n:"De Kas",la:52.356,lo:4.923,d:"Farm-to-table in a 1926 greenhouse. Grows its own herbs. Special.",c:"Fine Dining",p:"€50-92"},
-{n:"Rijks",la:52.3595,lo:4.885,d:"Dutch classics at the Rijksmuseum. Great lunch stop between museums.",c:"Dutch",p:"€30-45"},
-{n:"Koevoet",la:52.378,lo:4.882,d:"Classic Jordaan café with creative seasonal menu. Feels like home.",c:"Modern Dutch",p:"€25-40"},
-{n:"Café Modern",la:52.387,lo:4.9,d:"Noord pioneer. Surprise tasting menu. Adventurous wine pairing.",c:"Modern European",p:"€50-70"},
-{n:"Albert Cuyp Market",la:52.3558,lo:4.8924,d:"Biggest outdoor market. Stroopwafels, herring, kibbeling. Cheap lunch.",c:"Street Food",p:"€3-8"},
-{n:"Bar Lusconi",la:52.37,lo:4.865,d:"Italian in West. Handmade pasta, great cocktails. Local favorite.",c:"Italian",p:"€20-35"},
-{n:"Brasserie Van Baerle",la:52.3575,lo:4.88,d:"Museum District classic. French-Dutch brasserie. Terrace.",c:"Brasserie",p:"€25-40"},
-{n:"Kaagman & Kortekaas",la:52.376,lo:4.897,d:"Michelin bistronomy. Nose-to-tail. Surprise tasting menu.",c:"Fine Dining",p:"€50-70"},
-{n:"Flore (2⭐)",la:52.3665,lo:4.894,d:"2 Michelin stars. Canal-side. Veg-led. Special occasion.",c:"Fine Dining",p:"€150-250"}
+// RESTAURANTS — exact geocoded coordinates
+[{n:"Foodhallen",la:52.3665,lo:4.8686,d:"Indoor food market — 20+ vendors. Bánh mì to burgers.",c:"Market",p:"€8-15"},
+{n:"BAK",la:52.3906,lo:4.8852,d:"Minimalist warehouse on the IJ. Veg-forward set menus. TimeOut #1.",c:"Fine Dining",p:"€65-95"},
+{n:"Hoi Tin",la:52.3755,lo:4.9011,d:"Best Cantonese in Amsterdam. Chinatown institution. Locals' pick.",c:"Cantonese",p:"€20-30"},
+{n:"De Kas",la:52.3523,lo:4.9306,d:"Farm-to-table in a 1926 greenhouse. Grows its own herbs.",c:"Fine Dining",p:"€50-92"},
+{n:"Rijks",la:52.3596,lo:4.8843,d:"Dutch classics at the Rijksmuseum. Great lunch stop.",c:"Dutch",p:"€30-45"},
+{n:"Koevoet",la:52.3804,lo:4.8872,d:"Classic Jordaan café with creative seasonal menu.",c:"Modern Dutch",p:"€25-40"},
+{n:"Café Modern",la:52.3865,lo:4.9090,d:"Noord pioneer. Surprise tasting menu. Great wine pairing.",c:"Modern European",p:"€50-70"},
+{n:"Albert Cuyp Market",la:52.3556,lo:4.8942,d:"Biggest outdoor market. Stroopwafels, herring, kibbeling.",c:"Street Food",p:"€3-8"},
+{n:"Bar Lusconi",la:52.3743,lo:4.8728,d:"Italian in West. Handmade pasta, great cocktails.",c:"Italian",p:"€20-35"},
+{n:"Brasserie Van Baerle",la:52.3539,lo:4.8813,d:"Museum District classic. French-Dutch brasserie. Terrace.",c:"Brasserie",p:"€25-40"},
+{n:"Kaagman & Kortekaas",la:52.3748,lo:4.8924,d:"Michelin bistronomy. Nose-to-tail. Surprise tasting menu.",c:"Fine Dining",p:"€50-70"},
+{n:"Flore (2⭐)",la:52.3677,lo:4.8943,d:"2 Michelin stars. Canal-side. Veg-led. Special occasion.",c:"Fine Dining",p:"€150-250"}
 ].forEach(r=>{
   L.marker([r.la,r.lo],{icon:mk('#6bcb77',16),zIndexOffset:800}).bindPopup('<div class="pf"><b>🍽️ '+r.n+'</b><br>'+r.d+'<br><span class="tg tc">'+r.c+'</span><span class="tg tp">'+r.p+'</span></div>').addTo(ly.food);
   L.marker([r.la,r.lo],{icon:lb(r.n),interactive:false}).addTo(ly.food);
 });
 
-map.fitBounds([[52.345,4.855],[52.392,4.925]],{padding:[20,20]});
+map.fitBounds([[52.345,4.855],[52.395,4.935]],{padding:[20,20]});
 </script>
 </body>
 </html>
