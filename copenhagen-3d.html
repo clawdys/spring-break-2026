@@ -307,8 +307,8 @@ function addHeatMap(){
     const e=viewer.entities.add({
       position:Cesium.Cartesian3.fromDegrees(hz.lon,hz.lat,1),
       ellipse:{
-        semiMajorAxis:hz.rx,
-        semiMinorAxis:hz.ry,
+        semiMajorAxis:Math.max(hz.rx,hz.ry),
+        semiMinorAxis:Math.min(hz.rx,hz.ry),
         material:Cesium.Color.fromCssColorString(hz.c),
         height:1,
         outline:false

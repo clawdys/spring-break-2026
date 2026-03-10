@@ -270,7 +270,7 @@ hoods.forEach(function(hood){
 heatZones.forEach(function(z){
   layers.heatmap.push(viewer.entities.add({show:false,
     position:Cesium.Cartesian3.fromDegrees(z[1],z[0],0),
-    ellipse:{semiMajorAxis:z[2],semiMinorAxis:z[3],
+    ellipse:{semiMajorAxis:Math.max(z[2],z[3]),semiMinorAxis:Math.min(z[2],z[3]),
     material:new Cesium.Color(z[4]/255,z[5]/255,z[6]/255,z[7]),
     heightReference:Cesium.HeightReference.CLAMP_TO_GROUND}
   }));
